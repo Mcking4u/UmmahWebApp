@@ -21,22 +21,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { Send as SendIcon } from "@mui/icons-material";
-import { makeStyles } from  "@mui/styles";
 
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginBottom: theme.spacing(2),
-  },
- 
-  form: {
-    padding: theme.spacing(2),
-  },
-  tableContainer: {
-    maxHeight: '400px',
-    overflowY: 'auto',
-  },
-
-}));
 
 const announcements = [
   { id: 1, message: 'Example announcement', date: '2024-07-02' },
@@ -51,16 +36,15 @@ const Announcements = () => {
     dispatch(updateNavState({headerText: "Announcements", activeLink:"/announcements"}))
   }, [] );
 
-  const classes = useStyles();
 
   return (
-    <div className={classes.root}>
+    <div >
        <Typography variant="h6" color="inherit">
             Make Announcements
           </Typography>
 
-          <Paper className={classes.paper} elevation={3}>
-          <form className={classes.form} noValidate autoComplete="off">
+          <Paper sx={{ mb:2,}} elevation={3}>
+          <form style={{padding:'10px'}} noValidate autoComplete="off">
             <TextField
               id="announcement-message"
               label="Announcement Message"
@@ -105,7 +89,8 @@ const Announcements = () => {
         <Typography variant="h6" gutterBottom>
           Announcement History
         </Typography>
-        <Paper className={classes.tableContainer}>
+        <Paper sx={{ maxHeight: '400px',
+    overflowY: 'auto',}}>
           <TableContainer>
             <Table>
               <TableHead>

@@ -9,46 +9,10 @@ import {
   Box,
   CircularProgress,
 } from "@mui/material";
-import { makeStyles } from "@mui/styles";
 import logoImage from "/logo.svg"; // Import your logo image
-import {useNavigate} from "react-router-dom";
-
-const useStyles = makeStyles((theme) => ({
-  page: {
-    backgroundColor: "#333", // Set dark background color for the page
-    minHeight: "100vh", // Ensure full height of the viewport
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  card: {
-    width: "100%",
-    maxWidth: 400,
-    padding: theme.spacing(4),
-    backgroundColor: theme.palette.background.default,
-    color: theme.palette.text.primary,
-  },
-  form: {
-    width: "100%", // Fix IE 11 issue.
-    marginTop: theme.spacing(1),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-  errorText: {
-    color: "red",
-    marginBottom: theme.spacing(1),
-    textAlign: "left",
-  },
-  logo: {
-    width: 80,
-    height: 80,
-    marginBottom: theme.spacing(2),
-  },
-}));
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
-  const classes = useStyles();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -84,11 +48,11 @@ const LoginPage = () => {
 
     if (validateForm()) {
       // Perform login action or API call here
-      setTimeout( () => {
+      setTimeout(() => {
         navigate("/");
-      }, 3000 );
+      }, 3000);
     } else {
-     setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -101,16 +65,32 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className={classes.page}>
-      <Card className={classes.card}>
+    <div
+      style={{
+        backgroundColor: "#333",
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Card sx={{ width: "100%", maxWidth: 400, p: 4, color: "primary" }}>
         <CardContent>
           <Box sx={{ width: "100%", textAlign: "center" }}>
-            <img src={logoImage} alt="Logo" className={classes.logo} />
+            <img
+              src={logoImage}
+              alt="Logo"
+              style={{ width: 80, height: 'auto', maxWidth:80, mb: 2 }}
+            />
           </Box>
           <Typography component="h1" variant="h5" align="center">
             Sign In
           </Typography>
-          <form className={classes.form} onSubmit={handleSubmit} noValidate>
+          <form
+            style={{ width: "100%", mt: 1 }}
+            onSubmit={handleSubmit}
+            noValidate
+          >
             <TextField
               variant="outlined"
               margin="normal"
@@ -127,7 +107,7 @@ const LoginPage = () => {
               helperText={emailError}
               onKeyDown={handleKeyDown}
             />
-          
+
             <TextField
               variant="outlined"
               margin="normal"
@@ -144,7 +124,7 @@ const LoginPage = () => {
               helperText={passwordError}
               onKeyDown={handleKeyDown}
             />
-          
+
             <Button
               type="submit"
               fullWidth
@@ -152,7 +132,6 @@ const LoginPage = () => {
               color="primary"
               disabled={loading}
               sx={{ mt: 2 }}
-              className={classes.submit}
             >
               {loading ? <CircularProgress /> : " Sign In"}
             </Button>

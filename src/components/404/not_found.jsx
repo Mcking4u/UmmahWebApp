@@ -1,27 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { makeStyles } from '@mui/styles';
 import { Typography, Button, Container, Grid } from '@mui/material';
 import { ErrorOutline } from '@mui/icons-material';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    height: '70vh',
+
+
+const NotFoundPage = () => {
+
+  return (
+    <Container sx={{ height: '70vh',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    textAlign: 'center',
-  },
-  button: {
-    marginTop: theme.spacing(2),
-  },
-}));
-
-const NotFoundPage = () => {
-  const classes = useStyles();
-
-  return (
-    <Container className={classes.root} maxWidth="md">
+    textAlign: 'center',}} maxWidth="md">
       <Grid container spacing={2}
       sx={{widht:"100%", height:"100%", display:"flex", justifyContent:"center", alignItems:"center"}}
       >
@@ -38,7 +29,7 @@ const NotFoundPage = () => {
             color="primary"
             component={Link}
             to="/"
-            className={classes.button}
+            sx={{mt:2}}
           >
             Go to Home Page
           </Button>
