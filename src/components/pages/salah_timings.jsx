@@ -45,7 +45,7 @@ function SalahTimings() {
     dispatch(
       updateNavState({
         headerText: "Salah Timings",
-        activeLink: "/salah-timings",
+        activeLink: "/masjid/salah-timings",
       })
     );
     fetchSalahTimings();

@@ -151,7 +151,7 @@ function NavBar(props) {
               },
               mb: 1,
             }}
-            onClick={() => navigateTo("/")}
+            onClick={() => navigateTo("/masjid/")}
           >
             <ListItemIcon>
               <Dashboard style={{ fill: activeLink === "/" ? "#019B8F" : "" }} />
@@ -161,7 +161,7 @@ function NavBar(props) {
         </ListItem>
         <ListItem disablePadding>
           <ListItemButton
-            selected={activeLink === "/details"}
+            selected={activeLink === "/masjid/details"}
             sx={{
               "&:hover": {
                 borderRadius: "12px",
@@ -171,17 +171,17 @@ function NavBar(props) {
               },
               mb: 1,
             }}
-            onClick={() => navigateTo("/details")}
+            onClick={() => navigateTo("/masjid/details")}
           >
             <ListItemIcon>
-              <Mosque style={{ fill: activeLink === "/details" ? "#019B8F" : "" }} />
+              <Mosque style={{ fill: activeLink === "/masjid/details" ? "#019B8F" : "" }} />
             </ListItemIcon>
             <ListItemText primary={"Masjid Details"} />
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
           <ListItemButton
-            selected={activeLink === "/salah-timings"}
+            selected={activeLink === "/masjid/salah-timings"}
             sx={{
               "&:hover": {
                 borderRadius: "12px",
@@ -191,17 +191,17 @@ function NavBar(props) {
               },
               mb: 1,
             }}
-            onClick={() => navigateTo("/salah-timings")}
+            onClick={() => navigateTo("/masjid/salah-timings")}
           >
             <ListItemIcon>
-              <Timeline style={{ fill: activeLink === "/salah-timings" ? "#019B8F" : "" }} />
+              <Timeline style={{ fill: activeLink === "/masjid/salah-timings" ? "#019B8F" : "" }} />
             </ListItemIcon>
             <ListItemText primary={"Salah Timings"} />
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
           <ListItemButton
-            selected={activeLink === "/announcements"}
+            selected={activeLink === "/masjid/announcements"}
             sx={{
               "&:hover": {
                 borderRadius: "12px",
@@ -211,10 +211,10 @@ function NavBar(props) {
               },
               mb: 1,
             }}
-            onClick={() => navigateTo("/announcements")}
+            onClick={() => navigateTo("/masjid/announcements")}
           >
             <ListItemIcon>
-              <AnnouncementOutlined style={{ fill: activeLink === "/announcements" ? "#019B8F" : "" }} />
+              <AnnouncementOutlined style={{ fill: activeLink === "/masjid/announcements" ? "#019B8F" : "" }} />
             </ListItemIcon>
             <ListItemText primary={"Announcements"} />
           </ListItemButton>
@@ -229,7 +229,7 @@ function NavBar(props) {
             name={userData.name || "Admin"}
             onLogout={() => {
               localStorage.setItem(NetworkHandler.loginTokenKey, "");
-              navigateTo("/login");
+              navigateTo("/");
             }}
           />
         )}

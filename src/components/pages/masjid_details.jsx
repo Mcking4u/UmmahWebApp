@@ -17,7 +17,7 @@ function MasjidDetails() {
 
   useEffect(() => {
     dispatch(
-      updateNavState({ headerText: "Masjid Details", activeLink: "/details" })
+      updateNavState({ headerText: "Masjid Details", activeLink: "/masjid/details" })
     );
 
     // Fetch Masjid details on component mount

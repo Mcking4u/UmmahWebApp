@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const host = "http://127.0.0.1:8000";
-//const host = "https://objects.ummah-app.com";
+// const host = "http://127.0.0.1:8000";
+const host = "https://objects.ummah-app.com";
 const baseUrls = {
   landing: `${host}/landing/api`,
   masjid: `${host}/masjid/api`,
@@ -20,7 +20,7 @@ class NetworkHandler {
       (error) => {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem(NetworkHandler.loginTokenKey);
-          alert("Your session expired, please login again");
+          // alert("Either your session expired or you dont have sufficient permissions to view this page, please login again");
           window.location.reload();
         } else if (error.response && error.response.status === 500) {
           alert("Something went wrong, please try again later...");

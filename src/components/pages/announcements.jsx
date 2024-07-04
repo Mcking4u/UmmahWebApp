@@ -31,7 +31,7 @@ const Announcements = () => {
   const [announcementDate, setAnnouncementDate] = useState('');
 
   useEffect(() => {
-    dispatch(updateNavState({ headerText: "Announcements", activeLink: "/announcements" }));
+    dispatch(updateNavState({ headerText: "Announcements", activeLink: "/masjid/announcements" }));
     fetchAnnouncements();
   }, []);
 
