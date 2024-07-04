@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { updateNavState } from "../../redux/navSlice";
 import {
@@ -10,15 +10,43 @@ import {
   Alert,
 } from "@mui/material";
 import SlideTransition from "../animation/slide_transition";
+import NetworkHandler from "../../network/network_handler";
 
 function MasjidDetails() {
   const dispatch = useDispatch();
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(
       updateNavState({ headerText: "Masjid Details", activeLink: "/details" })
     );
-  }, []);
+
+    // Fetch Masjid details on component mount
+    const fetchMasjidDetails = async () => {
+      try {
+        let data = await new NetworkHandler().getMasjidProfile();
+        data[0]['Password'] = "";
+        setMasjidDetails(data[0]);
+      } catch (error) {
+        console.error("Error fetching Masjid details:", error);
+      }
+    };
+
+    fetchMasjidDetails();
+  }, [dispatch]);
+
+  const [masjidDetails, setMasjidDetails] = useState({
+    name: "",
+    phone_number: "",
+    email_address: "",
+    address_street: "",
+    address_city: "",
+    address_postal_code: "",
+    address_country: "",
+    thumbnail_url: "",
+    latitude: "",
+    longitude: "",
+    Password: "",
+  });
 
   const [masjidDetailsEditable, setMasjidDetailsEditable] = useState(false);
   const [contactPersonEditable, setContactPersonEditable] = useState(false);
@@ -31,16 +59,20 @@ function MasjidDetails() {
     }
   };
 
-  const handleSubmitClick = (section) => {
-    // Handle form submission logic for the respective section
-
+  const handleSubmitClick = async (section) => {
     if (section === "masjidDetails") {
-      setMasjidDetailsEditable(false);
-      setToastState({
-        open: true,
-        vertical: "top",
-        horizontal: "right",
-      });
+      try {
+        setMasjidDetailsEditable(false);
+        setToastState({
+          open: true,
+          vertical: "top",
+          horizontal: "right",
+        });
+        await new NetworkHandler().editMasjidProfile(masjidDetails);
+      
+      } catch (error) {
+        alert("Error updating Masjid details:");
+      }
     } else if (section === "contactPerson") {
       setContactPersonEditable(false);
       setToastState({
@@ -51,7 +83,15 @@ function MasjidDetails() {
     }
   };
 
-  const [toastState, setToastState] = React.useState({
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setMasjidDetails((prevDetails) => ({
+      ...prevDetails,
+      [name]: value,
+    }));
+  };
+
+  const [toastState, setToastState] = useState({
     open: false,
     vertical: "top",
     horizontal: "center",
@@ -66,20 +106,24 @@ function MasjidDetails() {
       </Typography>
       <Grid container spacing={2}>
         {[
-          "Masjid Name",
-          "Contact #",
-          "Email",
-          "Address",
-          "City",
-          "Postal Code",
-          "Country",
-          "Thumbnail",
-          "Latitude",
-          "Longitude",
-        ].map((label) => (
-          <Grid item xs={12} sm={6} key={label}>
+          { label: "Masjid Name", name: "name" },
+          { label: "Contact #", name: "phone_number" },
+          { label: "Email", name: "email_address" },
+          { label: "Address", name: "address_street" },
+          { label: "City", name: "address_city" },
+          { label: "Postal Code", name: "address_postal_code" },
+          { label: "Country", name: "address_country" },
+          { label: "Thumbnail", name: "thumbnail_url" },
+          { label: "Latitude", name: "latitude" },
+          { label: "Longitude", name: "longitude" },
+          { label: "Password", name: "Password" },
+        ].map((field) => (
+          <Grid item xs={12} sm={6} key={field.name}>
             <TextField
-              label={label}
+              label={field.label}
+              name={field.name}
+              value={masjidDetails[field.name] || ""}
+              onChange={handleInputChange}
               fullWidth
               disabled={!masjidDetailsEditable}
             />
@@ -147,9 +191,7 @@ function MasjidDetails() {
             horizontal: "right",
           })
         }
-      >
-        {/* <Alert severity="success">Changes Saved!</Alert> */}
-      </Snackbar>
+      />
     </div>
   );
 }

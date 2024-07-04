@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { updateNavState } from '../../redux/navSlice';
 import SlideTransition from '../animation/slide_transition';
+import NetworkHandler from '../../network/network_handler';
 import {
   AppBar,
   Toolbar,
@@ -22,75 +23,110 @@ import {
 } from "@mui/material";
 import { Send as SendIcon } from "@mui/icons-material";
 
-
-const announcements = [
-  { id: 1, message: 'Example announcement', date: '2024-07-02' },
-  // Add more announcements as needed
-];
-
 const Announcements = () => {
-
   const dispatch = useDispatch();
+  const [announcements, setAnnouncements] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [announcementMessage, setAnnouncementMessage] = useState('');
+  const [announcementDate, setAnnouncementDate] = useState('');
 
-  React.useEffect( () => {
-    dispatch(updateNavState({headerText: "Announcements", activeLink:"/announcements"}))
-  }, [] );
+  useEffect(() => {
+    dispatch(updateNavState({ headerText: "Announcements", activeLink: "/announcements" }));
+    fetchAnnouncements();
+  }, []);
 
+  const fetchAnnouncements = async () => {
+    setLoading(true);
+    try {
+      const data = await new NetworkHandler().getAnnouncements();
+      const formattedAnnouncements = data.announcements.map(item => ({
+        id: item.announcement_time, // Use a unique identifier here
+        message: item.announcement_desc,
+        date: item.announcement_time
+      }));
+      setAnnouncements(formattedAnnouncements);
+    } catch (error) {
+      console.error('Failed to fetch announcements', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSendAnnouncement = async () => {
+    if (!announcementMessage || !announcementDate) return;
+    setLoading(true);
+    try {
+      /*
+      {
+        text: announcementMessage,
+        date: announcementDate
+      }
+      */
+      await new NetworkHandler().sendAnnouncement(announcementMessage);
+      fetchAnnouncements();
+    } catch (error) {
+      console.error('Failed to send announcement', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div >
-       <Typography variant="h6" color="inherit">
-            Make Announcements
-          </Typography>
+    <div>
+      <Typography variant="h6" color="inherit">
+        Make Announcements
+      </Typography>
 
-          <Paper sx={{ mb:2,}} elevation={3}>
-          <form style={{padding:'10px'}} noValidate autoComplete="off">
-            <TextField
-              id="announcement-message"
-              label="Announcement Message"
-              fullWidth
-              multiline
-              rows={4}
-              variant="outlined"
-            />
-            <Grid container spacing={2} alignItems="center"
-            sx={{mt:2}}
-            >
-              <Grid item xs={12} md={6}>
-                {/* Date and Time Field */}
-                <TextField
-                  id="announcement-date"
-                  label="Announcement Date"
-                  type="datetime-local"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  fullWidth
-                  variant="outlined"
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                {/* Send Button */}
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="large"
-                  endIcon={<SendIcon />}
-                  
-                >
-                  Send
-                </Button>
-              </Grid>
+      <Paper sx={{ mb: 2 }} elevation={3}>
+        <form style={{ padding: '10px' }} noValidate autoComplete="off">
+          <TextField
+            id="announcement-message"
+            label="Announcement Message"
+            fullWidth
+            multiline
+            rows={4}
+            variant="outlined"
+            value={announcementMessage}
+            onChange={(e) => setAnnouncementMessage(e.target.value)}
+          />
+          <Grid container spacing={2} alignItems="center" sx={{ mt: 2 }}>
+            <Grid item xs={12} md={6}>
+              <TextField
+                id="announcement-date"
+                label="Announcement Date"
+                type="datetime-local"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                fullWidth
+                variant="outlined"
+                value={announcementDate}
+                onChange={(e) => setAnnouncementDate(e.target.value)}
+              />
             </Grid>
-          </form>
-        </Paper>
+            <Grid item xs={12} md={6}>
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                endIcon={<SendIcon />}
+                onClick={handleSendAnnouncement}
+                disabled={loading}
+              >
+                Send
+              </Button>
+            </Grid>
+          </Grid>
+        </form>
+      </Paper>
 
-        {/* Announcement History */}
-        <Typography variant="h6" gutterBottom>
-          Announcement History
-        </Typography>
-        <Paper sx={{ maxHeight: '400px',
-    overflowY: 'auto',}}>
+      <Typography variant="h6" gutterBottom>
+        Announcement History
+      </Typography>
+      <Paper sx={{ maxHeight: '400px', overflowY: 'auto' }}>
+        {loading ? (
+          <CircularProgress />
+        ) : (
           <TableContainer>
             <Table>
               <TableHead>
@@ -111,14 +147,14 @@ const Announcements = () => {
               </TableBody>
             </Table>
           </TableContainer>
-        </Paper>
+        )}
+      </Paper>
     </div>
   );
 };
 
-
 export default () => (
   <SlideTransition>
-      <Announcements />
+    <Announcements />
   </SlideTransition>
 );

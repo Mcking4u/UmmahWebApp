@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useState, useEffect } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -22,12 +23,12 @@ import {
   Timeline,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-
 import { styled, alpha } from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
 import { useSelector } from "react-redux";
 import UserProfileCard from "../profile/user_profile_card";
+import NetworkHandler from "../../network/network_handler";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -75,11 +76,26 @@ const drawerWidth = 240;
 
 function NavBar(props) {
   const { window } = props;
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [isClosing, setIsClosing] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const [userData, setUserData] = useState(null);
 
   const headerText = useSelector((state) => state.nav.headerText);
   const activeLink = useSelector((state) => state.nav.activeLink);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const networkHandler = new NetworkHandler();
+        const data = await networkHandler.getUser();
+        setUserData(data);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -101,7 +117,7 @@ function NavBar(props) {
   const navigateTo = (to) => {
     handleDrawerClose();
     navigate(to);
-  }
+  };
 
   const drawer = (
     <div style={{ paddingLeft: "8px", paddingRight: "8px" }}>
@@ -121,8 +137,7 @@ function NavBar(props) {
           <img src={Logo} style={{ width: "60px", height: "auto" }} />
         </Box>
       </Toolbar>
-      
-   <Divider />
+      <Divider />
       <List>
         <ListItem disablePadding>
           <ListItemButton
@@ -139,14 +154,11 @@ function NavBar(props) {
             onClick={() => navigateTo("/")}
           >
             <ListItemIcon>
-              <Dashboard
-                style={{ fill: activeLink === "/" ? "#019B8F" : "" }}
-              />
+              <Dashboard style={{ fill: activeLink === "/" ? "#019B8F" : "" }} />
             </ListItemIcon>
             <ListItemText primary={"Dashboard"} />
           </ListItemButton>
         </ListItem>
-
         <ListItem disablePadding>
           <ListItemButton
             selected={activeLink === "/details"}
@@ -162,14 +174,11 @@ function NavBar(props) {
             onClick={() => navigateTo("/details")}
           >
             <ListItemIcon>
-              <Mosque
-                style={{ fill: activeLink === "/details" ? "#019B8F" : "" }}
-              />
+              <Mosque style={{ fill: activeLink === "/details" ? "#019B8F" : "" }} />
             </ListItemIcon>
             <ListItemText primary={"Masjid Details"} />
           </ListItemButton>
         </ListItem>
-
         <ListItem disablePadding>
           <ListItemButton
             selected={activeLink === "/salah-timings"}
@@ -185,16 +194,11 @@ function NavBar(props) {
             onClick={() => navigateTo("/salah-timings")}
           >
             <ListItemIcon>
-              <Timeline
-                style={{
-                  fill: activeLink === "/salah-timings" ? "#019B8F" : "",
-                }}
-              />
+              <Timeline style={{ fill: activeLink === "/salah-timings" ? "#019B8F" : "" }} />
             </ListItemIcon>
             <ListItemText primary={"Salah Timings"} />
           </ListItemButton>
         </ListItem>
-
         <ListItem disablePadding>
           <ListItemButton
             selected={activeLink === "/announcements"}
@@ -210,36 +214,31 @@ function NavBar(props) {
             onClick={() => navigateTo("/announcements")}
           >
             <ListItemIcon>
-              <AnnouncementOutlined
-                style={{
-                  fill: activeLink === "/announcements" ? "#019B8F" : "",
-                }}
-              />
+              <AnnouncementOutlined style={{ fill: activeLink === "/announcements" ? "#019B8F" : "" }} />
             </ListItemIcon>
             <ListItemText primary={"Announcements"} />
           </ListItemButton>
         </ListItem>
       </List>
       <Divider />
-
-      <Box sx={{mt:1, mb:1}}> 
-    <UserProfileCard
-      imageSrc="https://example.com/avatar.jpg"
-      email="admin@olari.com"
-      name="Admin"
-      onLogout={() => {
-        localStorage.setItem("token", "");
-        navigateTo("/login");
-      }}
-    />
-    
-    </Box>
+      <Box sx={{ mt: 1, mb: 1 }}>
+        {userData && (
+          <UserProfileCard
+            imageSrc={userData.avatarUrl || "https://example.com/avatar.jpg"}
+            email={userData.email || "admin@olari.com"}
+            name={userData.name || "Admin"}
+            onLogout={() => {
+              localStorage.setItem(NetworkHandler.loginTokenKey, "");
+              navigateTo("/login");
+            }}
+          />
+        )}
+      </Box>
     </div>
   );
 
   // Remove this const when copying and pasting into your project.
-  const container =
-    window !== undefined ? () => window().document.body : undefined;
+  const container = window !== undefined ? () => window().document.body : undefined;
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -294,13 +293,11 @@ function NavBar(props) {
         sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
         aria-label="mailbox folders"
       >
-        {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
         <Drawer
           container={container}
           variant="temporary"
           open={mobileOpen}
-          onTransitionEnd={handleDrawerTransitionEnd}
-          onClose={handleDrawerClose}
+          onClose={handleDrawerToggle}
           ModalProps={{
             keepMounted: true, // Better open performance on mobile.
           }}
@@ -311,6 +308,7 @@ function NavBar(props) {
               width: drawerWidth,
             },
           }}
+          onTransitionEnd={handleDrawerTransitionEnd}
         >
           {drawer}
         </Drawer>
@@ -330,11 +328,7 @@ function NavBar(props) {
       </Box>
       <Box
         component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-        }}
+        sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
       >
         <Toolbar />
         {props.children}

@@ -1,8 +1,10 @@
-const axios = require("axios");
+import axios from "axios";
 
+const host = "http://127.0.0.1:8000";
+//const host = "https://objects.ummah-app.com";
 const baseUrls = {
-  landing: "https://objects.ummah-app.com/landing/api",
-  masjid: "https://objects.ummah-app.com/masjid/api",
+  landing: `${host}/landing/api`,
+  masjid: `${host}/masjid/api`,
 };
 
 class NetworkHandler {
@@ -130,19 +132,66 @@ class NetworkHandler {
     }
   }
 
+  async getAnnouncements() {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/sendnotification"; 
+
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json",
+    };
+    try {
+      const response = await this.axiosInstance.get(url, {
+        baseURL: baseUrls.masjid,
+        headers,
+      });
+      return response.data; 
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
+  async getUser() {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/ummah/getuser"; // Note: This is relative to the 'ummah' base URL
+
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+      // ... (other headers from cURL can be omitted as Axios handles them)
+    };
+
+    try {
+      const response = await this.axiosInstance.get(url, { headers }); // No need to override baseURL for 'ummah'
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
+  async uploadSalahTimings(formData) {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/namaztim_upload"; 
+
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      'Content-Type': 'multipart/form-data',
+    };
+
+    try {
+      const response = await this.axiosInstance.post(url, formData, {
+        baseURL: baseUrls.masjid,
+        headers,
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
 }
 
-module.exports = NetworkHandler;
-
-// // Usage example:
-// const networkHandler = new NetworkHandler();
-
-// const username = 'test@olari.com';
-// const password = 'test@olari.com';
-// networkHandler.login(username, password)
-//   .then(responseData => {
-//     console.log('Login successful:', responseData);
-//   })
-//   .catch(error => {
-//     console.error('Login error:', error);
-//   });
+export default NetworkHandler;

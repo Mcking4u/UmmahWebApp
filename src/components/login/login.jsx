@@ -5,12 +5,12 @@ import {
   TextField,
   Button,
   Typography,
-  Container,
   Box,
   CircularProgress,
 } from "@mui/material";
 import logoImage from "/logo.svg"; // Import your logo image
 import { useNavigate } from "react-router-dom";
+import NetworkHandler from "../../network/network_handler";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -18,6 +18,9 @@ const LoginPage = () => {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
+  const networkHandler = new NetworkHandler();
 
   const validateForm = () => {
     let isValid = true;
@@ -42,15 +45,31 @@ const LoginPage = () => {
     return isValid;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     if (validateForm()) {
-      // Perform login action or API call here
-      setTimeout(() => {
-        navigate("/");
-      }, 3000);
+      try {
+        const response = await networkHandler.login(email, password);
+        setLoading(false);
+        if(response.status){
+          localStorage.setItem(NetworkHandler.loginTokenKey, response.token); 
+          navigate("/"); 
+
+          //implement this later
+          // let is_masjid_admin = response.is_masjid_admin;
+          // let is_super_user = response.is_super_user;
+          // let is_ummah_admin = response.is_ummah_admin;
+        }
+        else {
+          setPasswordError(response.message);
+        }
+       
+      } catch (error) {
+        setLoading(false);
+        alert("Login failed, please try again");
+      }
     } else {
       setLoading(false);
     }
@@ -61,8 +80,6 @@ const LoginPage = () => {
       handleSubmit(e);
     }
   };
-
-  const navigate = useNavigate();
 
   return (
     <div
@@ -80,7 +97,7 @@ const LoginPage = () => {
             <img
               src={logoImage}
               alt="Logo"
-              style={{ width: 80, height: 'auto', maxWidth:80, mb: 2 }}
+              style={{ width: 80, height: "auto", maxWidth: 80, mb: 2 }}
             />
           </Box>
           <Typography component="h1" variant="h5" align="center">

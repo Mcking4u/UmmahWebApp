@@ -6,11 +6,15 @@ import { Routes, Route, useNavigate } from "react-router-dom";
 
 import LoginPage from "./components/login/login";
 import Home from "./components/pages/home";
+import NetworkHandler from "./network/network_handler";
 
 function App() {
   const navigate = useNavigate();
   React.useEffect(() => {
-    navigate("/login");
+    let appToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    if(appToken === "" || appToken === undefined || appToken === null){
+      navigate("/login");
+    }
   }, [])
 
   return (
