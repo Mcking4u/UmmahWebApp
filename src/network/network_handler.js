@@ -192,6 +192,187 @@ class NetworkHandler {
     }
   }
 
+
+  async getMadrasas() {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/ummah/get-madrasas-init"; 
+
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+    };
+
+    try {
+      const response = await this.axiosInstance.get(url, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getTeachers() {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/ummah/get-teachers"; 
+
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+    };
+
+    try {
+      const response = await this.axiosInstance.get(url, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
+  async editTeacher(teacherId, teacherData) {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = `/ummah/editteacher/${teacherId}`;
+  
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json",
+    };
+  
+    try {
+      const response = await this.axiosInstance.post(url, teacherData, { headers });
+      return response.data;
+    } catch (error) {
+      throw error; 
+    }
+  }
+
+  
+  async addTeacher(teacherData) {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/ummah/add-teacher";
+  
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json",
+    };
+  
+    try {
+      const response = await this.axiosInstance.post(url, teacherData, { headers });
+      return response.data;
+    } catch (error) {
+      throw error; 
+    }
+  }
+
+  async getMadrasaAnnouncements() {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/ummah/get-announcements"; 
+
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+    };
+
+    try {
+      const response = await this.axiosInstance.get(url, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
+  async addMadrasaAnnouncement(announcementData) {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/ummah/add-announcement";
+  
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json",
+    };
+  
+    try {
+      const response = await this.axiosInstance.post(url, announcementData, { headers });
+      return response.data;
+    } catch (error) {
+      throw error; 
+    }
+  }
+  async getMadrasaEnrollments() {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/ummah/get-enrollments";
+
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+    };
+
+    try {
+      const response = await this.axiosInstance.get(url, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  
+  async assignTeacher(assignmentData) {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/ummah/assign-teacher";
+  
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json",
+    };
+  
+    try {
+      const response = await this.axiosInstance.post(url, assignmentData, { headers });
+      return response.data;
+    } catch (error) {
+      throw error; 
+    }
+  }
+
+  
+  async rejectEnrollment(rejectionData) {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/ummah/reject";
+  
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json",
+    };
+  
+    try {
+      const response = await this.axiosInstance.post(url, rejectionData, { headers });
+      return response.data;
+    } catch (error) {
+      throw error; 
+    }
+  }
+  async getAssignedStudents() {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/ummah/get-mapping";
+  
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+    };
+  
+    try {
+      const response = await this.axiosInstance.get(url, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+    
+  
+
 }
 
 export default NetworkHandler;
