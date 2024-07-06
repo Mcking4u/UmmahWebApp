@@ -9,6 +9,17 @@ import NotFound from "../404/not_found";
 import React from "react";
 import NetworkHandler from "../../network/network_handler";
 
+
+import { Dashboard as DashboardIcon, Mosque, Timeline, AnnouncementOutlined } from "@mui/icons-material";
+
+const navLinks = [
+  { path: "/masjid/", label: "Dashboard", icon: <DashboardIcon /> },
+  { path: "/masjid/details", label: "Masjid Details", icon: <Mosque /> },
+  { path: "/masjid/salah-timings", label: "Salah Timings", icon: <Timeline /> },
+  { path: "/masjid/announcements", label: "Announcements", icon: <AnnouncementOutlined /> }
+];
+
+
 const MasjidHome = () => {
 
   const navigate = useNavigate();
@@ -20,7 +31,7 @@ const MasjidHome = () => {
   }, [])
 
     return ( 
-        <NavBar>
+        <NavBar navLinks={navLinks}>
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/details" element={<MasjidDetails />} />

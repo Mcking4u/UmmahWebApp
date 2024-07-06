@@ -15,6 +15,12 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Logo from "/logo.svg";
+import Avatar from "@mui/material/Avatar";
+import Popover from "@mui/material/Popover";
+import Button from "@mui/material/Button";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import NetworkHandler from "../../network/network_handler";
 import {
   AnnouncementOutlined,
   Dashboard,
@@ -22,63 +28,15 @@ import {
   Mosque,
   Timeline,
 } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
-import { styled, alpha } from "@mui/material/styles";
-import InputBase from "@mui/material/InputBase";
-import SearchIcon from "@mui/icons-material/Search";
-import { useSelector } from "react-redux";
-import UserProfileCard from "../profile/user_profile_card";
-import NetworkHandler from "../../network/network_handler";
-
-const Search = styled("div")(({ theme }) => ({
-  position: "relative",
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  marginLeft: 0,
-  width: "100%",
-  [theme.breakpoints.up("sm")]: {
-    marginLeft: theme.spacing(1),
-    width: "auto",
-  },
-}));
-
-const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: "100%",
-  position: "absolute",
-  pointerEvents: "none",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "inherit",
-  width: "100%",
-  "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create("width"),
-    [theme.breakpoints.up("sm")]: {
-      width: "12ch",
-      "&:focus": {
-        width: "20ch",
-      },
-    },
-  },
-}));
 
 const drawerWidth = 240;
 
 function NavBar(props) {
-  const { window } = props;
+  const { window, navLinks } = props;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [userData, setUserData] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
 
   const headerText = useSelector((state) => state.nav.headerText);
   const activeLink = useSelector((state) => state.nav.activeLink);
@@ -112,6 +70,14 @@ function NavBar(props) {
     }
   };
 
+  const handleAvatarClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+  };
+
   const navigate = useNavigate();
 
   const navigateTo = (to) => {
@@ -139,106 +105,33 @@ function NavBar(props) {
       </Toolbar>
       <Divider />
       <List>
-        <ListItem disablePadding>
-          <ListItemButton
-            selected={activeLink === "/"}
-            sx={{
-              "&:hover": {
-                borderRadius: "12px",
-              },
-              "&.Mui-selected": {
-                borderRadius: "12px",
-              },
-              mb: 1,
-            }}
-            onClick={() => navigateTo("/masjid/")}
-          >
-            <ListItemIcon>
-              <Dashboard style={{ fill: activeLink === "/" ? "#019B8F" : "" }} />
-            </ListItemIcon>
-            <ListItemText primary={"Dashboard"} />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            selected={activeLink === "/masjid/details"}
-            sx={{
-              "&:hover": {
-                borderRadius: "12px",
-              },
-              "&.Mui-selected": {
-                borderRadius: "12px",
-              },
-              mb: 1,
-            }}
-            onClick={() => navigateTo("/masjid/details")}
-          >
-            <ListItemIcon>
-              <Mosque style={{ fill: activeLink === "/masjid/details" ? "#019B8F" : "" }} />
-            </ListItemIcon>
-            <ListItemText primary={"Masjid Details"} />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            selected={activeLink === "/masjid/salah-timings"}
-            sx={{
-              "&:hover": {
-                borderRadius: "12px",
-              },
-              "&.Mui-selected": {
-                borderRadius: "12px",
-              },
-              mb: 1,
-            }}
-            onClick={() => navigateTo("/masjid/salah-timings")}
-          >
-            <ListItemIcon>
-              <Timeline style={{ fill: activeLink === "/masjid/salah-timings" ? "#019B8F" : "" }} />
-            </ListItemIcon>
-            <ListItemText primary={"Salah Timings"} />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            selected={activeLink === "/masjid/announcements"}
-            sx={{
-              "&:hover": {
-                borderRadius: "12px",
-              },
-              "&.Mui-selected": {
-                borderRadius: "12px",
-              },
-              mb: 1,
-            }}
-            onClick={() => navigateTo("/masjid/announcements")}
-          >
-            <ListItemIcon>
-              <AnnouncementOutlined style={{ fill: activeLink === "/masjid/announcements" ? "#019B8F" : "" }} />
-            </ListItemIcon>
-            <ListItemText primary={"Announcements"} />
-          </ListItemButton>
-        </ListItem>
+        {navLinks.map((link) => (
+          <ListItem key={link.path} disablePadding>
+            <ListItemButton
+              selected={activeLink === link.path}
+              sx={{
+                "&:hover": {
+                  borderRadius: "12px",
+                },
+                "&.Mui-selected": {
+                  borderRadius: "12px",
+                },
+                mb: 1,
+              }}
+              onClick={() => navigateTo(link.path)}
+            >
+              <ListItemIcon>{link.icon}</ListItemIcon>
+              <ListItemText primary={link.label} />
+            </ListItemButton>
+          </ListItem>
+        ))}
       </List>
       <Divider />
-      <Box sx={{ mt: 1, mb: 1 }}>
-        {userData && (
-          <UserProfileCard
-            imageSrc={userData.avatarUrl || "https://example.com/avatar.jpg"}
-            email={userData.email || "admin@olari.com"}
-            name={userData.name || "Admin"}
-            onLogout={() => {
-              localStorage.setItem(NetworkHandler.loginTokenKey, "");
-              navigateTo("/");
-            }}
-          />
-        )}
-      </Box>
     </div>
   );
 
-  // Remove this const when copying and pasting into your project.
-  const container = window !== undefined ? () => window().document.body : undefined;
+  const container =
+    window !== undefined ? () => window().document.body : undefined;
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -276,15 +169,62 @@ function NavBar(props) {
             >
               {headerText}
             </Typography>
-            <Search>
-              <SearchIconWrapper>
-                <SearchIcon />
-              </SearchIconWrapper>
-              <StyledInputBase
-                placeholder="Search…"
-                inputProps={{ "aria-label": "search" }}
-              />
-            </Search>
+
+            <Box>
+              {userData && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Avatar
+                    onClick={handleAvatarClick}
+                    sx={{ cursor: "pointer", width: 40, height: 40 }}
+                    src={userData.avatarUrl || "https://example.com/avatar.jpg"}
+                  />
+                  <Popover
+                    open={Boolean(anchorEl)}
+                    anchorEl={anchorEl}
+                    onClose={handlePopoverClose}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "center",
+                    }}
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "center",
+                    }}
+                  >
+                    <Box sx={{ p: 2 }}>
+                      <Typography variant="h6">
+                        {userData.name || "Admin"}
+                      </Typography>
+                      <Typography variant="subtitle1">
+                        {userData.email || "admin@olari.com"}
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        size="small"
+                        startIcon={<LogoutOutlined />}
+                        onClick={() => {
+                          localStorage.setItem(
+                            NetworkHandler.loginTokenKey,
+                            ""
+                          );
+                          navigateTo("/");
+                        }}
+                        sx={{ mt: 2 }}
+                      >
+                        Logout
+                      </Button>
+                    </Box>
+                  </Popover>
+                </Box>
+              )}
+            </Box>
           </Box>
         </Toolbar>
       </AppBar>
@@ -328,7 +268,11 @@ function NavBar(props) {
       </Box>
       <Box
         component="main"
-        sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+        }}
       >
         <Toolbar />
         {props.children}

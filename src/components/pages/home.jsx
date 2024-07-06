@@ -11,6 +11,7 @@ import Wedding from "../../assets/wedding.png";
 import Funeral from "../../assets/funeral.png";
 import { Container } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import NetworkHandler from "../../network/network_handler";
 
 const RootCard = styled(Card)({
   maxWidth: 345,
@@ -51,7 +52,13 @@ const Home = () => {
             cursor: 'pointer'
         }}
         onClick={() => {
+            let appToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+            if(appToken === "" || appToken === undefined || appToken === null){
+              navigate("/login");
+            } else {
             navigate("/masjid/")
+
+            }
         }}
         >
           <CardMedia
