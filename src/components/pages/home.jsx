@@ -20,106 +20,117 @@ const RootCard = styled(Card)({
 });
 
 const Home = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
   return (
     <div
-    style={{
-      backgroundColor: "#333",
-      minHeight: "100vh",
-     }}
+      style={{
+        backgroundColor: "#333",
+        minHeight: "100vh",
+      }}
     >
-
-   <Container
-    sx={{pt:4}}
-   >
-      <Typography
-        variant="h6"
-        sx={{ textAlign: "center", marginBottom: "20px", color:"#fff" }}
-      >
-        Services
-      </Typography>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "20px",
-          justifyContent: "center",
-        }}
-      >
-        <RootCard
-        sx={{
-            cursor: 'pointer'
-        }}
-        onClick={() => {
-            let appToken = localStorage.getItem(NetworkHandler.loginTokenKey);
-            if(appToken === "" || appToken === undefined || appToken === null){
-              navigate("/login");
-            } else {
-            navigate("/masjid/")
-
-            }
-        }}
+      <Container sx={{ pt: 4 }}>
+        <Typography
+          variant="h6"
+          sx={{ textAlign: "center", marginBottom: "20px", color: "#fff" }}
         >
-          <CardMedia
-            sx={{height: 180,}}
-            image={Masjid}
-            title="Image title"
-          />
-          <CardContent>
-            <Typography variant="subtitle1" sx={{ textAlign: "center" }}>
-              Masjid
-            </Typography>
-          </CardContent>
-        </RootCard>
+          Services
+        </Typography>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "20px",
+            justifyContent: "center",
+          }}
+        >
+          <RootCard
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              let appToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+              if (
+                appToken === "" ||
+                appToken === undefined ||
+                appToken === null
+              ) {
+                navigate("/login");
+              } else {
+                navigate("/masjid/");
+              }
+            }}
+          >
+            <CardMedia
+              sx={{ height: 180 }}
+              image={Masjid}
+              title="Image title"
+            />
+            <CardContent>
+              <Typography variant="subtitle1" sx={{ textAlign: "center" }}>
+                Masjid
+              </Typography>
+            </CardContent>
+          </RootCard>
 
-        <RootCard>
-          <CardMedia
-            sx={{height: 180,}}
-            image={Maktab}
-            title="Image title"
-          />
-          <CardContent>
-            <Typography variant="subtitle1" sx={{ textAlign: "center" }}>
-              Maktab
-            </Typography>
-          </CardContent>
-        </RootCard>
+          <RootCard
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              let appToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+              if (
+                appToken === "" ||
+                appToken === undefined ||
+                appToken === null
+              ) {
+                navigate("/login");
+              } else {
+                navigate("/madrasa/");
+              }
+            }}
+          >
+            <CardMedia
+              sx={{ height: 180 }}
+              image={Maktab}
+              title="Image title"
+            />
+            <CardContent>
+              <Typography variant="subtitle1" sx={{ textAlign: "center" }}>
+                Maktab
+              </Typography>
+            </CardContent>
+          </RootCard>
 
-        <RootCard>
-          <CardMedia
-            sx={{height: 180,}}
-            image={Wedding}
-            title="Image title"
-          />
-          <CardContent>
-            <Typography variant="subtitle1" sx={{ textAlign: "center" }}>
-              Wedding
-            </Typography>
-          </CardContent>
-        </RootCard>
+          <RootCard>
+            <CardMedia
+              sx={{ height: 180 }}
+              image={Wedding}
+              title="Image title"
+            />
+            <CardContent>
+              <Typography variant="subtitle1" sx={{ textAlign: "center" }}>
+                Wedding
+              </Typography>
+            </CardContent>
+          </RootCard>
 
-        <RootCard>
-          <CardMedia
-            sx={{height: 180,}}
-            image={Funeral}
-            title="Image title"
-          />
-          <CardContent sx={{ width: "100%" }}>
-            <Typography variant="subtitle1" sx={{ textAlign: "center" }}>
-              Funeral
-            </Typography>
-          </CardContent>
-        </RootCard>
-      </div>
-   </Container>
-   </div>
-
+          <RootCard>
+            <CardMedia
+              sx={{ height: 180 }}
+              image={Funeral}
+              title="Image title"
+            />
+            <CardContent sx={{ width: "100%" }}>
+              <Typography variant="subtitle1" sx={{ textAlign: "center" }}>
+                Funeral
+              </Typography>
+            </CardContent>
+          </RootCard>
+        </div>
+      </Container>
+    </div>
   );
 };
 
-export default () => (
-  <SlideTransition>
-    <Home />
-  </SlideTransition>
-);
+export default Home;

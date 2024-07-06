@@ -25,12 +25,18 @@ const LoginPage = () => {
   const validateForm = () => {
     let isValid = true;
 
-    // Email validation using regex
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setEmailError("Enter a valid email address");
-      isValid = false;
-    } else {
+    // // Email validation using regex
+    // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // if (!emailRegex.test(email)) {
+    //   setEmailError("Enter a valid email address");
+    //   isValid = false;
+    // } else {
+    //   setEmailError("");
+    // }
+    if(email.length < 1){
+      setEmailError("Please enter a valid username")
+    }
+    else {
       setEmailError("");
     }
 
@@ -114,7 +120,7 @@ const LoginPage = () => {
               required
               fullWidth
               id="username"
-              label="Email Address"
+              label="Username"
               name="email"
               autoComplete="email"
               autoFocus

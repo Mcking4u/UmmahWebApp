@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// const host = "http://127.0.0.1:8000";
-const host = "https://objects.ummah-app.com";
+const host = "http://127.0.0.1:8000";
+// const host = "https://objects.ummah-app.com";
 const baseUrls = {
   landing: `${host}/landing/api`,
   masjid: `${host}/masjid/api`,
@@ -209,6 +209,46 @@ class NetworkHandler {
       throw error;
     }
   }
+
+  async addMadrasa(madrasaData) {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/ummah/add-madrasa";
+  
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json",
+    };
+  
+    try {
+      const response = await this.axiosInstance.post(url, madrasaData, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+  
+
+
+  async editMadrasa(madrasaData) {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/ummah/edit-madrasa";
+  
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json",
+    };
+  
+    try {
+      const response = await this.axiosInstance.post(url, madrasaData, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+  
+
 
   async getTeachers() {
     const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);

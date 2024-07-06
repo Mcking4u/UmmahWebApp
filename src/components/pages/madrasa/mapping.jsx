@@ -1,7 +1,7 @@
 import withNavUpdate from "../../wrappers/with_nav_update";
 
-const Teachers = () => {
+const Mapping = () => {
     return ( <p></p> );
 }
  
-export default withNavUpdate(Teachers);
+export default withNavUpdate(Mapping);
