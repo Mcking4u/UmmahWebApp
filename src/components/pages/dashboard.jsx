@@ -1,20 +1,8 @@
-import React from 'react';
-import { useDispatch } from 'react-redux';
-import { updateNavState } from '../../redux/navSlice';
+import SlideTransition from "../animation/slide_transition";
+import withNavUpdate from "../wrappers/with_nav_update";
 
-const Dashboard = () => {
-  const dispatch = useDispatch();
+const Dashboard = (props) => {
+  return <div>DASHBOARD</div>;
+};
 
-  React.useEffect( () => {
-    dispatch(
-      updateNavState({
-        headerText: "Dashboard",
-        activeLink: "/masjid/",
-      })
-    )
-  }, [] )
-
-  return (  <div>DASHBOARD</div>);
-}
- 
-export default Dashboard;
+export default withNavUpdate(SlideTransition(Dashboard));

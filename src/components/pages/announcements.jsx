@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { updateNavState } from '../../redux/navSlice';
-import SlideTransition from '../animation/slide_transition';
-import NetworkHandler from '../../network/network_handler';
+import React, { useState, useEffect } from "react";
+import SlideTransition from "../animation/slide_transition";
+import NetworkHandler from "../../network/network_handler";
 import {
   AppBar,
   Toolbar,
@@ -22,16 +20,15 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { Send as SendIcon } from "@mui/icons-material";
+import withNavUpdate from "../wrappers/with_nav_update";
 
 const Announcements = () => {
-  const dispatch = useDispatch();
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [announcementMessage, setAnnouncementMessage] = useState('');
-  const [announcementDate, setAnnouncementDate] = useState('');
+  const [announcementMessage, setAnnouncementMessage] = useState("");
+  const [announcementDate, setAnnouncementDate] = useState("");
 
   useEffect(() => {
-    dispatch(updateNavState({ headerText: "Announcements", activeLink: "/masjid/announcements" }));
     fetchAnnouncements();
   }, []);
 
@@ -39,14 +36,14 @@ const Announcements = () => {
     setLoading(true);
     try {
       const data = await new NetworkHandler().getAnnouncements();
-      const formattedAnnouncements = data.announcements.map(item => ({
+      const formattedAnnouncements = data.announcements.map((item) => ({
         id: item.announcement_time, // Use a unique identifier here
         message: item.announcement_desc,
-        date: item.announcement_time
+        date: item.announcement_time,
       }));
       setAnnouncements(formattedAnnouncements);
     } catch (error) {
-      console.error('Failed to fetch announcements', error);
+      console.error("Failed to fetch announcements", error);
     } finally {
       setLoading(false);
     }
@@ -65,7 +62,7 @@ const Announcements = () => {
       await new NetworkHandler().sendAnnouncement(announcementMessage);
       fetchAnnouncements();
     } catch (error) {
-      console.error('Failed to send announcement', error);
+      console.error("Failed to send announcement", error);
     } finally {
       setLoading(false);
     }
@@ -78,7 +75,7 @@ const Announcements = () => {
       </Typography>
 
       <Paper sx={{ mb: 2 }} elevation={3}>
-        <form style={{ padding: '10px' }} noValidate autoComplete="off">
+        <form style={{ padding: "10px" }} noValidate autoComplete="off">
           <TextField
             id="announcement-message"
             label="Announcement Message"
@@ -123,7 +120,7 @@ const Announcements = () => {
       <Typography variant="h6" gutterBottom>
         Announcement History
       </Typography>
-      <Paper sx={{ maxHeight: '400px', overflowY: 'auto' }}>
+      <Paper sx={{ maxHeight: "400px", overflowY: "auto" }}>
         {loading ? (
           <CircularProgress />
         ) : (
@@ -153,8 +150,4 @@ const Announcements = () => {
   );
 };
 
-export default () => (
-  <SlideTransition>
-    <Announcements />
-  </SlideTransition>
-);
+export default withNavUpdate(SlideTransition(Announcements));

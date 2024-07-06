@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { updateNavState } from "../../redux/navSlice";
 import {
   Box,
   Button,
@@ -23,6 +21,7 @@ import NetworkHandler from "../../network/network_handler";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+import withNavUpdate from "../wrappers/with_nav_update";
 
 const networkHandler = new NetworkHandler();
 
@@ -39,15 +38,7 @@ const StyledTextField = styled(TextField)({
 });
 
 function SalahTimings() {
-  const dispatch = useDispatch();
-
   useEffect(() => {
-    dispatch(
-      updateNavState({
-        headerText: "Salah Timings",
-        activeLink: "/masjid/salah-timings",
-      })
-    );
     fetchSalahTimings();
   }, []);
 
@@ -210,26 +201,24 @@ function SalahTimings() {
             label="Start Date"
             value={startDate}
             onChange={(date) => handleDateChange("start", date)}
-            renderInput={(params) => (
-              <StyledTextField
-                {...params}
-                size="small" 
-                helperText="Filter dates" 
-              />
-            )}
+            slots={{
+              textField: StyledTextField, // Use the textField slot
+            }}
+            slotProps={{
+              textField: { size: "small", helperText: "Filter dates" },
+            }}
           />
           <DatePicker
             label="End Date"
-            renderInput={(params) => (
-              <StyledTextField
-                {...params}
-                size="small" 
-                helperText="Filter dates"
-              />
-            )}
             value={endDate}
             onChange={(date) => handleDateChange("end", date)}
             sx={{ ml: 2 }}
+            slots={{
+              textField: StyledTextField,
+            }}
+            slotProps={{
+              textField: { size: "small", helperText: "Filter dates" },
+            }}
           />
         </Box>
 
@@ -263,9 +252,4 @@ function SalahTimings() {
     </LocalizationProvider>
   );
 }
-
-export default () => (
-  <SlideTransition>
-    <SalahTimings />
-  </SlideTransition>
-);
+export default withNavUpdate(SlideTransition(SalahTimings));

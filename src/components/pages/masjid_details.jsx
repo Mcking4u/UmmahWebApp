@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { updateNavState } from "../../redux/navSlice";
 import {
   TextField,
   Button,
@@ -11,20 +9,15 @@ import {
 } from "@mui/material";
 import SlideTransition from "../animation/slide_transition";
 import NetworkHandler from "../../network/network_handler";
+import withNavUpdate from "../wrappers/with_nav_update";
 
 function MasjidDetails() {
-  const dispatch = useDispatch();
-
   useEffect(() => {
-    dispatch(
-      updateNavState({ headerText: "Masjid Details", activeLink: "/masjid/details" })
-    );
-
     // Fetch Masjid details on component mount
     const fetchMasjidDetails = async () => {
       try {
         let data = await new NetworkHandler().getMasjidProfile();
-        data[0]['Password'] = "";
+        data[0]["Password"] = "";
         setMasjidDetails(data[0]);
       } catch (error) {
         console.error("Error fetching Masjid details:", error);
@@ -32,7 +25,7 @@ function MasjidDetails() {
     };
 
     fetchMasjidDetails();
-  }, [dispatch]);
+  }, []);
 
   const [masjidDetails, setMasjidDetails] = useState({
     name: "",
@@ -69,7 +62,6 @@ function MasjidDetails() {
           horizontal: "right",
         });
         await new NetworkHandler().editMasjidProfile(masjidDetails);
-      
       } catch (error) {
         alert("Error updating Masjid details:");
       }
@@ -195,9 +187,4 @@ function MasjidDetails() {
     </div>
   );
 }
-
-export default () => (
-  <SlideTransition>
-    <MasjidDetails />
-  </SlideTransition>
-);
+export default withNavUpdate(SlideTransition(MasjidDetails));

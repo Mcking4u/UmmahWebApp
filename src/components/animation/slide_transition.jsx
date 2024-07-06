@@ -12,10 +12,8 @@ const slideFadeKeyframes = keyframes`
     opacity: 1;
   }
 `;
-
-const SlideTransition = ({ children }) => {
+const SlideTransition = (WrappedComponent) => (props) => {
   const [inProp, setInProp] = useState(false);
-
   useEffect(() => {
     setInProp(true);
   }, []);
@@ -28,9 +26,7 @@ const SlideTransition = ({ children }) => {
         transform: inProp ? 'translateY(0)' : 'translateY(8px)',
       }}
     >
-      {children}
     </Box>
   );
 };
-
 export default SlideTransition;
