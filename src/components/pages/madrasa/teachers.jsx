@@ -55,7 +55,7 @@ const Teachers = () => {
     const networkHandler = new NetworkHandler();
     const data = await networkHandler.getTeachers();
     setMadrasas(data.madrasas);
-    setTeachersData(data.teachers[selectedMadrasa]?.teachers || []);
+    setTeachersData(data.madrasas[selectedMadrasa]?.teachers || []);
   };
 
   useEffect(() => {
@@ -212,6 +212,7 @@ const Teachers = () => {
               value={selectedMadrasa}
               onChange={handleMadrasaChange}
               label="Select Madrasa"
+              sx={{minWidth:150}}
             >
               {madrasas.map((madrasa, index) => (
                 <MenuItem key={index} value={index}>

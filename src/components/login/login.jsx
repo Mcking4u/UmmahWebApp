@@ -61,12 +61,15 @@ const LoginPage = () => {
         setLoading(false);
         if(response.status){
           localStorage.setItem(NetworkHandler.loginTokenKey, response.token); 
-          navigate("/"); 
-
-          //implement this later
-          // let is_masjid_admin = response.is_masjid_admin;
-          // let is_super_user = response.is_super_user;
-          // let is_ummah_admin = response.is_ummah_admin;
+          localStorage.setItem(NetworkHandler.loginResponseKey, JSON.stringify(response));
+          let is_masjid_admin = response.is_masjid_admin;
+          let is_ummah_admin = response.is_ummah_admin;
+          if(is_masjid_admin){
+            navigate("/masjid/");
+          }
+          else if(is_ummah_admin){
+            navigate("/madrasa/")
+          }
         }
         else {
           setPasswordError(response.message);

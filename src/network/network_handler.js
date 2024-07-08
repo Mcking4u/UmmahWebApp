@@ -9,6 +9,7 @@ const baseUrls = {
 
 class NetworkHandler {
   static loginTokenKey = "ummahToken";
+  static loginResponseKey = "loginResponseKey";
 
   constructor() {
     this.axiosInstance = axios.create({

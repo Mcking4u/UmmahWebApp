@@ -214,6 +214,10 @@ function NavBar(props) {
                             NetworkHandler.loginTokenKey,
                             ""
                           );
+                          localStorage.setItem(
+                            NetworkHandler.loginResponseKey,
+                            ""
+                          );
                           navigateTo("/");
                         }}
                         sx={{ mt: 2 }}

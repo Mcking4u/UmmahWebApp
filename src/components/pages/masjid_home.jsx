@@ -33,6 +33,12 @@ const MasjidHome = () => {
     if (appToken === "" || appToken === undefined || appToken === null) {
       navigate("/login");
     }
+    let responseData = localStorage.getItem(NetworkHandler.loginResponseKey);
+    responseData = JSON.parse(responseData);
+    let is_masjid_admin = responseData.is_masjid_admin;
+    if(!is_masjid_admin){
+      navigate("/login");
+    }
   }, []);
 
   return (

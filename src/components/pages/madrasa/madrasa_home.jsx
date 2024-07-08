@@ -11,13 +11,13 @@ import {
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import NotFoundPage from "../../404/not_found";
 import NavBar from "../../nav/navbar";
-import Dashboard from "../dashboard";
 import MyMadrasas from "./my_madrasas";
 import Teachers from "./teachers";
 import Announcements from "./announcements";
 import Enrollments from "./enrollments";
 import Mapping from "./mapping";
 import NetworkHandler from "../../../network/network_handler";
+import Dashboard from "./madrasa_dashboard";
 
 const navLinks = [
   { path: "/madrasa/", label: "Dashboard", icon: <DashboardIcon /> },
@@ -45,6 +45,12 @@ const MadrasaHome = () => {
   React.useEffect(() => {
     let appToken = localStorage.getItem(NetworkHandler.loginTokenKey);
     if (appToken === "" || appToken === undefined || appToken === null) {
+      navigate("/login");
+    }
+    let responseData = localStorage.getItem(NetworkHandler.loginResponseKey);
+    responseData = JSON.parse(responseData);
+    let is_ummah_admin = responseData.is_ummah_admin;
+    if(!is_ummah_admin){
       navigate("/login");
     }
   }, []);

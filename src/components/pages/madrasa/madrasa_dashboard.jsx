@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, Typography, Grid, Box } from '@mui/material';
+import SchoolIcon from '@mui/icons-material/School';
 import PeopleIcon from '@mui/icons-material/People';
+import GroupIcon from '@mui/icons-material/Group';
+import NetworkHandler from '../../../network/network_handler';
 import { Mosque, SchoolSharp } from '@mui/icons-material';
-import NetworkHandler from '../../network/network_handler';
-import withNavUpdate from '../wrappers/with_nav_update';
+import withNavUpdate from '../../wrappers/with_nav_update';
 
 const Dashboard = () => {
   const [data, setData] = useState({
