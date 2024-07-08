@@ -15,6 +15,8 @@ import {
   Grid,
   CircularProgress,
   Box,
+  DialogActions,
+  InputAdornment,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
@@ -22,9 +24,10 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import CloseIcon from "@mui/icons-material/Close";
 import withNavUpdate from "../../wrappers/with_nav_update";
 import NetworkHandler from "../../../network/network_handler";
+import { Add, BatchPrediction, Description, Map, Money, Title } from "@mui/icons-material";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
+  return <Slide direction="left" ref={ref} {...props} />;
 });
 
 function MyMadrasas() {
@@ -182,31 +185,31 @@ function MyMadrasas() {
 
   return (
     <div>
-     <Box sx={{width:"100%", textAlign:"right"}}>
-     <Button
-     size="small"
-        variant="contained"
-        startIcon={<AddIcon />}
-        onClick={() => {
-          setFormData({
-            madrasa_name: "",
-            description: "",
-            fee: "",
-            address: "",
-            batches: [],
-            newBatch: "",
-          });
-          setLoading(false);
-          setIsEditing(false);
-          setEditId(null);
-          setFormErrors({});
-          setOpenDialog(true);
-        }}
-        sx={{ marginBottom: 2 }} // Add some spacing below the button
-      >
-        Add Madrasa
-      </Button>
-     </Box>
+      <Box sx={{ width: "100%", textAlign: "right" }}>
+        <Button
+          size="small"
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => {
+            setFormData({
+              madrasa_name: "",
+              description: "",
+              fee: "",
+              address: "",
+              batches: [],
+              newBatch: "",
+            });
+            setLoading(false);
+            setIsEditing(false);
+            setEditId(null);
+            setFormErrors({});
+            setOpenDialog(true);
+          }}
+          sx={{ marginBottom: 2 }} // Add some spacing below the button
+        >
+          Add Madrasa
+        </Button>
+      </Box>
 
       <div style={{ height: 400, width: "100%" }}>
         <DataGrid
@@ -233,13 +236,21 @@ function MyMadrasas() {
           </IconButton>
         </DialogTitle>
 
-        <DialogContent>
+        <DialogContent sx={{maxWidth:350}}>
           <Stack>
             <Grid sx={{ mt: 1 }} container spacing={2} alignItems="center">
               <Grid item xs={12} sm={6}>
                 <TextField
                   label="Madrasa Name"
                   fullWidth
+                  size="small"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                          <Title />
+                      </InputAdornment>
+                    ),
+                  }}
                   value={formData.madrasa_name}
                   onChange={(e) =>
                     setFormData({ ...formData, madrasa_name: e.target.value })
@@ -253,6 +264,14 @@ function MyMadrasas() {
                   label="Madrasa Fee"
                   fullWidth
                   value={formData.fee}
+                  size="small"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                          <Money />
+                      </InputAdornment>
+                    ),
+                  }}
                   onChange={(e) =>
                     setFormData({ ...formData, fee: e.target.value })
                   }
@@ -266,6 +285,14 @@ function MyMadrasas() {
                   fullWidth
                   multiline
                   rows={2}
+                  size="small"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                          <Description />
+                      </InputAdornment>
+                    ),
+                  }}
                   value={formData.description}
                   onChange={(e) =>
                     setFormData({ ...formData, description: e.target.value })
@@ -280,6 +307,14 @@ function MyMadrasas() {
                   fullWidth
                   multiline
                   rows={2}
+                  size="small"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                          <Map />
+                      </InputAdornment>
+                    ),
+                  }}
                   value={formData.address}
                   onChange={(e) =>
                     setFormData({ ...formData, address: e.target.value })
@@ -296,10 +331,18 @@ function MyMadrasas() {
               spacing={2}
               alignItems="center"
             >
-              <Grid item xs={9}>
+              <Grid item xs={8}>
                 <TextField
                   label="Add Batch"
                   fullWidth
+                  size="small"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                          <BatchPrediction />
+                      </InputAdornment>
+                    ),
+                  }}
                   value={formData.newBatch}
                   onChange={(e) =>
                     setFormData({ ...formData, newBatch: e.target.value })
@@ -307,8 +350,9 @@ function MyMadrasas() {
                   helperText={formErrors.batches}
                 />
               </Grid>
-              <Grid item xs={3}>
-                <Button variant="outlined" onClick={handleAddBatch}>
+              <Grid item xs={4}>
+                <Button 
+                variant="outlined" onClick={handleAddBatch}>
                   Add
                 </Button>
               </Grid>
@@ -334,17 +378,23 @@ function MyMadrasas() {
                 </ListItem>
               ))}
             </List>
-
-            <Button
-              variant="contained"
-              onClick={isEditing ? handleEditMadrasa : handleAddMadrasa}
-              disabled={loading}
-              startIcon={loading ? <CircularProgress size={20} /> : null}
-            >
-              {isEditing ? "Update Madrasa" : "Add Madrasa"}
-            </Button>
           </Stack>
         </DialogContent>
+
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)} color="secondary">
+            Cancel
+          </Button>
+          <Button
+           
+            onClick={isEditing ? handleEditMadrasa : handleAddMadrasa}
+            disabled={loading}
+            startIcon={loading ? <CircularProgress size={20} /> : null}
+            color="primary"
+          >
+            {isEditing ? "Update Madrasa" : "Add Madrasa"}
+          </Button>
+        </DialogActions>
       </Dialog>
     </div>
   );

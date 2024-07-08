@@ -7,7 +7,6 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
-import SlideTransition from "../animation/slide_transition";
 import NetworkHandler from "../../network/network_handler";
 import withNavUpdate from "../wrappers/with_nav_update";
 
@@ -187,4 +186,4 @@ function MasjidDetails() {
     </div>
   );
 }
-export default withNavUpdate(SlideTransition(MasjidDetails));
+export default withNavUpdate(MasjidDetails);

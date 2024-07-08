@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import SlideTransition from "../animation/slide_transition";
 import NetworkHandler from "../../network/network_handler";
 import {
   AppBar,
@@ -74,7 +73,7 @@ const Announcements = () => {
         Make Announcements
       </Typography>
 
-      <Paper sx={{ mb: 2 }} elevation={3}>
+      <Paper sx={{ mb: 2, mt:1 }} elevation={3}>
         <form style={{ padding: "10px" }} noValidate autoComplete="off">
           <TextField
             id="announcement-message"
@@ -82,6 +81,7 @@ const Announcements = () => {
             fullWidth
             multiline
             rows={4}
+            size="small"
             variant="outlined"
             value={announcementMessage}
             onChange={(e) => setAnnouncementMessage(e.target.value)}
@@ -105,7 +105,7 @@ const Announcements = () => {
               <Button
                 variant="contained"
                 color="primary"
-                size="large"
+                size="small"
                 endIcon={<SendIcon />}
                 onClick={handleSendAnnouncement}
                 disabled={loading}
@@ -150,4 +150,4 @@ const Announcements = () => {
   );
 };
 
-export default withNavUpdate(SlideTransition(Announcements));
+export default withNavUpdate(Announcements);

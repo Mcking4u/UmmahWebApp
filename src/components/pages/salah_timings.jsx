@@ -11,12 +11,12 @@ import {
   Snackbar,
   styled,
   TextField,
+  Slide,
 } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 import UploadIcon from "@mui/icons-material/Upload";
 import EditIcon from "@mui/icons-material/Edit";
 import { DataGrid } from "@mui/x-data-grid";
-import SlideTransition from "../animation/slide_transition";
 import NetworkHandler from "../../network/network_handler";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -24,6 +24,10 @@ import dayjs from "dayjs";
 import withNavUpdate from "../wrappers/with_nav_update";
 
 const networkHandler = new NetworkHandler();
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 // Create a styled TextField component
 const StyledTextField = styled(TextField)({
@@ -159,15 +163,16 @@ function SalahTimings() {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box>
-        <Typography variant="h5" gutterBottom>
+        {/* <Typography variant="h5" gutterBottom>
           Salah Timings
-        </Typography>
+        </Typography> */}
 
         <Box sx={{ display: "flex", mb: 2 }}>
           <Button
             onClick={handleDownload}
             startIcon={<DownloadIcon />}
             variant="outlined"
+            size="small"
           >
             Download Template
           </Button>
@@ -175,6 +180,7 @@ function SalahTimings() {
             startIcon={<UploadIcon />}
             variant="outlined"
             sx={{ ml: 2 }}
+            size="small"
             onClick={handleOpenDialog}
           >
             Upload
@@ -222,7 +228,9 @@ function SalahTimings() {
           />
         </Box>
 
-        <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <Dialog open={openDialog} onClose={handleCloseDialog}
+        TransitionComponent={Transition}
+        >
           <DialogTitle>Upload Template</DialogTitle>
           <DialogContent>
             <DialogContentText>Select the file to upload:</DialogContentText>
@@ -252,4 +260,4 @@ function SalahTimings() {
     </LocalizationProvider>
   );
 }
-export default withNavUpdate(SlideTransition(SalahTimings));
+export default withNavUpdate(SalahTimings);
