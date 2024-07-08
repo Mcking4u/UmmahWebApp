@@ -272,9 +272,8 @@ const Teachers = () => {
                 InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <IconButton edge="start">
+                       
                           <Phone />
-                        </IconButton>
                       </InputAdornment>
                     ),
                   }}
@@ -294,9 +293,8 @@ const Teachers = () => {
                 InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <IconButton edge="start">
+                     
                           <Person />
-                        </IconButton>
                       </InputAdornment>
                     ),
                   }}
@@ -316,9 +314,8 @@ const Teachers = () => {
                 InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <IconButton edge="start">
+                      
                           <Email />
-                        </IconButton>
                       </InputAdornment>
                     ),
                   }}
