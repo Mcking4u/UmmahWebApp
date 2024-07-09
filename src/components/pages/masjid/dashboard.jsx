@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, Typography, Grid, Box } from '@mui/material';
 import PeopleIcon from '@mui/icons-material/People';
 import { Mosque, SchoolSharp } from '@mui/icons-material';
-import NetworkHandler from '../../network/network_handler';
-import withNavUpdate from '../wrappers/with_nav_update';
+import NetworkHandler from '../../../network/network_handler';
+import withNavUpdate from '../../wrappers/with_nav_update';
 
 const Dashboard = () => {
   const [data, setData] = useState({

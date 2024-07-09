@@ -5,7 +5,7 @@ import theme from "./theme";
 import { Routes, Route } from "react-router-dom";
 
 import LoginPage from "./components/login/login";
-import MasjidHome from "./components/pages/masjid_home";
+import MasjidHome from "./components/pages/masjid/masjid_home";
 import Home from "./components/pages/home";
 import MadrasaHome from "./components/pages/madrasa/madrasa_home";
 

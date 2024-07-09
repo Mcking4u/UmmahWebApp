@@ -7,8 +7,8 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
-import NetworkHandler from "../../network/network_handler";
-import withNavUpdate from "../wrappers/with_nav_update";
+import NetworkHandler from "../../../network/network_handler";
+import withNavUpdate from "../../wrappers/with_nav_update";
 
 function MasjidDetails() {
   useEffect(() => {

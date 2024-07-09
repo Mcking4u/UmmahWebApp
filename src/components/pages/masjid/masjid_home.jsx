@@ -2,11 +2,11 @@ import Dashboard from "./dashboard";
 import MasjidDetails from "./masjid_details";
 import SalahTimings from "./salah_timings";
 import Announcements from "./announcements";
-import NavBar from "../nav/navbar";
+import NavBar from "../../nav/navbar";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import NotFound from "../404/not_found";
+import NotFound from "../../404/not_found";
 import React from "react";
-import NetworkHandler from "../../network/network_handler";
+import NetworkHandler from "../../../network/network_handler";
 
 import {
   Dashboard as DashboardIcon,

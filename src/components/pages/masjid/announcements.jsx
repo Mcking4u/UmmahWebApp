@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import NetworkHandler from "../../network/network_handler";
+import NetworkHandler from "../../../network/network_handler";
 import {
   AppBar,
   Toolbar,
@@ -19,7 +19,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { Send as SendIcon } from "@mui/icons-material";
-import withNavUpdate from "../wrappers/with_nav_update";
+import withNavUpdate from "../../wrappers/with_nav_update";
 
 const Announcements = () => {
   const [announcements, setAnnouncements] = useState([]);
