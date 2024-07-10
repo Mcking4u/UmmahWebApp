@@ -8,13 +8,13 @@ import withNavUpdate from '../../wrappers/with_nav_update';
 const Dashboard = () => {
   const [data, setData] = useState({
     teachers: 0,
-    madrasas: [],
+    madrasas: 0,
     students: 0,
   });
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await new NetworkHandler().getDashboard();
+      const response = await new NetworkHandler().getSuperDashboard();
       setData(response);
     };
 
@@ -22,7 +22,7 @@ const Dashboard = () => {
   }, []);
 
   const cardsData = [
-    { icon: <Mosque sx={{color:"#019B8F", fontSize:100}} />, number: data.madrasas.length, text: 'Total Madrasas' },
+    { icon: <Mosque sx={{color:"#019B8F", fontSize:100}} />, number: data.madrasas, text: 'Total Madrasas' },
     { icon: <PeopleIcon  sx={{color:"#019B8F", fontSize:100}} />, number: data.teachers, text: 'Total Teachers' },
     { icon: <SchoolSharp  sx={{color:"#019B8F", fontSize:100}}  />, number: data.students, text: 'Total Students' },
   ];

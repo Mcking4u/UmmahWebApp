@@ -8,28 +8,20 @@ import NetworkHandler from "../../../network/network_handler";
 import Madrasas from "./madrasas";
 import Accounts from "./accounts";
 import Volunteer from "./volunteer";
-import VolunteerCategories from "./volunteer_categories";
 import Job from "./job";
-import JobCategories from "./job_categories";
 import Daawah from "./daawah";
-import DaawahCategories from "./daawah_categories";
 import Activity from "./activity";
-import ActivityCategories from "./activity_categories";
 import Event from "./events";
-import EventCategories from "./event_categories";
 import Networking from "./networking";
-import NetworkingCategories from "./networking_categories";
 import UmrahHajj from "./umrah_and_hajj";
 import Faq from "./faq";
 import Learning from "./islamic_learning";
-
 
 import {
   Dashboard as DashboardIcon,
   Mosque,
   Person,
   VolunteerActivism as VolunteerIcon,
-  Category as CategoryIcon,
   Work as JobIcon,
   Forum as DaawahIcon,
   Task as ActivityIcon,
@@ -46,17 +38,11 @@ const navLinks = [
   { path: "/admin/accounts", label: "User Accounts", icon: <Person /> },
   { path: "/admin/madrasas", label: "Madrasas", icon: <Mosque /> },
   { path: "/admin/volunteer", label: "Volunteer", icon: <VolunteerIcon /> },
-  { path: "/admin/volunteer/categories", label: "Volunteer Categories", icon: <CategoryIcon /> },
   { path: "/admin/job", label: "Job", icon: <JobIcon /> },
-  { path: "/admin/job/categories", label: "Job Categories", icon: <CategoryIcon /> },
   { path: "/admin/daawah", label: "Daawah", icon: <DaawahIcon /> },
-  { path: "/admin/daawah/categories", label: "Daawah Categories", icon: <CategoryIcon /> },
   { path: "/admin/activity", label: "Activity", icon: <ActivityIcon /> },
-  { path: "/admin/activity/categories", label: "Activity Categories", icon: <CategoryIcon /> },
   { path: "/admin/event", label: "Event", icon: <EventIcon /> },
-  { path: "/admin/event/categories", label: "Event Categories", icon: <CategoryIcon /> },
   { path: "/admin/networking", label: "Networking", icon: <NetworkingIcon /> },
-  { path: "/admin/networking/categories", label: "Networking Categories", icon: <CategoryIcon /> },
   { path: "/admin/umrah-hajj", label: "Umrah and Hajj", icon: <UmrahHajjIcon /> },
   { path: "/admin/faq", label: "Faq's", icon: <FaqIcon /> },
   { path: "/admin/learning", label: "Islamic Learning", icon: <LearningIcon /> },
@@ -111,94 +97,43 @@ const AdminHome = () => {
           }
         />
         <Route
-          path="/volunteer/categories"
-          element={
-            <VolunteerCategories
-              route={navLinks[5].path}
-              label={navLinks[5].label}
-            />
-          }
-        />
-        <Route
           path="/job"
-          element={<Job route={navLinks[6].path} label={navLinks[6].label} />}
-        />
-        <Route
-          path="/job/categories"
-          element={
-            <JobCategories route={navLinks[7].path} label={navLinks[7].label} />
-          }
+          element={<Job route={navLinks[5].path} label={navLinks[5].label} />}
         />
         <Route
           path="/daawah"
-          element={<Daawah route={navLinks[8].path} label={navLinks[8].label} />}
-        />
-        <Route
-          path="/daawah/categories"
-          element={
-            <DaawahCategories
-              route={navLinks[9].path}
-              label={navLinks[9].label}
-            />
-          }
+          element={<Daawah route={navLinks[6].path} label={navLinks[6].label} />}
         />
         <Route
           path="/activity"
           element={
-            <Activity route={navLinks[10].path} label={navLinks[10].label} />
-          }
-        />
-        <Route
-          path="/activity/categories"
-          element={
-            <ActivityCategories
-              route={navLinks[11].path}
-              label={navLinks[11].label}
-            />
+            <Activity route={navLinks[7].path} label={navLinks[7].label} />
           }
         />
         <Route
           path="/event"
-          element={<Event route={navLinks[12].path} label={navLinks[12].label} />}
-        />
-        <Route
-          path="/event/categories"
-          element={
-            <EventCategories
-              route={navLinks[13].path}
-              label={navLinks[13].label}
-            />
-          }
+          element={<Event route={navLinks[8].path} label={navLinks[8].label} />}
         />
         <Route
           path="/networking"
           element={
-            <Networking route={navLinks[14].path} label={navLinks[14].label} />
-          }
-        />
-        <Route
-          path="/networking/categories"
-          element={
-            <NetworkingCategories
-              route={navLinks[15].path}
-              label={navLinks[15].label}
-            />
+            <Networking route={navLinks[9].path} label={navLinks[9].label} />
           }
         />
         <Route
           path="/umrah-hajj"
           element={
-            <UmrahHajj route={navLinks[16].path} label={navLinks[16].label} />
+            <UmrahHajj route={navLinks[10].path} label={navLinks[10].label} />
           }
         />
         <Route
           path="/faq"
-          element={<Faq route={navLinks[17].path} label={navLinks[17].label} />}
+          element={<Faq route={navLinks[11].path} label={navLinks[11].label} />}
         />
         <Route
           path="/learning"
           element={
-            <Learning route={navLinks[18].path} label={navLinks[18].label} />
+            <Learning route={navLinks[12].path} label={navLinks[12].label} />
           }
         />
         <Route path="/*" element={<NotFound />} />

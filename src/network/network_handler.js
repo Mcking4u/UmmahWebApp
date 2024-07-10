@@ -1,10 +1,11 @@
 import axios from "axios";
 
-const host = "http://127.0.0.1:8000";
-// const host = "https://objects.ummah-app.com";
+export const host = "http://127.0.0.1:8000";
+// export const host = "https://objects.ummah-app.com";
 const baseUrls = {
   landing: `${host}/landing/api`,
   masjid: `${host}/masjid/api`,
+  root: host,
 };
 
 class NetworkHandler {
@@ -610,7 +611,103 @@ class NetworkHandler {
   }
   
   
-    
+  async getCategoryAdmin(url) {
+    const headers = {
+      "Accept": "application/json, text/plain, */*",
+      "Accept-Language": "en-US,en;q=0.9,fi-FI;q=0.8,fi;q=0.7,sv-FI;q=0.6,sv;q=0.5,de;q=0.4",
+      "Authorization": `Token ${localStorage.getItem(NetworkHandler.loginTokenKey)}`,
+    };
+  
+    try {
+      const axiosInstance = axios.create({
+        baseURL: baseUrls.root,
+      });
+      const response = await axiosInstance.get(url, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async addCategoryAdmin(url, category, image) { 
+    const headers = {
+      Accept: "application/json, text/plain, */*",
+      Authorization: `Token ${localStorage.getItem(NetworkHandler.loginTokenKey)}`,
+      "Content-Type": "application/json",
+    };
+  
+    const data = { category, image }; // Include the image data
+  
+    try {
+      const axiosInstance = axios.create({
+        baseURL: baseUrls.root,
+      });
+      const response = await axiosInstance.post(url, data, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
+  async editCategoryAdmin(url, categoryId, category, image) {
+    const headers = {
+      Accept: "application/json, text/plain, */*",
+      Authorization: `Token ${localStorage.getItem(NetworkHandler.loginTokenKey)}`,
+      "Content-Type": "application/json",
+    };
+  
+    const data = { id: categoryId, category, image };
+  
+    try {
+      const axiosInstance = axios.create({
+        baseURL: baseUrls.root,
+      });
+      const response = await axiosInstance.post(url, data, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+  
+  
+
+  async getPendingApprovalsAdmin(url) {
+    const headers = {
+      Accept: "application/json, text/plain, */*", // Standard for JSON responses
+      Authorization: `Token ${localStorage.getItem(NetworkHandler.loginTokenKey)}`, // Crucial for authentication
+    };
+  
+    try {
+      const axiosInstance = axios.create({
+        baseURL: baseUrls.root, 
+      });
+      const response = await axiosInstance.get(url, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async approveApprovalsAdmin(url, id) {
+    const headers = {
+      Accept: "application/json, text/plain, */*",
+      Authorization: `Token ${localStorage.getItem(NetworkHandler.loginTokenKey)}`,
+      "Content-Type": "application/json",
+    };
+  
+    const data = { id: id };
+  
+    try {
+      const axiosInstance = axios.create({
+        baseURL: baseUrls.root,
+      });
+      const response = await axiosInstance.post(url, data, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
   
 
 }
