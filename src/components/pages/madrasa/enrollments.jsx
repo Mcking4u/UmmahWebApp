@@ -113,7 +113,7 @@ const EnrollmentDataGrid = () => {
   };
 
   const columns = [
-    { field: "name", headerName: "Student Name", width: 150, flex: 1 },
+    { field: "name", headerName: "Student Name", width: 150, flex: 1, minWidth:150 },
     { field: "parent_name", headerName: "Parent Name", width: 150, flex: 1 },
     {
       field: "emergency_contact",

@@ -81,7 +81,7 @@ const TeachersMapping = () => {
   };
 
   const columns = [
-    { field: 'username', headerName: 'Username', width: 150, flex:1 },
+    { field: 'username', headerName: 'Username', width: 150, flex:1 , minWidth:150},
     { field: 'name', headerName: 'Name', width: 150, flex:1 },
     { field: 'email', headerName: 'Email', width: 200, flex:1 },
     {

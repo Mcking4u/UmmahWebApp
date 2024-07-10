@@ -12,8 +12,9 @@ import {
   CircularProgress,
   Box,
   InputAdornment,
+  IconButton,
 } from "@mui/material";
-import { Add, Phone, Email, LocationOn, Lock, Home, Flag, MarkunreadMailbox, Edit, Person, Map } from "@mui/icons-material";
+import { Add, Phone, Email, LocationOn, Lock, Home, Flag, MarkunreadMailbox, Edit, Person, Map, Close } from "@mui/icons-material";
 import withNavUpdate from "../../wrappers/with_nav_update";
 import NetworkHandler from "../../../network/network_handler";
 
@@ -96,6 +97,7 @@ const Masjids = () => {
       thumbnail_url: "",
       Password: "",
     });
+    setFormErrors({});
   };
 
   const handleFormChange = (event) => {
@@ -125,7 +127,7 @@ const Masjids = () => {
 
 
 const columns = [
-    { field: "name", headerName: "Masjid Name", width: 200, flex: 1 },
+    { field: "name", headerName: "Masjid Name", width: 200, minWidth:150, flex: 1 },
     {
       field: "thumbnail_url",
       headerName: "Thumbnail Image",
@@ -197,7 +199,15 @@ const columns = [
         onClose={handleDialogClose}
         TransitionComponent={Slide}
       >
-        <DialogTitle sx={{ mb: 0, pb: 0 }}>{isEditMode ? "Edit Masjid" : "Add Masjid"}</DialogTitle>
+        <DialogTitle sx={{ mb: 0, pb: 0 }}>{isEditMode ? "Edit Masjid" : "Add Masjid"}
+        <IconButton
+            aria-label="close"
+            onClick={handleDialogClose}
+            sx={{ position: "absolute", right: 8, top: 8 }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
         <DialogContent>
           <Grid sx={{ mt: 0.5 }} container spacing={2}>
             <Grid item xs={6} sm={12} md={6}>

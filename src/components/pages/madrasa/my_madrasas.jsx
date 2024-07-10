@@ -163,7 +163,7 @@ function MyMadrasas() {
   };
 
   const columns = [
-    { field: "name", headerName: "Madrasa Name", width: 200, flex: 1 },
+    { field: "name", headerName: "Madrasa Name", width: 200, flex: 1 , minWidth:150},
     { field: "describtion", headerName: "Description", width: 300, flex: 2 },
     { field: "address", headerName: "Address", width: 150, flex: 1 },
     {
@@ -347,6 +347,7 @@ function MyMadrasas() {
                   onChange={(e) =>
                     setFormData({ ...formData, newBatch: e.target.value })
                   }
+                  error={!!formErrors.batches}
                   helperText={formErrors.batches}
                 />
               </Grid>

@@ -512,6 +512,44 @@ class NetworkHandler {
     }
   }
 
+  async addAccountAdmin(data) {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/add-account";
+  
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json",
+    };
+  
+    try {
+      const response = await this.axiosInstance.post(url, data, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async resetAccountPasswordAdmin(password, accountId) {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/reset-password";
+  
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json",
+    };
+  
+    const data = { password, account_id: accountId };
+  
+    try {
+      const response = await this.axiosInstance.post(url, data, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
 
   async addMadrasaAdmin(madrasaData) {
     const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
@@ -528,6 +566,46 @@ class NetworkHandler {
       return response.data;
     } catch (error) {
       throw error; // Handle errors in the interceptor
+    }
+  }
+  
+
+
+  async getMadrasasAdmin() {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/get-madrasas-init"; 
+
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+    };
+
+    try {
+      const response = await this.axiosInstance.get(url, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  
+
+
+  async editMadrasaAdmin(madrasaData) {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/edit-madrasa";
+  
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json",
+    };
+  
+    try {
+      const response = await this.axiosInstance.post(url, madrasaData, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
     }
   }
   
