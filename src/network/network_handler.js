@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// const host = "http://127.0.0.1:8000";
-const host = "https://objects.ummah-app.com";
+const host = "http://127.0.0.1:8000";
+// const host = "https://objects.ummah-app.com";
 const baseUrls = {
   landing: `${host}/landing/api`,
   masjid: `${host}/masjid/api`,
@@ -64,6 +64,24 @@ class NetworkHandler {
       throw error;
     }
   }
+
+  async getSuperDashboard() {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/ummah/getsuperdashboard"; // Relative to the 'landing' base URL
+  
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+    };
+  
+    try {
+      const response = await this.axiosInstance.get(url, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+  
 
   async getMasjidProfile() {
     const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
@@ -411,6 +429,109 @@ class NetworkHandler {
       throw error;
     }
   }
+
+
+  async getMasjidAdmin() {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/getmasjid"; // Relative to the 'masjid' base URL
+  
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+      // Other headers from cURL can be omitted as Axios handles them automatically
+    };
+  
+    try {
+      const response = await this.axiosInstance.get(url, {
+        baseURL: baseUrls.masjid,  // Override the default baseURL to 'masjid'
+        headers
+      });
+      return response.data;
+    } catch (error) {
+      throw error; 
+    }
+  }
+
+  
+  async addMasjidAdmin(masjidData) {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey); // Get auth token
+    const url = "/addmasjid"; // Relative to the 'masjid' base URL
+  
+    const headers = {
+      Authorization: `Token ${authToken}`, // Use the retrieved auth token
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json",
+      // Other headers from cURL can be omitted as Axios handles them automatically
+    };
+  
+    try {
+      const response = await this.axiosInstance.post(url, masjidData, {
+        baseURL: baseUrls.masjid, // Set the base URL for 'masjid' API
+        headers,
+      });
+      return response.data;
+    } catch (error) {
+      throw error; // Handle errors using the interceptor
+    }
+  }
+
+  async editMasjidAdmin(masjidData) {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/editmasjid";
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json",
+    };
+    try {
+      const response = await this.axiosInstance.post(url, masjidData, {
+        baseURL: baseUrls.masjid,
+        headers,
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getAccountsAdmin() {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/get-accounts"; // Relative to the 'landing' base URL
+  
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+      // Other headers from cURL can be omitted as Axios handles them automatically
+    };
+  
+    try {
+      const response = await this.axiosInstance.get(url, { headers }); // No need to override baseURL for 'landing'
+      return response.data;
+    } catch (error) {
+      throw error; // Handle errors using the interceptor
+    }
+  }
+
+
+  async addMadrasaAdmin(madrasaData) {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/add-madrasa"; // Relative to the 'landing' base URL
+  
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json",
+    };
+  
+    try {
+      const response = await this.axiosInstance.post(url, madrasaData, { headers });
+      return response.data;
+    } catch (error) {
+      throw error; // Handle errors in the interceptor
+    }
+  }
+  
+  
     
   
 

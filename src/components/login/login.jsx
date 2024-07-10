@@ -64,11 +64,15 @@ const LoginPage = () => {
           localStorage.setItem(NetworkHandler.loginResponseKey, JSON.stringify(response));
           let is_masjid_admin = response.is_masjid_admin;
           let is_ummah_admin = response.is_ummah_admin;
+          let is_super_user = response.is_super_user;
           if(is_masjid_admin){
             navigate("/masjid/");
           }
           else if(is_ummah_admin){
             navigate("/madrasa/")
+          } 
+          else if (is_super_user){
+            navigate("/admin/")
           }
         }
         else {

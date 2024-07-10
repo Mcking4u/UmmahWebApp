@@ -8,6 +8,7 @@ import LoginPage from "./components/login/login";
 import MasjidHome from "./components/pages/masjid/masjid_home";
 import Home from "./components/pages/home";
 import MadrasaHome from "./components/pages/madrasa/madrasa_home";
+import AdminHome from "./components/pages/admin/admin_home";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/" element={<Home />} />
         <Route path="/masjid/*" element={<MasjidHome />} />
+        <Route path="/admin/*" element={<AdminHome />} />
         <Route path="/madrasa/*" element={<MadrasaHome />} />
       </Routes>
     </ThemeProvider>

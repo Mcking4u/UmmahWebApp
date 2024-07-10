@@ -199,10 +199,10 @@ function NavBar(props) {
                   >
                     <Box sx={{ p: 2 }}>
                       <Typography variant="h6">
-                        {userData.name || "Admin"}
+                        {userData.username || "Admin"}
                       </Typography>
                       <Typography variant="subtitle1">
-                        {userData.email || "admin@olari.com"}
+                        {userData.name || "Admin"}
                       </Typography>
                       <Button
                         variant="contained"
