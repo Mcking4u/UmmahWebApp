@@ -40,7 +40,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const dawaahs = () => {
+const Daawah = () => {
   const [pendingApprovals, setPendingApprovals] = useState([]);
   const [categories, setCategories] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -317,4 +317,4 @@ const dawaahs = () => {
   );
 };
 
-export default withNavUpdate(dawaahs);
+export default withNavUpdate(Daawah);

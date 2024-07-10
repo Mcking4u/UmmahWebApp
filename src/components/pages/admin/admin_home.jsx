@@ -44,8 +44,9 @@ const navLinks = [
   { path: "/admin/event", label: "Event", icon: <EventIcon /> },
   { path: "/admin/networking", label: "Networking", icon: <NetworkingIcon /> },
   { path: "/admin/umrah-hajj", label: "Umrah and Hajj", icon: <UmrahHajjIcon /> },
-  { path: "/admin/faq", label: "Faq's", icon: <FaqIcon /> },
   { path: "/admin/learning", label: "Islamic Learning", icon: <LearningIcon /> },
+  // { path: "/admin/faq", label: "Faq's", icon: <FaqIcon /> },
+
 ];
 
 const AdminHome = () => {
@@ -64,7 +65,7 @@ const AdminHome = () => {
   }, []);
 
   return (
-    <NavBar navLinks={navLinks}>
+    <NavBar navLinks={navLinks} useDividers={true}>
       <Routes>
         <Route
           path="/"
@@ -127,15 +128,15 @@ const AdminHome = () => {
           }
         />
         <Route
-          path="/faq"
-          element={<Faq route={navLinks[11].path} label={navLinks[11].label} />}
-        />
-        <Route
           path="/learning"
-          element={
-            <Learning route={navLinks[12].path} label={navLinks[12].label} />
-          }
+          element={<Learning route={navLinks[11].path} label={navLinks[11].label} />}
         />
+        {/* <Route
+          path="/faq"
+          element={
+            <Faq route={navLinks[12].path} label={navLinks[12].label} />
+          }
+        /> */}
         <Route path="/*" element={<NotFound />} />
       </Routes>
     </NavBar>

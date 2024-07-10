@@ -32,7 +32,7 @@ import {
 const drawerWidth = 240;
 
 function NavBar(props) {
-  const { window, navLinks } = props;
+  const { window, navLinks, useDividers } = props;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [userData, setUserData] = useState(null);
@@ -105,25 +105,50 @@ function NavBar(props) {
       </Toolbar>
       <Divider />
       <List>
-        {navLinks.map((link) => (
-          <ListItem key={link.path} disablePadding>
-            <ListItemButton
-              selected={activeLink === link.path}
-              sx={{
-                "&:hover": {
-                  borderRadius: "12px",
-                },
-                "&.Mui-selected": {
-                  borderRadius: "12px",
-                },
-                mb: 1,
-              }}
-              onClick={() => navigateTo(link.path)}
-            >
-              <ListItemIcon>{link.icon}</ListItemIcon>
-              <ListItemText primary={link.label} />
-            </ListItemButton>
-          </ListItem>
+        {navLinks.map((link, index) => (
+          <React.Fragment  key={link.path}>
+            <ListItem disablePadding>
+              <ListItemButton
+                selected={activeLink === link.path}
+                sx={{
+                  "&:hover": {
+                    borderRadius: "12px",
+                  },
+                  "&.Mui-selected": {
+                    borderRadius: "12px",
+                  },
+                  mb: 1,
+                }}
+                onClick={() => navigateTo(link.path)}
+              >
+                <ListItemIcon>{link.icon}</ListItemIcon>
+                <ListItemText primary={link.label} />
+              </ListItemButton>
+            </ListItem>
+            {useDividers && index === 3 ? (
+              <div>
+                <Divider />
+                <Typography
+                  component="div"
+                  variant="subtitle1"
+                  sx={{ mt: 2, pl: 2, mb: 1 }}
+                >
+                  Services
+                </Typography>
+              </div>
+            ) : (
+              <div></div>
+            )}
+
+            {useDividers && index === 0 || index === 9 ? (
+              <div>
+                <Divider sx={{mb:1}} />
+              </div>
+            ) : (
+              <div></div>
+            )}
+
+          </React.Fragment>
         ))}
       </List>
       <Divider />

@@ -708,6 +708,133 @@ class NetworkHandler {
       throw error;
     }
   }
+
+  async getUmrahAndHajj() {
+    const url = "/umrahandhajj/api/getall";
+  
+    const headers = {
+      Accept: "application/json, text/plain, */*", 
+      Authorization: `Token ${localStorage.getItem(NetworkHandler.loginTokenKey)}`,
+    };
+  
+    try {
+      const axiosInstance = axios.create({
+        baseURL: baseUrls.root, 
+      });
+      const response = await axiosInstance.get(url, { headers });
+      return response.data;
+    } catch (error) {
+      throw error; 
+    }
+  }
+  
+
+  async addVendorAdmin(vendorData) {
+    const url = "/umrahandhajj/api/addvendor";
+  
+    const headers = {
+      Accept: "application/json, text/plain, */*",
+      Authorization: `Token ${localStorage.getItem(NetworkHandler.loginTokenKey)}`,
+      "Content-Type": "application/json",
+    };
+  
+    try {
+      const axiosInstance = axios.create({
+        baseURL: baseUrls.root,
+      });
+      const response = await axiosInstance.post(url, vendorData, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+  
+
+  async getIslamicLearningData() {
+    const url = "/IslamicLearning/api/getdata";
+  
+    const headers = {
+      Accept: "application/json, text/plain, */*",
+      Authorization: `Token ${localStorage.getItem(NetworkHandler.loginTokenKey)}`,
+      "Content-Type": "application/json",
+    };
+  
+  
+    try {
+      const axiosInstance = axios.create({
+        baseURL: baseUrls.root, // Ensure the correct base URL for this API
+      });
+  
+      const response = await axiosInstance.get(url, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async addIslamicLearningCategory(categoryname) {
+    const url = "/IslamicLearning/api/addcategory";
+  
+    const headers = {
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json",
+      Authorization: `Token ${localStorage.getItem(NetworkHandler.loginTokenKey)}`,
+    };
+  
+    const data = { categoryname };
+  
+    try {
+      const axiosInstance = axios.create({
+        baseURL: baseUrls.root,
+      });
+      const response = await axiosInstance.post(url, data, { headers });
+      return response.data;
+    } catch (error) {
+      throw error; 
+    }
+  }
+
+  async addIslamicLearningVideo(videoData) {
+    const url = "/IslamicLearning/api/AddVideo"; 
+  
+    const headers = {
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json",
+      Authorization: `Token ${localStorage.getItem(NetworkHandler.loginTokenKey)}`,
+    };
+  
+    try {
+      const axiosInstance = axios.create({
+        baseURL: baseUrls.root,
+      });
+      const response = await axiosInstance.post(url, videoData, { headers });
+      return response.data;
+    } catch (error) {
+      throw error; 
+    }
+  }
+
+  async deleteIslamicLearningVideo(videoId) {
+    const url = `/IslamicLearning/api/delete/${videoId}`; // Use template literal to include videoId
+  
+    const headers = {
+      Accept: "application/json, text/plain, */*", 
+      Authorization: `Token ${localStorage.getItem(NetworkHandler.loginTokenKey)}`,
+    };
+  
+    try {
+      const axiosInstance = axios.create({
+        baseURL: baseUrls.root,
+      });
+      const response = await axiosInstance.post(url, null, { headers }); // POST request with null data
+      return response.data;
+    } catch (error) {
+      throw error; 
+    }
+  }
+  
+  
+  
   
 
 }
