@@ -17,7 +17,7 @@ import {
   styled,
 } from "@mui/material";
 import NetworkHandler, { host } from "../../../network/network_handler";
-import { Add, Approval, Category, Close, Edit } from "@mui/icons-material";
+import { Add, Approval, Cancel, Category, Close, Edit } from "@mui/icons-material";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -52,14 +52,17 @@ const Daawah = () => {
   const [error, setFormError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchPendingApprovals = async () => {
-      const approvals = await new NetworkHandler().getPendingApprovalsAdmin(
-        approvalEndpoint
-      );
-      setPendingApprovals(approvals);
-    };
+  const [rejections, setRejections] = useState([]);
 
+  const fetchPendingApprovals = async () => {
+    const response = await new NetworkHandler().getPendingApprovalsAdmin(
+      approvalEndpoint
+    );
+    setPendingApprovals(response.approvals);
+    setRejections(response.rejected);
+  };
+
+  useEffect(() => {
     const fetchCategories = async () => {
       const categoriesData = await new NetworkHandler().getCategoryAdmin(
         categoryEndpoint
@@ -71,14 +74,11 @@ const Daawah = () => {
     fetchCategories();
   }, []);
 
-  const handleApprove = async (id) => {
-    await new NetworkHandler().approveApprovalsAdmin(approvalEndpoint, id);
-    // Refresh the data
-    const approvals = await new NetworkHandler().getPendingApprovalsAdmin(
-      approvalEndpoint
-    );
-    setPendingApprovals(approvals);
+  const handleApprove = async (id, approve) => {
+    await new NetworkHandler().approveApprovalsAdmin(approvalEndpoint, id, approve);
+    fetchPendingApprovals();
   };
+
 
   const handleOpenDialog = (category = null) => {
     setIsEditMode(!!category);
@@ -165,19 +165,38 @@ const Daawah = () => {
     {
       field: "action",
       headerName: "Action",
-      width: 150,
+      width: 200,
       renderCell: (params) => (
-        <Button
+        <Box sx={{display:"flex", gap:"5px"}}>
+         <Button
           size="small"
           startIcon={<Approval />}
           variant="contained"
           color="primary"
-          onClick={() => handleApprove(params.id)}
+          onClick={() => handleApprove(params.id, true)}
         >
           Approve
         </Button>
+        <Button
+          size="small"
+          startIcon={<Cancel />}
+          variant="contained"
+          color="secondary"
+          onClick={() => handleApprove(params.id, false)}
+        >
+          Reject
+        </Button>
+       </Box>
       ),
     },
+  ];
+
+
+  const pendingRejections = [
+    { field: "hosted_by", headerName: "Host", width: 150, flex: 1 },
+    { field: "topic", headerName: "Topic", width: 150, flex: 1 },
+    { field: "description", headerName: "Description", width: 200, flex: 1 },
+    { field: "dawaah_type", headerName: "Type", width: 150, flex: 1 },
   ];
 
   const categoryColumns = [
@@ -222,6 +241,11 @@ const Daawah = () => {
       <h2>Pending Approvals</h2>
       <div style={{ height: 250, width: "100%" }}>
         <DataGrid rows={pendingApprovals} columns={pendingApprovalColumns} />
+      </div>
+
+      <h2 style={{marginTop:"20px"}}>Rejections</h2>
+      <div style={{ height: 250, width: "100%" }}>
+        <DataGrid rows={rejections} columns={pendingRejections} />
       </div>
       <Box
         sx={{

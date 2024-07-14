@@ -689,14 +689,14 @@ class NetworkHandler {
     }
   }
 
-  async approveApprovalsAdmin(url, id) {
+  async approveApprovalsAdmin(url, id, approve) {
     const headers = {
       Accept: "application/json, text/plain, */*",
       Authorization: `Token ${localStorage.getItem(NetworkHandler.loginTokenKey)}`,
       "Content-Type": "application/json",
     };
   
-    const data = { id: id };
+    const data = { id: id, approve: approve };
   
     try {
       const axiosInstance = axios.create({
