@@ -30,7 +30,7 @@ const navLinks = [
   },
   {
     path: "/madrasa/enrollments",
-    label: "Enrollments",
+    label: "Students",
     icon: <ListOutlined />,
   },
   {

@@ -1,7 +1,7 @@
 import axios from "axios";
 
-export const host = "http://127.0.0.1:8000";
-// export const host = "https://objects.ummah-app.com";
+// export const host = "http://127.0.0.1:8000";
+export const host = "https://objects.ummah-app.com";
 const baseUrls = {
   landing: `${host}/landing/api`,
   masjid: `${host}/masjid/api`,

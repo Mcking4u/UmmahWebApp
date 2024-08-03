@@ -16,7 +16,8 @@ import {
 } from "@mui/material";
 import NetworkHandler from "../../../network/network_handler";
 import withNavUpdate from "../../wrappers/with_nav_update";
-import { Approval, Cancel, Check } from "@mui/icons-material";
+import { Cancel, Check } from "@mui/icons-material";
+import ReplayIcon from "@mui/icons-material/Replay";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -25,6 +26,12 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const EnrollmentDataGrid = () => {
   const [enrollments, setEnrollments] = useState([]);
   const [filteredEnrollments, setFilteredEnrollments] = useState([]);
+  const [completedEnrollments, setCompletedEnrollments] = useState([]);
+  const [filteredCompletedEnrollments, setFilteredCompletedEnrollments] =
+    useState([]);
+  const [rejectedEnrollments, setRejectedEnrollments] = useState([]);
+  const [filteredRejectedEnrollments, setFilteredRejectedEnrollments] =
+    useState([]);
   const [madrasas, setMadrasas] = useState([]);
   const [selectedMadrasa, setSelectedMadrasa] = useState("");
   const [openApproveDialog, setOpenApproveDialog] = useState(false);
@@ -39,9 +46,18 @@ const EnrollmentDataGrid = () => {
       const response = await new NetworkHandler().getMadrasaEnrollments();
       setMadrasas(response.madrasas);
       setSelectedMadrasa(response.madrasas[0].name);
-      setEnrollments(
-        response.madrasas.flatMap((madrasa) => madrasa.pending_enrolls)
+      const allEnrollments = response.madrasas.flatMap(
+        (madrasa) => madrasa.pending_enrolls
       );
+      const allCompletedEnrollments = response.madrasas.flatMap(
+        (madrasa) => madrasa.completed
+      );
+      const allRejectedEnrollments = response.madrasas.flatMap(
+        (madrasa) => madrasa.rejected
+      );
+      setEnrollments(allEnrollments);
+      setCompletedEnrollments(allCompletedEnrollments);
+      setRejectedEnrollments(allRejectedEnrollments);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -56,9 +72,23 @@ const EnrollmentDataGrid = () => {
       (enrollment) => enrollment.enrolled_madrasa.name === selectedMadrasa
     );
     setFilteredEnrollments(filtered);
+    const filteredCompleted = completedEnrollments.filter(
+      (enrollment) => enrollment.enrolled_madrasa.name === selectedMadrasa
+    );
+    setFilteredCompletedEnrollments(filteredCompleted);
+    const filteredRejected = rejectedEnrollments.filter(
+      (enrollment) => enrollment.enrolled_madrasa.name === selectedMadrasa
+    );
+    setFilteredRejectedEnrollments(filteredRejected);
     const madrasa = madrasas.find((m) => m.name === selectedMadrasa);
     setCurrentTeachers(madrasa ? madrasa.teachers : []);
-  }, [selectedMadrasa, enrollments, madrasas]);
+  }, [
+    selectedMadrasa,
+    enrollments,
+    completedEnrollments,
+    rejectedEnrollments,
+    madrasas,
+  ]);
 
   const handleMadrasaChange = (event) => {
     setSelectedMadrasa(event.target.value);
@@ -113,7 +143,13 @@ const EnrollmentDataGrid = () => {
   };
 
   const columns = [
-    { field: "name", headerName: "Student Name", width: 150, flex: 1, minWidth:150 },
+    {
+      field: "name",
+      headerName: "Student Name",
+      width: 150,
+      flex: 1,
+      minWidth: 150,
+    },
     { field: "parent_name", headerName: "Parent Name", width: 150, flex: 1 },
     {
       field: "emergency_contact",
@@ -151,6 +187,60 @@ const EnrollmentDataGrid = () => {
     },
   ];
 
+  const completedColumns = [
+    {
+      field: "name",
+      headerName: "Student Name",
+      width: 150,
+      flex: 1,
+      minWidth: 150,
+    },
+    { field: "parent_name", headerName: "Parent Name", width: 150, flex: 1 },
+    {
+      field: "emergency_contact",
+      headerName: "Contact Number",
+      width: 150,
+      flex: 1,
+    },
+    {
+      field: "approve",
+      headerName: "Reassign",
+      renderCell: (params) => (
+        <IconButton
+          color="primary"
+          onClick={() => handleOpenApproveDialog(params.row.id)}
+        >
+          <ReplayIcon />
+        </IconButton>
+      ),
+      width: 150,
+      flex: 0.5,
+    },
+  ];
+
+  const rejectedColumns = [
+    {
+      field: "name",
+      headerName: "Student Name",
+      width: 150,
+      flex: 1,
+      minWidth: 150,
+    },
+    { field: "parent_name", headerName: "Parent Name", width: 150, flex: 1 },
+    {
+      field: "emergency_contact",
+      headerName: "Contact Number",
+      width: 150,
+      flex: 1,
+    },
+    {
+      field: "reason",
+      headerName: "Reason for rejection",
+      width: 150,
+      flex: 2,
+    },
+  ];
+
   const rows = filteredEnrollments.map((enrollment) => ({
     id: enrollment.id,
     name: enrollment.name,
@@ -158,6 +248,21 @@ const EnrollmentDataGrid = () => {
     emergency_contact: enrollment.emergency_contact,
   }));
 
+  const completedRows = filteredCompletedEnrollments.map((enrollment) => ({
+    id: enrollment.id,
+    name: enrollment.name,
+    parent_name: enrollment.parent_name,
+    emergency_contact: enrollment.emergency_contact,
+    status: enrollment.status,
+  }));
+
+  const rejectedRows = filteredRejectedEnrollments.map((enrollment) => ({
+    id: enrollment.id,
+    name: enrollment.name,
+    parent_name: enrollment.parent_name,
+    emergency_contact: enrollment.emergency_contact,
+    reason: enrollment.enrolled_comment,
+  }));
   return (
     <div>
       <FormControl
@@ -179,9 +284,41 @@ const EnrollmentDataGrid = () => {
           ))}
         </Select>
       </FormControl>
-      <div style={{ height: 400, width: "100%" }}>
-        <DataGrid rows={rows} columns={columns} pageSize={5} />
-      </div>
+
+      {rows.length > 0 && (
+        <div style={{ height: 300, width: "100%", marginBottom: "120px" }}>
+          <h3>Pending Enrollments</h3>
+          <DataGrid rows={rows} columns={columns} pageSize={5} />
+        </div>
+      )}
+      {completedRows.length > 0 && (
+        <div style={{ height: 300, width: "100%", marginBottom: "120px" }}>
+          <h3>Enrolled Students</h3>
+          <DataGrid
+            rows={completedRows}
+            columns={completedColumns}
+            pageSize={5}
+          />
+        </div>
+      )}
+
+      {rejectedRows.length > 0 && (
+        <div
+          style={{
+            height: 300,
+            width: "100%",
+            marginBottom: "120px",
+            marginTop: "100px",
+          }}
+        >
+          <h3>Rejected Enrollments</h3>
+          <DataGrid
+            rows={rejectedRows}
+            columns={rejectedColumns}
+            pageSize={5}
+          />
+        </div>
+      )}
 
       {/* Approve Dialog */}
       <Dialog
