@@ -11,6 +11,7 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
+  Typography,
   Slide,
   IconButton,
 } from "@mui/material";
@@ -284,41 +285,44 @@ const EnrollmentDataGrid = () => {
           ))}
         </Select>
       </FormControl>
+      {/* {rows.length <= 0 && completedRows.length <= 0 &&  rejectedRows.length <= 0 && (
+      <Typography variant="subtitle1" >No students available for this madrasa, please check again later.</Typography>
+      )} */}
 
-      {rows.length > 0 && (
-        <div style={{ height: 300, width: "100%", marginBottom: "120px" }}>
-          <h3>Pending Enrollments</h3>
-          <DataGrid rows={rows} columns={columns} pageSize={5} />
-        </div>
-      )}
-      {completedRows.length > 0 && (
-        <div style={{ height: 300, width: "100%", marginBottom: "120px" }}>
-          <h3>Enrolled Students</h3>
-          <DataGrid
-            rows={completedRows}
-            columns={completedColumns}
-            pageSize={5}
-          />
-        </div>
-      )}
+      <div style={{ height: 300, width: "100%", marginBottom: "70px" }}>
+        <h3>Pending Enrollments</h3>
+        <DataGrid rows={rows} columns={columns} pageSize={5} />
+      </div>
 
-      {rejectedRows.length > 0 && (
-        <div
-          style={{
-            height: 300,
-            width: "100%",
-            marginBottom: "120px",
-            marginTop: "100px",
-          }}
-        >
-          <h3>Rejected Enrollments</h3>
-          <DataGrid
-            rows={rejectedRows}
-            columns={rejectedColumns}
-            pageSize={5}
-          />
-        </div>
-      )}
+      {/* {rows.length > 0 && (
+       
+      )} */}
+
+      <div style={{ height: 300, width: "100%", marginBottom: "70px" }}>
+        <h3>Enrolled Students</h3>
+        <DataGrid
+          rows={completedRows}
+          columns={completedColumns}
+          pageSize={5}
+        />
+      </div>
+      {/* {completedRows.length > 0 && (
+     
+      )} */}
+
+      {/* {rejectedRows.length > 0 && (
+       
+      )} */}
+      <div
+        style={{
+          height: 300,
+          width: "100%",
+          marginBottom: "70px",
+        }}
+      >
+        <h3>Rejected Enrollments</h3>
+        <DataGrid rows={rejectedRows} columns={rejectedColumns} pageSize={5} />
+      </div>
 
       {/* Approve Dialog */}
       <Dialog

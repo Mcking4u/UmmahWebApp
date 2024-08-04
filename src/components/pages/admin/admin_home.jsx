@@ -45,7 +45,7 @@ const navLinks = [
   { path: "/admin/networking", label: "Networking", icon: <NetworkingIcon /> },
   { path: "/admin/umrah-hajj", label: "Umrah and Hajj", icon: <UmrahHajjIcon /> },
   { path: "/admin/learning", label: "Islamic Learning", icon: <LearningIcon /> },
-  // { path: "/admin/faq", label: "Faq's", icon: <FaqIcon /> },
+  { path: "/admin/faq", label: "Faq's", icon: <FaqIcon /> },
 
 ];
 
@@ -131,12 +131,12 @@ const AdminHome = () => {
           path="/learning"
           element={<Learning route={navLinks[11].path} label={navLinks[11].label} />}
         />
-        {/* <Route
+        <Route
           path="/faq"
           element={
             <Faq route={navLinks[12].path} label={navLinks[12].label} />
           }
-        /> */}
+        />
         <Route path="/*" element={<NotFound />} />
       </Routes>
     </NavBar>

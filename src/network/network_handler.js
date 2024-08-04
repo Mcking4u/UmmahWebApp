@@ -5,6 +5,7 @@ export const host = "https://objects.ummah-app.com";
 const baseUrls = {
   landing: `${host}/landing/api`,
   masjid: `${host}/masjid/api`,
+  faq: `${host}/faq/api`,
   root: host,
 };
 
@@ -830,6 +831,43 @@ class NetworkHandler {
       return response.data;
     } catch (error) {
       throw error; 
+    }
+  }
+
+
+  async getFaqs() {
+    const url = "/faq"; 
+    const headers = {
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json",
+    };
+    try {
+      const response = await this.axiosInstance.get(url, {
+        baseURL: baseUrls.faq,
+        headers,
+      });
+      return response.data; 
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
+
+  async addFaq(data) {
+    const url = "/add"; 
+    const headers = {
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json",
+    };
+    try {
+      const response = await this.axiosInstance.post(url, data, {
+        baseURL: baseUrls.faq,
+        headers,
+      });
+      return response.data; 
+    } catch (error) {
+      throw error;
     }
   }
   
