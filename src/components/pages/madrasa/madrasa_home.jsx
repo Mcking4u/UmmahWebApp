@@ -7,8 +7,9 @@ import {
   ListOutlined,
   Mosque,
   Person2,
+  People
 } from "@mui/icons-material";
-import GraphicEqIcon from '@mui/icons-material/GraphicEq';
+import GraphicEqIcon from "@mui/icons-material/GraphicEq";
 import NotFoundPage from "../../404/not_found";
 import NavBar from "../../nav/navbar";
 import MyMadrasas from "./my_madrasas";
@@ -18,6 +19,7 @@ import Enrollments from "./enrollments";
 import Mapping from "./mapping";
 import NetworkHandler from "../../../network/network_handler";
 import Dashboard from "./madrasa_dashboard";
+import Students from "./students";
 
 const navLinks = [
   { path: "/madrasa/", label: "Dashboard", icon: <DashboardIcon /> },
@@ -30,13 +32,18 @@ const navLinks = [
   },
   {
     path: "/madrasa/enrollments",
-    label: "Students",
+    label: "Enrollments",
     icon: <ListOutlined />,
   },
   {
     path: "/madrasa/mapping",
     label: "Teachers Mapping",
     icon: <GraphicEqIcon />,
+  },
+  {
+    path: "/madrasa/students",
+    label: "Students",
+    icon: <People />,
   },
 ];
 
@@ -50,7 +57,7 @@ const MadrasaHome = () => {
     let responseData = localStorage.getItem(NetworkHandler.loginResponseKey);
     responseData = JSON.parse(responseData);
     let is_ummah_admin = responseData.is_ummah_admin;
-    if(!is_ummah_admin){
+    if (!is_ummah_admin) {
       navigate("/login");
     }
   }, []);
@@ -67,10 +74,7 @@ const MadrasaHome = () => {
         <Route
           path="/details"
           element={
-            <MyMadrasas
-              route={navLinks[1].path}
-              label={navLinks[1].label}
-            />
+            <MyMadrasas route={navLinks[1].path} label={navLinks[1].label} />
           }
         />
         <Route
@@ -99,6 +103,14 @@ const MadrasaHome = () => {
             <Mapping route={navLinks[5].path} label={navLinks[5].label} />
           }
         />
+
+        <Route
+          path="/students"
+          element={
+            <Students route={navLinks[6].path} label={navLinks[6].label} />
+          }
+        />
+
         <Route path="/*" element={<NotFoundPage />} />
       </Routes>
     </NavBar>

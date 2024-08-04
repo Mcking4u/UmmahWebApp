@@ -24,7 +24,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const EnrollmentDataGrid = () => {
+const Students = () => {
   const [enrollments, setEnrollments] = useState([]);
   const [filteredEnrollments, setFilteredEnrollments] = useState([]);
   const [completedEnrollments, setCompletedEnrollments] = useState([]);
@@ -289,23 +289,23 @@ const EnrollmentDataGrid = () => {
       <Typography variant="subtitle1" >No students available for this madrasa, please check again later.</Typography>
       )} */}
 
-      <div style={{ height: 300, width: "100%", marginBottom: "70px" }}>
+      {/* <div style={{ height: 300, width: "100%", marginBottom: "70px" }}>
         <h3>Pending Enrollments</h3>
         <DataGrid rows={rows} columns={columns} pageSize={5} />
-      </div>
+      </div> */}
 
       {/* {rows.length > 0 && (
        
       )} */}
 
-      {/* <div style={{ height: 300, width: "100%", marginBottom: "70px" }}>
-        <h3>Enrolled Students</h3>
+      <div style={{ height: 300, width: "100%", marginBottom: "70px" }}>
+        {/* <h3>Enrolled Students</h3> */}
         <DataGrid
           rows={completedRows}
           columns={completedColumns}
           pageSize={5}
         />
-      </div> */}
+      </div>
       {/* {completedRows.length > 0 && (
      
       )} */}
@@ -313,7 +313,7 @@ const EnrollmentDataGrid = () => {
       {/* {rejectedRows.length > 0 && (
        
       )} */}
-      <div
+      {/* <div
         style={{
           height: 300,
           width: "100%",
@@ -322,7 +322,7 @@ const EnrollmentDataGrid = () => {
       >
         <h3>Rejected Enrollments</h3>
         <DataGrid rows={rejectedRows} columns={rejectedColumns} pageSize={5} />
-      </div>
+      </div> */}
 
       {/* Approve Dialog */}
       <Dialog
@@ -393,4 +393,4 @@ const EnrollmentDataGrid = () => {
   );
 };
 
-export default withNavUpdate(EnrollmentDataGrid);
+export default withNavUpdate(Students);
