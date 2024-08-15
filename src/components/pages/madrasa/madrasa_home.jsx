@@ -7,7 +7,8 @@ import {
   ListOutlined,
   Mosque,
   Person2,
-  People
+  People,
+  Timeline
 } from "@mui/icons-material";
 import GraphicEqIcon from "@mui/icons-material/GraphicEq";
 import NotFoundPage from "../../404/not_found";
@@ -20,6 +21,7 @@ import Mapping from "./mapping";
 import NetworkHandler from "../../../network/network_handler";
 import Dashboard from "./madrasa_dashboard";
 import Students from "./students";
+import Sessions from "./sessions";
 
 const navLinks = [
   { path: "/madrasa/", label: "Dashboard", icon: <DashboardIcon /> },
@@ -45,6 +47,7 @@ const navLinks = [
     label: "Students",
     icon: <People />,
   },
+  { path: "/madrasa/sessions", label: "Sessions", icon: <Timeline /> },
 ];
 
 const MadrasaHome = () => {
@@ -108,6 +111,12 @@ const MadrasaHome = () => {
           path="/students"
           element={
             <Students route={navLinks[6].path} label={navLinks[6].label} />
+          }
+        />
+        <Route
+          path="/sessions"
+          element={
+            <Sessions route={navLinks[7].path} label={navLinks[7].label} />
           }
         />
 

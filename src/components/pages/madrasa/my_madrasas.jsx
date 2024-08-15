@@ -163,7 +163,7 @@ function MyMadrasas() {
   };
 
   const columns = [
-    { field: "name", headerName: "Madrasa Name", width: 200, flex: 1 , minWidth:150},
+    { field: "name", headerName: "Madrasa Name", width: 200, flex: 1, minWidth: 150 },
     { field: "describtion", headerName: "Description", width: 300, flex: 2 },
     { field: "address", headerName: "Address", width: 150, flex: 1 },
     {
@@ -236,10 +236,10 @@ function MyMadrasas() {
           </IconButton>
         </DialogTitle>
 
-        <DialogContent sx={{maxWidth:350}}>
+        <DialogContent sx={{ maxWidth: 350 }}>
           <Stack>
             <Grid sx={{ mt: 1 }} container spacing={2} alignItems="center">
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={12}>
                 <TextField
                   label="Madrasa Name"
                   fullWidth
@@ -247,7 +247,7 @@ function MyMadrasas() {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                          <Title />
+                        <Title />
                       </InputAdornment>
                     ),
                   }}
@@ -259,7 +259,7 @@ function MyMadrasas() {
                   helperText={formErrors.madrasa_name}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={12}>
                 <TextField
                   label="Madrasa Fee"
                   fullWidth
@@ -268,7 +268,7 @@ function MyMadrasas() {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                          <Money />
+                        <Money />
                       </InputAdornment>
                     ),
                   }}
@@ -289,7 +289,7 @@ function MyMadrasas() {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                          <Description />
+                        <Description />
                       </InputAdornment>
                     ),
                   }}
@@ -311,7 +311,7 @@ function MyMadrasas() {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                          <Map />
+                        <Map />
                       </InputAdornment>
                     ),
                   }}
@@ -339,7 +339,7 @@ function MyMadrasas() {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                          <BatchPrediction />
+                        <BatchPrediction />
                       </InputAdornment>
                     ),
                   }}
@@ -352,8 +352,8 @@ function MyMadrasas() {
                 />
               </Grid>
               <Grid item xs={4}>
-                <Button 
-                variant="outlined" onClick={handleAddBatch}>
+                <Button
+                  variant="outlined" onClick={handleAddBatch}>
                   Add
                 </Button>
               </Grid>
@@ -387,7 +387,7 @@ function MyMadrasas() {
             Cancel
           </Button>
           <Button
-           
+
             onClick={isEditing ? handleEditMadrasa : handleAddMadrasa}
             disabled={loading}
             startIcon={loading ? <CircularProgress size={20} /> : null}

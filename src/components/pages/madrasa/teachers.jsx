@@ -18,8 +18,8 @@ import {
   IconButton,
   InputAdornment,
 } from "@mui/material";
+import { InputBase } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-
 import SlideTransition from "../../animation/slide_transition";
 import NetworkHandler from "../../../network/network_handler";
 import { Add, Edit, Email, Person, Phone } from "@mui/icons-material";
@@ -29,6 +29,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="left" ref={ref} {...props} />;
 });
 
+const countryCodes = ["+358", "+92", "+91"];
 
 const Teachers = () => {
   const [teachersData, setTeachersData] = useState([]);
@@ -42,6 +43,7 @@ const Teachers = () => {
     name: "",
     email: "",
     madrasa: "",
+    countryCode: countryCodes[0],
   });
   const [formErrors, setFormErrors] = useState({
     phoneNumber: "",
@@ -68,7 +70,7 @@ const Teachers = () => {
   };
 
   const columns = [
-    { field: "username", headerName: "Username", width: 150, flex: 1, minWidth:150 },
+    { field: "username", headerName: "Username", width: 150, flex: 1, minWidth: 150 },
     {
       field: "name",
       headerName: "Name",
@@ -102,12 +104,17 @@ const Teachers = () => {
   ];
 
   const handleEdit = (teacher) => {
+    const matchedCountryCode = countryCodes.find((code) =>
+      teacher.username.startsWith(code)
+    );
+
     setSelectedTeacherId(teacher.id);
     setForm({
-      phoneNumber: teacher.username,
+      phoneNumber: teacher.username.replace(matchedCountryCode, ""),
       name: teacher.profile.name,
       email: teacher.profile.email,
       madrasa: teacher.madrasa_id,
+      countryCode: matchedCountryCode || countryCodes[0],
     });
     setIsEditMode(true);
     setOpen(true);
@@ -125,6 +132,7 @@ const Teachers = () => {
       name: "",
       email: "",
       madrasa: "",
+      countryCode: countryCodes[0],
     });
     setFormErrors({
       phoneNumber: "",
@@ -138,6 +146,13 @@ const Teachers = () => {
     setForm({
       ...form,
       [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleCountryCodeChange = (event) => {
+    setForm({
+      ...form,
+      countryCode: event.target.value,
     });
   };
 
@@ -177,17 +192,17 @@ const Teachers = () => {
       setLoading(true);
       const networkHandler = new NetworkHandler();
       try {
+        const teacherData = {
+          username: `${form.countryCode}${form.phoneNumber}`,
+          name: form.name,
+          email: form.email,
+        };
+
         if (isEditMode) {
-          await networkHandler.editTeacher(selectedTeacherId, {
-            username: form.phoneNumber,
-            name: form.name,
-            email: form.email,
-          });
+          await networkHandler.editTeacher(selectedTeacherId, teacherData);
         } else {
           await networkHandler.addTeacher({
-            username: form.phoneNumber,
-            name: form.name,
-            email: form.email,
+            ...teacherData,
             madrasa_id: form.madrasa,
           });
         }
@@ -204,7 +219,7 @@ const Teachers = () => {
 
   return (
     <Box sx={{ height: 400, width: "100%" }}>
-      <Grid container sx={{ marginBottom: 2, width:"100%" }} spacing={2} alignItems="center">
+      <Grid container sx={{ marginBottom: 2, width: "100%" }} spacing={2} alignItems="center">
         <Grid item>
           <FormControl fullWidth variant="outlined">
             <InputLabel>Select Madrasa</InputLabel>
@@ -212,7 +227,7 @@ const Teachers = () => {
               value={selectedMadrasa}
               onChange={handleMadrasaChange}
               label="Select Madrasa"
-              sx={{minWidth:150}}
+              sx={{ minWidth: 150 }}
             >
               {madrasas.map((madrasa, index) => (
                 <MenuItem key={index} value={index}>
@@ -222,19 +237,17 @@ const Teachers = () => {
             </Select>
           </FormControl>
         </Grid>
-        <Grid item
-        flexGrow={1}
-        >
-          <Box sx={{with:'100%', textAlign:"right"}}>
-          <Button
-            variant="contained"
-            color="primary"
-            size="small"
-            startIcon={<Add />}
-            onClick={handleOpenDialog}
-          >
-            Add Teacher
-          </Button>
+        <Grid item flexGrow={1}>
+          <Box sx={{ with: "100%", textAlign: "right" }}>
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              startIcon={<Add />}
+              onClick={handleOpenDialog}
+            >
+              Add Teacher
+            </Button>
           </Box>
         </Grid>
       </Grid>
@@ -262,26 +275,49 @@ const Teachers = () => {
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent sx={{maxWidth:300}}>
+        <DialogContent sx={{ maxWidth: 300 }}>
           <Grid sx={{ mt: 1 }} container spacing={2} alignItems="center">
             <Grid item xs={12} sm={12}>
               <TextField
                 label="Phone Number"
                 name="phoneNumber"
                 size="small"
-                InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                       
-                          <Phone />
-                      </InputAdornment>
-                    ),
-                  }}
                 value={form.phoneNumber}
                 onChange={handleFormChange}
                 error={!!formErrors.phoneNumber}
                 helperText={formErrors.phoneNumber}
                 fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <FormControl variant="standard" size="small" sx={{ marginRight: 1 }}>
+                        <Select
+                          value={form.countryCode}
+                          onChange={handleCountryCodeChange}
+                          input={<InputBase />}
+                          sx={{
+                            minWidth: 70,
+                            "& .MuiSelect-select": {
+                              paddingLeft: 0,
+                            },
+                            "& .MuiSelect-icon": {
+                              display: 'none', // Hide the dropdown icon if needed
+                            },
+                            "& .MuiOutlinedInput-notchedOutline": {
+                              border: 'none', // Remove the border
+                            },
+                          }}
+                        >
+                          {countryCodes.map((code) => (
+                            <MenuItem key={code} value={code}>
+                              {code}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </Grid>
 
@@ -291,13 +327,12 @@ const Teachers = () => {
                 name="name"
                 size="small"
                 InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                     
-                          <Person />
-                      </InputAdornment>
-                    ),
-                  }}
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Person />
+                    </InputAdornment>
+                  ),
+                }}
                 value={form.name}
                 onChange={handleFormChange}
                 error={!!formErrors.name}
@@ -305,20 +340,18 @@ const Teachers = () => {
                 fullWidth
               />
             </Grid>
-
             <Grid item xs={12} sm={12}>
               <TextField
                 label="Email"
                 name="email"
                 size="small"
                 InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                      
-                          <Email />
-                      </InputAdornment>
-                    ),
-                  }}
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Email />
+                    </InputAdornment>
+                  ),
+                }}
                 value={form.email}
                 onChange={handleFormChange}
                 error={!!formErrors.email}
@@ -326,19 +359,13 @@ const Teachers = () => {
                 fullWidth
               />
             </Grid>
-
-            <Grid item xs={12} sm={12}>
-              {!isEditMode && (
-                <FormControl
-                  fullWidth
-                  variant="outlined"
-           
-                >
-                  <InputLabel>Select Madrasa</InputLabel>
+            {!isEditMode && (
+              <Grid item xs={12} sm={12}>
+                <FormControl fullWidth variant="outlined" size="small">
+                  <InputLabel>Madrasa</InputLabel>
                   <Select
-                    label="Select Madrasa"
+                    label="Madrasa"
                     name="madrasa"
-                    size="small"
                     value={form.madrasa}
                     onChange={handleFormChange}
                     error={!!formErrors.madrasa}
@@ -350,26 +377,18 @@ const Teachers = () => {
                     ))}
                   </Select>
                   {formErrors.madrasa && (
-                    <Box
-                      sx={{
-                        color: "error.main",
-                        fontSize: "0.75rem",
-                        marginTop: 1,
-                      }}
-                    >
-                      {formErrors.madrasa}
-                    </Box>
+                    <p style={{ color: "red" }}>{formErrors.madrasa}</p>
                   )}
                 </FormControl>
-              )}
-            </Grid>
+              </Grid>
+            )}
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} color="secondary">
+          <Button onClick={handleCloseDialog} color="primary" variant="outlined">
             Cancel
           </Button>
-          <Button onClick={handleSubmit} color="primary" disabled={loading}>
+          <Button onClick={handleSubmit} color="primary" variant="contained">
             {loading ? <CircularProgress size={24} /> : "Save"}
           </Button>
         </DialogActions>
