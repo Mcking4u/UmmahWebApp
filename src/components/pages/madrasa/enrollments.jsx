@@ -11,7 +11,6 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
-  Typography,
   Slide,
   IconButton,
 } from "@mui/material";
@@ -28,6 +27,7 @@ const EnrollmentDataGrid = () => {
   const [enrollments, setEnrollments] = useState([]);
   const [filteredEnrollments, setFilteredEnrollments] = useState([]);
   const [completedEnrollments, setCompletedEnrollments] = useState([]);
+  const [allEnrollments, setAllEnrollments] = useState([]);
   const [filteredCompletedEnrollments, setFilteredCompletedEnrollments] =
     useState([]);
   const [rejectedEnrollments, setRejectedEnrollments] = useState([]);
@@ -38,9 +38,9 @@ const EnrollmentDataGrid = () => {
   const [openApproveDialog, setOpenApproveDialog] = useState(false);
   const [openRejectDialog, setOpenRejectDialog] = useState(false);
   const [selectedStudentId, setSelectedStudentId] = useState(null);
-  const [selectedTeacher, setSelectedTeacher] = useState("");
+  const [selectedSessions, setSelectedSessions] = useState({});
   const [rejectReason, setRejectReason] = useState("");
-  const [currentTeachers, setCurrentTeachers] = useState([]);
+  const [approveLoading, setAppRoveLoading] = useState(false);
 
   async function fetchData() {
     try {
@@ -77,12 +77,11 @@ const EnrollmentDataGrid = () => {
       (enrollment) => enrollment.enrolled_madrasa.name === selectedMadrasa
     );
     setFilteredCompletedEnrollments(filteredCompleted);
+    setAllEnrollments([...filtered, ...filteredCompleted]);
     const filteredRejected = rejectedEnrollments.filter(
       (enrollment) => enrollment.enrolled_madrasa.name === selectedMadrasa
     );
     setFilteredRejectedEnrollments(filteredRejected);
-    const madrasa = madrasas.find((m) => m.name === selectedMadrasa);
-    setCurrentTeachers(madrasa ? madrasa.teachers : []);
   }, [
     selectedMadrasa,
     enrollments,
@@ -97,12 +96,13 @@ const EnrollmentDataGrid = () => {
 
   const handleOpenApproveDialog = (studentId) => {
     setSelectedStudentId(studentId);
+    setSelectedSessions({}); // Reset selected sessions
     setOpenApproveDialog(true);
   };
 
   const handleCloseApproveDialog = () => {
     setOpenApproveDialog(false);
-    setSelectedTeacher("");
+    setSelectedSessions({});
   };
 
   const handleOpenRejectDialog = (studentId) => {
@@ -115,18 +115,43 @@ const EnrollmentDataGrid = () => {
     setRejectReason("");
   };
 
+  const handleSessionTeacherChange = (sessionId, teacherId) => {
+    setSelectedSessions((prev) => ({
+      ...prev,
+      [sessionId]: teacherId,
+    }));
+  };
+
   const handleApprove = async () => {
+    const sessions = Object.keys(selectedSessions).map((sessionId) => ({
+      session_id: sessionId,
+      teacher_id: selectedSessions[sessionId],
+    }));
+
+    if (sessions.length != allRows
+      .find((row) => row.id === selectedStudentId)
+      ?.sessions.length) {
+      alert("Please select teachers");
+      return;
+    }
+    setAppRoveLoading(true);
+
     const assignmentData = {
       student_id: selectedStudentId,
-      teacher_id: selectedTeacher,
+      sessions,
     };
+
+
     try {
       await new NetworkHandler().assignTeacher(assignmentData);
       handleCloseApproveDialog();
       fetchData();
     } catch (error) {
-      console.error("Error assigning teacher:", error);
+      setAppRoveLoading(false);
+
+      console.error("Error assigning teachers:", error);
     }
+    setAppRoveLoading(false);
   };
 
   const handleReject = async () => {
@@ -247,6 +272,15 @@ const EnrollmentDataGrid = () => {
     name: enrollment.name,
     parent_name: enrollment.parent_name,
     emergency_contact: enrollment.emergency_contact,
+    sessions: enrollment.sessions,
+  }));
+
+  const allRows = allEnrollments.map((enrollment) => ({
+    id: enrollment.id,
+    name: enrollment.name,
+    parent_name: enrollment.parent_name,
+    emergency_contact: enrollment.emergency_contact,
+    sessions: enrollment.sessions,
   }));
 
   const completedRows = filteredCompletedEnrollments.map((enrollment) => ({
@@ -264,6 +298,7 @@ const EnrollmentDataGrid = () => {
     emergency_contact: enrollment.emergency_contact,
     reason: enrollment.enrolled_comment,
   }));
+
   return (
     <div>
       <FormControl
@@ -285,96 +320,92 @@ const EnrollmentDataGrid = () => {
           ))}
         </Select>
       </FormControl>
-      {/* {rows.length <= 0 && completedRows.length <= 0 &&  rejectedRows.length <= 0 && (
-      <Typography variant="subtitle1" >No students available for this madrasa, please check again later.</Typography>
-      )} */}
 
-      <div style={{ height: 300, width: "100%", marginBottom: "70px" }}>
-        <h3>Pending Enrollments</h3>
-        <DataGrid rows={rows} columns={columns} pageSize={5} />
+      <div style={{ height: 400, width: "100%", marginBottom: "20px" }}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          pageSize={5}
+          disableSelectionOnClick
+        />
       </div>
 
-      {/* {rows.length > 0 && (
-       
-      )} */}
-
-      {/* <div style={{ height: 300, width: "100%", marginBottom: "70px" }}>
-        <h3>Enrolled Students</h3>
+      <div style={{ height: 400, width: "100%", marginBottom: "20px" }}>
         <DataGrid
           rows={completedRows}
           columns={completedColumns}
           pageSize={5}
+          disableSelectionOnClick
         />
-      </div> */}
-      {/* {completedRows.length > 0 && (
-     
-      )} */}
-
-      {/* {rejectedRows.length > 0 && (
-       
-      )} */}
-      <div
-        style={{
-          height: 300,
-          width: "100%",
-          marginBottom: "70px",
-        }}
-      >
-        <h3>Rejected Enrollments</h3>
-        <DataGrid rows={rejectedRows} columns={rejectedColumns} pageSize={5} />
       </div>
 
-      {/* Approve Dialog */}
+      <div style={{ height: 400, width: "100%", marginBottom: "20px" }}>
+        <DataGrid
+          rows={rejectedRows}
+          columns={rejectedColumns}
+          pageSize={5}
+          disableSelectionOnClick
+        />
+      </div>
+
       <Dialog
         open={openApproveDialog}
         TransitionComponent={Transition}
+        keepMounted
         onClose={handleCloseApproveDialog}
       >
-        <DialogTitle>Assign Teacher</DialogTitle>
-        <DialogContent sx={{ minWidth: 300 }}>
-          <FormControl fullWidth sx={{ mt: 1 }}>
-            <InputLabel id="teacher-select-label">Select Teacher</InputLabel>
-            <Select
-              labelId="teacher-select-label"
-              id="teacher-select"
-              value={selectedTeacher}
-              onChange={(e) => setSelectedTeacher(e.target.value)}
-              label="Select Teacher"
-            >
-              {currentTeachers.map((teacher) => (
-                <MenuItem key={teacher.id} value={teacher.id}>
-                  {teacher.profile.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+        <DialogTitle>Assign Teachers</DialogTitle>
+        <DialogContent
+          sx={{ minWidth: 400 }}
+        >
+          {allRows
+            .find((row) => row.id === selectedStudentId)
+            ?.sessions.map((session) => (
+              <FormControl fullWidth key={session.id} margin="normal">
+                <InputLabel>Select teacher for {session.name}</InputLabel>
+                <Select
+                  value={selectedSessions[session.id] || ""}
+                  label={`Select teacher for ${session.name}`}
+                  onChange={(e) =>
+                    handleSessionTeacherChange(session.id, e.target.value)
+                  }
+                >
+                  {session.teachers.map((teacher) => (
+                    <MenuItem key={teacher.id} value={teacher.id}>
+                      {teacher.profile.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ))}
+
+
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseApproveDialog} color="secondary">
             Cancel
           </Button>
-          <Button onClick={handleApprove} color="primary">
-            Save
+          <Button onClick={handleApprove}
+            disabled={approveLoading}
+            color="primary">
+            Approve
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Reject Dialog */}
       <Dialog
         open={openRejectDialog}
         TransitionComponent={Transition}
+        keepMounted
         onClose={handleCloseRejectDialog}
       >
         <DialogTitle>Reject Enrollment</DialogTitle>
-        <DialogContent sx={{ minWidth: 300 }}>
+        <DialogContent>
           <TextField
-            autoFocus
-            margin="dense"
-            id="reject-reason"
-            rows={4}
-            multiline
             label="Reason for Rejection"
-            type="text"
+            multiline
+            rows={4}
+            variant="outlined"
             fullWidth
             value={rejectReason}
             onChange={(e) => setRejectReason(e.target.value)}
@@ -385,7 +416,7 @@ const EnrollmentDataGrid = () => {
             Cancel
           </Button>
           <Button onClick={handleReject} color="primary">
-            Save
+            Reject
           </Button>
         </DialogActions>
       </Dialog>

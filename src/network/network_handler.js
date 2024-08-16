@@ -1,7 +1,7 @@
 import axios from "axios";
 
-export const host = "http://127.0.0.1:8000";
-// export const host = "https://objects.ummah-app.com";
+// export const host = "http://127.0.0.1:8000";
+export const host = "https://objects.ummah-app.com";
 const baseUrls = {
   landing: `${host}/landing/api`,
   masjid: `${host}/masjid/api`,
@@ -889,7 +889,7 @@ class NetworkHandler {
       throw error;
     }
   }
-  async addSession(madrasaId, day, startTime, endTime, gender, teachers) {
+  async addSession(madrasaId, day, startTime, endTime, gender, teachers, name) {
     const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
     const url = "/ummah/sessions";
 
@@ -904,7 +904,8 @@ class NetworkHandler {
       start_time: startTime,
       end_time: endTime,
       gender: gender,
-      teachers: teachers
+      teachers: teachers,
+      name: name
     };
 
     try {
@@ -915,7 +916,7 @@ class NetworkHandler {
     }
   }
 
-  async editSession(madrasaId, day, startTime, endTime, gender, sessionId, teachers) {
+  async editSession(madrasaId, day, startTime, endTime, gender, sessionId, teachers, name) {
     const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
     const url = "/ummah/sessions";
 
@@ -931,7 +932,8 @@ class NetworkHandler {
       end_time: endTime,
       gender: gender,
       id: sessionId, // Include the session ID for updating
-      teachers: teachers
+      teachers: teachers,
+      name: name,
     };
 
     try {

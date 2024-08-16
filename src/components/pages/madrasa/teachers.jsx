@@ -282,6 +282,7 @@ const Teachers = () => {
                 label="Phone Number"
                 name="phoneNumber"
                 size="small"
+                placeholder="442446786"
                 value={form.phoneNumber}
                 onChange={handleFormChange}
                 error={!!formErrors.phoneNumber}

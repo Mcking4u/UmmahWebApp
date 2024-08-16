@@ -27,6 +27,7 @@ const navLinks = [
   { path: "/madrasa/", label: "Dashboard", icon: <DashboardIcon /> },
   { path: "/madrasa/details", label: "My Madrasas", icon: <Mosque /> },
   { path: "/madrasa/teachers", label: "Teachers", icon: <Person2 /> },
+  { path: "/madrasa/sessions", label: "Sessions", icon: <Timeline /> },
   {
     path: "/madrasa/announcements",
     label: "Announcements",
@@ -47,7 +48,6 @@ const navLinks = [
     label: "Students",
     icon: <People />,
   },
-  { path: "/madrasa/sessions", label: "Sessions", icon: <Timeline /> },
 ];
 
 const MadrasaHome = () => {
@@ -87,36 +87,36 @@ const MadrasaHome = () => {
           }
         />
         <Route
+          path="/sessions"
+          element={
+            <Sessions route={navLinks[3].path} label={navLinks[3].label} />
+          }
+        />
+        <Route
           path="/announcements"
           element={
-            <Announcements route={navLinks[3].path} label={navLinks[3].label} />
+            <Announcements route={navLinks[4].path} label={navLinks[4].label} />
           }
         />
 
         <Route
           path="/enrollments"
           element={
-            <Enrollments route={navLinks[4].path} label={navLinks[4].label} />
+            <Enrollments route={navLinks[5].path} label={navLinks[5].label} />
           }
         />
 
         <Route
           path="/mapping"
           element={
-            <Mapping route={navLinks[5].path} label={navLinks[5].label} />
+            <Mapping route={navLinks[6].path} label={navLinks[6].label} />
           }
         />
 
         <Route
           path="/students"
           element={
-            <Students route={navLinks[6].path} label={navLinks[6].label} />
-          }
-        />
-        <Route
-          path="/sessions"
-          element={
-            <Sessions route={navLinks[7].path} label={navLinks[7].label} />
+            <Students route={navLinks[7].path} label={navLinks[7].label} />
           }
         />
 

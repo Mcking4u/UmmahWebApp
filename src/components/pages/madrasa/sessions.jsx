@@ -7,6 +7,10 @@ import {
 import { DataGrid } from '@mui/x-data-grid';
 import { forwardRef } from 'react';
 import { Add, Edit } from '@mui/icons-material';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
 import withNavUpdate from '../../wrappers/with_nav_update';
 import NetworkHandler from '../../../network/network_handler';
 
@@ -25,8 +29,9 @@ function Sessions() {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [formData, setFormData] = useState({
         day: '',
-        startTime: '',
-        endTime: '',
+        name: '',
+        startTime: null,
+        endTime: null,
         gender: '',
         teachers: []
     });
@@ -43,7 +48,6 @@ function Sessions() {
 
     useEffect(() => {
         // Fetch madrasas and their sessions
-
         fetchSessions();
     }, []);
 
@@ -61,18 +65,20 @@ function Sessions() {
         if (session) {
             setFormData({
                 day: session.row.day,
-                startTime: session.row.start_time,
-                endTime: session.row.end_time,
+                startTime: dayjs(session.row.start_time, 'HH:mm'),
+                endTime: dayjs(session.row.end_time, 'HH:mm'),
                 gender: session.row.gender,
-                teachers: session.row.teachers
+                teachers: session.row.teachers,
+                name: session.row.name,
             });
         } else {
             setFormData({
                 day: '',
-                startTime: '',
-                endTime: '',
+                startTime: null,
+                endTime: null,
                 gender: '',
-                teachers: []
+                teachers: [],
+                name: '',
             });
         }
         setOpen(true);
@@ -83,16 +89,18 @@ function Sessions() {
     };
 
     const handleSave = async () => {
-        const { day, startTime, endTime, gender, teachers } = formData;
+        const { day, startTime, endTime, gender, teachers, name } = formData;
         const teacherIds = teachers;
+        const formattedStartTime = startTime ? startTime.format('HH:mm') : '';
+        const formattedEndTime = endTime ? endTime.format('HH:mm') : '';
 
         if (selectedSession) {
             // Edit existing session
-            await new NetworkHandler().editSession(selectedMadrasa.id, day, startTime, endTime, gender, selectedSession.id, teacherIds);
+            await new NetworkHandler().editSession(selectedMadrasa.id, day, formattedStartTime, formattedEndTime, gender, selectedSession.id, teacherIds, name);
             await fetchSessions();
         } else {
             // Add new session
-            await new NetworkHandler().addSession(selectedMadrasa.id, day, startTime, endTime, gender, teacherIds);
+            await new NetworkHandler().addSession(selectedMadrasa.id, day, formattedStartTime, formattedEndTime, gender, teacherIds, name);
             await fetchSessions();
         }
         handleClose();
@@ -100,7 +108,13 @@ function Sessions() {
 
     const handleChange = (event) => {
         const { name, value } = event.target;
+        setFormData({
+            ...formData,
+            [name]: value
+        });
+    };
 
+    const handleTimeChange = (name, value) => {
         setFormData({
             ...formData,
             [name]: value
@@ -109,6 +123,7 @@ function Sessions() {
 
     const columns = [
         { field: 'day', headerName: 'Session Day', width: 150 },
+        { field: 'name', headerName: 'Session Name', width: 150 },
         { field: 'start_time', headerName: 'Start Time', width: 150 },
         { field: 'end_time', headerName: 'End Time', width: 150 },
         { field: 'gender', headerName: 'Gender', width: 150 },
@@ -144,121 +159,129 @@ function Sessions() {
     }
 
     return (
-        <div style={{ padding: 20 }}>
-            <Grid container justifyContent="space-between" alignItems="center" style={{ marginBottom: 20 }}>
-                <FormControl size="small" style={{ minWidth: 200 }}>
-                    <InputLabel>Select a Madrasa</InputLabel>
-                    <Select
-                        value={selectedMadrasa?.id || ''}
-                        onChange={handleMadrasaChange}
-                        label="Select a Madrasa"
-                    >
-                        {madrasas.map(madrasa => (
-                            <MenuItem key={madrasa.id} value={madrasa.id}>{madrasa.name}</MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-                <Button variant="contained"
-                    size='small'
-                    startIcon={<Add />}
-                    color="primary" onClick={() => handleOpen(null)}>
-                    Add Session
-                </Button>
-            </Grid>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <div style={{ padding: 20 }}>
+                <Grid container justifyContent="space-between" alignItems="center" style={{ marginBottom: 20 }}>
+                    <FormControl size="small" style={{ minWidth: 200 }}>
+                        <InputLabel>Select a Madrasa</InputLabel>
+                        <Select
+                            value={selectedMadrasa?.id || ''}
+                            onChange={handleMadrasaChange}
+                            label="Select a Madrasa"
+                        >
+                            {madrasas.map(madrasa => (
+                                <MenuItem key={madrasa.id} value={madrasa.id}>{madrasa.name}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <Button variant="contained"
+                        size='small'
+                        startIcon={<Add />}
+                        color="primary" onClick={() => handleOpen(null)}>
+                        Add Session
+                    </Button>
+                </Grid>
 
-            <div style={{ height: 400, width: '100%' }}>
-                <DataGrid rows={sessions} columns={columns} pageSize={5} />
+                <div style={{ height: 400, width: '100%' }}>
+                    <DataGrid rows={sessions} columns={columns} pageSize={5} />
+                </div>
+
+                <Dialog
+                    open={open}
+                    TransitionComponent={SlideTransition}
+                    onClose={handleClose}
+                >
+                    <DialogTitle>{selectedSession ? "Edit Session" : "Add Session"}</DialogTitle>
+                    <DialogContent sx={{ maxWidth: '400px' }}>
+                        <Box sx={{ '& .MuiFormControl-root': { mb: 2, width: '100%' } }}>
+                            <TextField
+                                sx={{ mt: 1 }}
+                                label="Session Name"
+                                type="text"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleChange}
+                                fullWidth
+
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                            />
+                            <FormControl  >
+                                <InputLabel>Session Day</InputLabel>
+                                <Select
+                                    name="day"
+                                    value={formData.day}
+                                    onChange={handleChange}
+                                    label="Session Day"
+                                >
+                                    <MenuItem value="Sunday">Sunday</MenuItem>
+                                    <MenuItem value="Monday">Monday</MenuItem>
+                                    <MenuItem value="Tuesday">Tuesday</MenuItem>
+                                    <MenuItem value="Wednesday">Wednesday</MenuItem>
+                                    <MenuItem value="Thursday">Thursday</MenuItem>
+                                    <MenuItem value="Friday">Friday</MenuItem>
+                                    <MenuItem value="Saturday">Saturday</MenuItem>
+                                </Select>
+                            </FormControl>
+                            <TimePicker
+                                label="Start Time"
+                                size="small"
+                                value={formData.startTime}
+                                onChange={(newValue) => handleTimeChange('startTime', newValue)}
+                                renderInput={(params) => <TextField {...params} size="small" fullWidth />}
+                            />
+                            <TimePicker
+                                label="End Time"
+                                size="small"
+                                value={formData.endTime}
+                                onChange={(newValue) => handleTimeChange('endTime', newValue)}
+                                renderInput={(params) => <TextField {...params} size="small" fullWidth />}
+                            />
+                            <FormControl >
+                                <InputLabel>Gender</InputLabel>
+                                <Select
+                                    name="gender"
+                                    value={formData.gender}
+                                    onChange={handleChange}
+                                    label="Gender"
+                                >
+                                    <MenuItem value="Boys">Boys</MenuItem>
+                                    <MenuItem value="Girls">Girls</MenuItem>
+                                    <MenuItem value="Adult Male">Adult Male</MenuItem>
+                                    <MenuItem value="Adult Female">Adult Female</MenuItem>
+                                </Select>
+                            </FormControl>
+                            <Autocomplete
+                                multiple
+                                options={teachers}
+                                getOptionLabel={(option) => option.profile.name}
+                                value={formData.teachers}
+                                onChange={(event, newValue) => {
+                                    setFormData({
+                                        ...formData,
+                                        teachers: newValue
+                                    });
+                                }}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        variant="outlined"
+                                        label="Teachers"
+                                        placeholder="Select Teachers"
+
+                                    />
+                                )}
+                            />
+                        </Box>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose} color="secondary">Cancel</Button>
+                        <Button onClick={handleSave} color="primary" variant="contained">Save</Button>
+                    </DialogActions>
+                </Dialog>
             </div>
-
-            <Dialog
-                open={open}
-                TransitionComponent={SlideTransition}
-                onClose={handleClose}
-
-            >
-                <DialogTitle>{selectedSession ? "Edit Session" : "Add Session"}</DialogTitle>
-                <DialogContent sx={{ maxWidth: '300px' }}>
-                    <Box sx={{ '& .MuiFormControl-root': { mb: 2, width: '100%' } }}>
-                        <FormControl size="small" sx={{ mt: 1 }} >
-                            <InputLabel>Session Day</InputLabel>
-                            <Select
-                                name="day"
-                                value={formData.day}
-                                onChange={handleChange}
-                                label="Session Day"
-                            >
-                                <MenuItem value="Sunday">Sunday</MenuItem>
-                                <MenuItem value="Monday">Monday</MenuItem>
-                                <MenuItem value="Tuesday">Tuesday</MenuItem>
-                                <MenuItem value="Wednesday">Wednesday</MenuItem>
-                                <MenuItem value="Thursday">Thursday</MenuItem>
-                                <MenuItem value="Friday">Friday</MenuItem>
-                                <MenuItem value="Saturday">Saturday</MenuItem>
-                            </Select>
-                        </FormControl>
-                        <TextField
-                            label="Start Time"
-                            type="text"
-                            name="startTime"
-                            value={formData.startTime}
-                            onChange={handleChange}
-                            fullWidth
-                            size="small"
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                        />
-                        <TextField
-                            label="End Time"
-                            type="text"
-                            name="endTime"
-                            value={formData.endTime}
-                            onChange={handleChange}
-                            fullWidth
-                            size="small"
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                        />
-                        <FormControl size="small">
-                            <InputLabel>Gender</InputLabel>
-                            <Select
-                                name="gender"
-                                value={formData.gender}
-                                onChange={handleChange}
-                                label="Gender"
-                            >
-
-                                <MenuItem value="Boy">Boy</MenuItem>
-                                <MenuItem value="Girl">Girl</MenuItem>
-                                <MenuItem value="Adult Male">Adult Male</MenuItem>
-                                <MenuItem value="Adult Female">Adult Female</MenuItem>
-                            </Select>
-                        </FormControl>
-                        <Autocomplete
-                            multiple
-                            options={teachers}
-                            getOptionLabel={(option) => option.profile.name}
-                            value={formData.teachers}
-                            onChange={(event, newValue) => {
-                                setFormData({ ...formData, teachers: newValue });
-                            }}
-                            renderInput={(params) => <TextField {...params} label="Teacher" size="small" />}
-                            fullWidth
-                            size='small'
-                        />
-                    </Box>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose} color="secondary">
-                        Cancel
-                    </Button>
-                    <Button onClick={handleSave} color="primary">
-                        Save
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </div>
+        </LocalizationProvider>
     );
 }
 
