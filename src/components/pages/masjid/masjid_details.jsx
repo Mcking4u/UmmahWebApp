@@ -6,6 +6,7 @@ import {
   Grid,
   Snackbar,
   Alert,
+  Avatar,
 } from "@mui/material";
 import NetworkHandler from "../../../network/network_handler";
 import withNavUpdate from "../../wrappers/with_nav_update";
@@ -38,6 +39,7 @@ function MasjidDetails() {
     latitude: "",
     longitude: "",
     Password: "",
+    donation_thumbnail: "", // New state for donation thumbnail
   });
 
   const [masjidDetailsEditable, setMasjidDetailsEditable] = useState(false);
@@ -60,7 +62,14 @@ function MasjidDetails() {
           vertical: "top",
           horizontal: "right",
         });
-        await new NetworkHandler().editMasjidProfile(masjidDetails);
+
+        // Prepare the payload
+        const payload = { ...masjidDetails };
+        if (!masjidDetails.donation_thumbnail || masjidDetails.donation_thumbnail.startsWith("http")) {
+          delete payload.donation_thumbnail;
+        }
+
+        await new NetworkHandler().editMasjidProfile(payload);
       } catch (error) {
         alert("Error updating Masjid details:");
       }
@@ -82,12 +91,37 @@ function MasjidDetails() {
     }));
   };
 
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const base64String = await convertToBase64(file);
+      setMasjidDetails((prevDetails) => ({
+        ...prevDetails,
+        donation_thumbnail: base64String,
+      }));
+    }
+  };
+
   const [toastState, setToastState] = useState({
     open: false,
     vertical: "top",
     horizontal: "center",
   });
   const { vertical, horizontal, open } = toastState;
+
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onerror = (error) => reject(error);
+      reader.onload = () => {
+        let base64String = reader.result
+          .replace("data:", "")
+          .replace(/^.+,/, "");
+        resolve(base64String);
+      };
+    });
+  };
 
   return (
     <div>
@@ -120,6 +154,47 @@ function MasjidDetails() {
             />
           </Grid>
         ))}
+
+        {/* Donation Thumbnail */}
+        <Grid item xs={12} sm={6}>
+          {masjidDetails.donation_thumbnail ? (
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <Avatar
+                alt="Donation Thumbnail"
+                // src={masjidDetails.donation_thumbnail}
+                src={masjidDetails.donation_thumbnail.startsWith("http") ? `${masjidDetails.donation_thumbnail}` : `data:image/jpeg;base64,${masjidDetails.donation_thumbnail}`}
+                sx={{ width: 56, height: 56, mr: 2 }}
+              />
+              <Button
+                variant="outlined"
+                component="label"
+                disabled={!masjidDetailsEditable}
+              >
+                Edit
+                <input
+                  type="file"
+                  hidden
+                  accept="image/*"
+                  onChange={handleFileChange}
+                />
+              </Button>
+            </div>
+          ) : (
+            <Button
+              variant="outlined"
+              component="label"
+              disabled={!masjidDetailsEditable}
+            >
+              Add Donation Thumbnail
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+            </Button>
+          )}
+        </Grid>
       </Grid>
       <Button
         variant="outlined"
@@ -186,4 +261,5 @@ function MasjidDetails() {
     </div>
   );
 }
+
 export default withNavUpdate(MasjidDetails);
