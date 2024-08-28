@@ -26,8 +26,6 @@ import Sessions from "./sessions";
 const navLinks = [
   { path: "/madrasa/", label: "Dashboard", icon: <DashboardIcon /> },
   { path: "/madrasa/details", label: "My Madrasas", icon: <Mosque /> },
-  { path: "/madrasa/teachers", label: "Teachers", icon: <Person2 /> },
-  { path: "/madrasa/sessions", label: "Sessions", icon: <Timeline /> },
   {
     path: "/madrasa/announcements",
     label: "Announcements",
@@ -38,15 +36,17 @@ const navLinks = [
     label: "Enrollments",
     icon: <ListOutlined />,
   },
-  {
-    path: "/madrasa/mapping",
-    label: "Teachers Mapping",
-    icon: <GraphicEqIcon />,
-  },
+  { path: "/madrasa/teachers", label: "Teachers", icon: <Person2 /> },
+  { path: "/madrasa/sessions", label: "Sessions", icon: <Timeline /> },
   {
     path: "/madrasa/students",
     label: "Students",
     icon: <People />,
+  },
+  {
+    path: "/madrasa/mapping",
+    label: "Teachers Mapping",
+    icon: <GraphicEqIcon />,
   },
 ];
 
@@ -81,45 +81,41 @@ const MadrasaHome = () => {
           }
         />
         <Route
+          path="/announcements"
+          element={
+            <Announcements route={navLinks[2].path} label={navLinks[2].label} />
+          }
+        />
+        <Route
+          path="/enrollments"
+          element={
+            <Enrollments route={navLinks[3].path} label={navLinks[3].label} />
+          }
+        />
+        <Route
           path="/teachers"
           element={
-            <Teachers route={navLinks[2].path} label={navLinks[2].label} />
+            <Teachers route={navLinks[4].path} label={navLinks[4].label} />
           }
         />
         <Route
           path="/sessions"
           element={
-            <Sessions route={navLinks[3].path} label={navLinks[3].label} />
+            <Sessions route={navLinks[5].path} label={navLinks[5].label} />
           }
         />
-        <Route
-          path="/announcements"
-          element={
-            <Announcements route={navLinks[4].path} label={navLinks[4].label} />
-          }
-        />
-
-        <Route
-          path="/enrollments"
-          element={
-            <Enrollments route={navLinks[5].path} label={navLinks[5].label} />
-          }
-        />
-
-        <Route
-          path="/mapping"
-          element={
-            <Mapping route={navLinks[6].path} label={navLinks[6].label} />
-          }
-        />
-
         <Route
           path="/students"
           element={
-            <Students route={navLinks[7].path} label={navLinks[7].label} />
+            <Students route={navLinks[6].path} label={navLinks[6].label} />
           }
         />
-
+        <Route
+          path="/mapping"
+          element={
+            <Mapping route={navLinks[7].path} label={navLinks[7].label} />
+          }
+        />
         <Route path="/*" element={<NotFoundPage />} />
       </Routes>
     </NavBar>

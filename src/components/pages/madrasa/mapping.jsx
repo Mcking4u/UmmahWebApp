@@ -81,9 +81,9 @@ const TeachersMapping = () => {
   };
 
   const columns = [
-    { field: 'username', headerName: 'Username', width: 150, flex:1 , minWidth:150},
-    { field: 'name', headerName: 'Name', width: 150, flex:1 },
-    { field: 'email', headerName: 'Email', width: 200, flex:1 },
+    { field: 'username', headerName: 'Username', width: 150, flex: 1, minWidth: 150 },
+    { field: 'name', headerName: 'Name', width: 150, flex: 1 },
+    { field: 'email', headerName: 'Email', width: 200, flex: 1 },
     {
       field: 'actions',
       headerName: 'Actions',
@@ -105,7 +105,7 @@ const TeachersMapping = () => {
   ];
 
   return (
-    <Container>
+    <div>
       <FormControl sx={{ minWidth: 200, marginRight: 2 }}>
         <InputLabel id="madrasa-select-label">Filter by Madrasa</InputLabel>
         <Select
@@ -125,7 +125,7 @@ const TeachersMapping = () => {
           ))}
         </Select>
       </FormControl>
-      <Box sx={{ height: 400, width: '100%', mt:2 }}>
+      <Box sx={{ height: 400, width: '100%', mt: 2 }}>
         <DataGrid
           rows={data}
           columns={columns}
@@ -164,7 +164,7 @@ const TeachersMapping = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Container>
+    </div>
   );
 };
 
