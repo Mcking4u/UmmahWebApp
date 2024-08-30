@@ -880,16 +880,85 @@ class NetworkHandler {
       "Content-Type": "application/json",
     };
 
-    const data = ' getSessions'; // It seems like this is a string you're sending in the body. If it's unnecessary, remove this line.
+    const data = ' getSessions';
 
     try {
-      const response = await this.axiosInstance.get(url, { headers, data }); // Include data if you need to send it
+      const response = await this.axiosInstance.get(url, { headers, data });
       return response.data;
     } catch (error) {
       throw error;
     }
   }
-  async addSession(madrasaId, day, startTime, endTime, gender, teachers, name) {
+
+
+
+  async getPrograms() {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/ummah/programs";
+
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      "Content-Type": "application/json",
+    };
+
+    const data = ' getSessions';
+
+    try {
+      const response = await this.axiosInstance.get(url, { headers, data });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async addProgram(madrasaId, name) {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/ummah/programs";
+
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      "Content-Type": "application/json",
+    };
+
+    const data = {
+      madrasa_id: madrasaId,
+      name: name,
+    };
+
+    try {
+      const response = await this.axiosInstance.post(url, data, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async editProgram(madrasaId, programId, name) {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/ummah/programs";
+
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      "Content-Type": "application/json",
+    };
+
+    const data = {
+      madrasa_id: madrasaId,
+      program_id: programId,
+      name: name
+    };
+
+    try {
+      const response = await this.axiosInstance.put(url, data, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
+
+  async addSession(madrasaId, day, startTime, endTime, gender, teachers, name, program) {
     const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
     const url = "/ummah/sessions";
 
@@ -905,7 +974,8 @@ class NetworkHandler {
       end_time: endTime,
       gender: gender,
       teachers: teachers,
-      name: name
+      name: name,
+      program_id: program,
     };
 
     try {
@@ -916,7 +986,7 @@ class NetworkHandler {
     }
   }
 
-  async editSession(madrasaId, day, startTime, endTime, gender, sessionId, teachers, name) {
+  async editSession(madrasaId, day, startTime, endTime, gender, sessionId, teachers, name, program) {
     const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
     const url = "/ummah/sessions";
 
@@ -934,6 +1004,7 @@ class NetworkHandler {
       id: sessionId, // Include the session ID for updating
       teachers: teachers,
       name: name,
+      program_id: program,
     };
 
     try {

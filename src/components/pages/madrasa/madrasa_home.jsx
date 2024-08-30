@@ -8,7 +8,8 @@ import {
   Mosque,
   Person2,
   People,
-  Timeline
+  Timeline,
+  School,
 } from "@mui/icons-material";
 import GraphicEqIcon from "@mui/icons-material/GraphicEq";
 import NotFoundPage from "../../404/not_found";
@@ -22,10 +23,12 @@ import NetworkHandler from "../../../network/network_handler";
 import Dashboard from "./madrasa_dashboard";
 import Students from "./students";
 import Sessions from "./sessions";
+import Programs from "./programs"; // Import the Programs component
 
 const navLinks = [
   { path: "/madrasa/", label: "Dashboard", icon: <DashboardIcon /> },
   { path: "/madrasa/details", label: "My Madrasas", icon: <Mosque /> },
+  { path: "/madrasa/programs", label: "Programs", icon: <School /> },
   {
     path: "/madrasa/announcements",
     label: "Announcements",
@@ -81,39 +84,45 @@ const MadrasaHome = () => {
           }
         />
         <Route
+          path="/programs"
+          element={
+            <Programs route={navLinks[2].path} label={navLinks[2].label} />
+          }
+        />
+        <Route
           path="/announcements"
           element={
-            <Announcements route={navLinks[2].path} label={navLinks[2].label} />
+            <Announcements route={navLinks[3].path} label={navLinks[3].label} />
           }
         />
         <Route
           path="/enrollments"
           element={
-            <Enrollments route={navLinks[3].path} label={navLinks[3].label} />
+            <Enrollments route={navLinks[4].path} label={navLinks[4].label} />
           }
         />
         <Route
           path="/teachers"
           element={
-            <Teachers route={navLinks[4].path} label={navLinks[4].label} />
+            <Teachers route={navLinks[5].path} label={navLinks[5].label} />
           }
         />
         <Route
           path="/sessions"
           element={
-            <Sessions route={navLinks[5].path} label={navLinks[5].label} />
+            <Sessions route={navLinks[6].path} label={navLinks[6].label} />
           }
         />
         <Route
           path="/students"
           element={
-            <Students route={navLinks[6].path} label={navLinks[6].label} />
+            <Students route={navLinks[7].path} label={navLinks[7].label} />
           }
         />
         <Route
           path="/mapping"
           element={
-            <Mapping route={navLinks[7].path} label={navLinks[7].label} />
+            <Mapping route={navLinks[8].path} label={navLinks[8].label} />
           }
         />
         <Route path="/*" element={<NotFoundPage />} />

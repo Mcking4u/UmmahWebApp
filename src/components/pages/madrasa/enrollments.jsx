@@ -10,13 +10,16 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Grid,
   TextField,
   Slide,
+  Typography,
+  Avatar,
   IconButton,
 } from "@mui/material";
 import NetworkHandler from "../../../network/network_handler";
 import withNavUpdate from "../../wrappers/with_nav_update";
-import { Cancel, Check } from "@mui/icons-material";
+import { Cancel, Check, RemoveRedEye } from "@mui/icons-material";
 import ReplayIcon from "@mui/icons-material/Replay";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -41,6 +44,20 @@ const EnrollmentDataGrid = () => {
   const [selectedSessions, setSelectedSessions] = useState({});
   const [rejectReason, setRejectReason] = useState("");
   const [approveLoading, setAppRoveLoading] = useState(false);
+  const [info, setInfo] = useState(
+    {
+      id: "",
+      profile_picture: null,
+      name: "",
+      age: "",
+      gender: "",
+      proficiency: "",
+      parent_name: "",
+      emergency_contact: "",
+      enrolled_comment: "",
+    }
+  );
+  const [showInfo, setShowInfo] = useState(false);
 
   async function fetchData() {
     try {
@@ -63,6 +80,7 @@ const EnrollmentDataGrid = () => {
       console.error("Error fetching data:", error);
     }
   }
+
 
   useEffect(() => {
     fetchData();
@@ -211,7 +229,29 @@ const EnrollmentDataGrid = () => {
       width: 150,
       flex: 0.5,
     },
+    {
+      field: "view_more",
+      headerName: "More Info",
+      renderCell: (params) => (
+        <IconButton
+          color="primary"
+          onClick={() => showEntollment(params.row.enrollment)}
+        >
+          <RemoveRedEye />
+        </IconButton>
+      ),
+      width: 150,
+      flex: 0.5,
+    },
   ];
+
+  const showEntollment = (enrollment) => {
+    setShowInfo(true);
+    setInfo(enrollment);
+  }
+  const handleInfoClose = () => {
+    setShowInfo(false);
+  }
 
   const completedColumns = [
     {
@@ -242,6 +282,20 @@ const EnrollmentDataGrid = () => {
       width: 150,
       flex: 0.5,
     },
+    {
+      field: "view_more",
+      headerName: "More Info",
+      renderCell: (params) => (
+        <IconButton
+          color="primary"
+          onClick={() => showEntollment(params.row.enrollment)}
+        >
+          <RemoveRedEye />
+        </IconButton>
+      ),
+      width: 150,
+      flex: 0.5,
+    },
   ];
 
   const rejectedColumns = [
@@ -265,6 +319,20 @@ const EnrollmentDataGrid = () => {
       width: 150,
       flex: 2,
     },
+    {
+      field: "view_more",
+      headerName: "More Info",
+      renderCell: (params) => (
+        <IconButton
+          color="primary"
+          onClick={() => showEntollment(params.row.enrollment)}
+        >
+          <RemoveRedEye />
+        </IconButton>
+      ),
+      width: 150,
+      flex: 0.5,
+    },
   ];
 
   const rows = filteredEnrollments.map((enrollment) => ({
@@ -273,6 +341,7 @@ const EnrollmentDataGrid = () => {
     parent_name: enrollment.parent_name,
     emergency_contact: enrollment.emergency_contact,
     sessions: enrollment.sessions,
+    enrollment: enrollment,
   }));
 
   const allRows = allEnrollments.map((enrollment) => ({
@@ -281,6 +350,8 @@ const EnrollmentDataGrid = () => {
     parent_name: enrollment.parent_name,
     emergency_contact: enrollment.emergency_contact,
     sessions: enrollment.sessions,
+    enrollment: enrollment,
+
   }));
 
   const completedRows = filteredCompletedEnrollments.map((enrollment) => ({
@@ -289,6 +360,8 @@ const EnrollmentDataGrid = () => {
     parent_name: enrollment.parent_name,
     emergency_contact: enrollment.emergency_contact,
     status: enrollment.status,
+    enrollment: enrollment,
+
   }));
 
   const rejectedRows = filteredRejectedEnrollments.map((enrollment) => ({
@@ -297,6 +370,7 @@ const EnrollmentDataGrid = () => {
     parent_name: enrollment.parent_name,
     emergency_contact: enrollment.emergency_contact,
     reason: enrollment.enrolled_comment,
+    enrollment: enrollment,
   }));
 
   return (
@@ -389,6 +463,74 @@ const EnrollmentDataGrid = () => {
             disabled={approveLoading}
             color="primary">
             Approve
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+
+      <Dialog
+        open={showInfo}
+        TransitionComponent={Transition}
+        keepMounted
+        onClose={handleInfoClose}
+      >
+        <DialogTitle>More Info</DialogTitle>
+        <DialogContent sx={{ minWidth: 400 }}>
+          <Grid container spacing={2}>
+            <Grid item xs={12} align="start">
+              <Avatar
+                alt={info.name}
+                src={info.profile_picture || '/placeholder.png'} // Provide a placeholder if no profile picture
+                sx={{ width: 100, height: 100 }}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="subtitle1"><strong>Name:</strong></Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body1">{info.name}</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="subtitle1"><strong>Age:</strong></Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body1">{info.age}</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="subtitle1"><strong>Gender:</strong></Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body1">{info.gender}</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="subtitle1"><strong>Proficiency:</strong></Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body1">{info.proficiency}</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="subtitle1"><strong>Parent Name:</strong></Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body1">{info.parent_name}</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="subtitle1"><strong>Emergency Contact:</strong></Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body1">{info.emergency_contact}</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="subtitle1"><strong>Enrolled Comment:</strong></Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body1">{info.enrolled_comment || 'N/A'}</Typography>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleInfoClose} color="primary">
+            Okay
           </Button>
         </DialogActions>
       </Dialog>

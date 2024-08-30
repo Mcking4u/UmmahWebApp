@@ -23,6 +23,8 @@ function Sessions() {
     const [open, setOpen] = useState(false);
     const [selectedSession, setSelectedSession] = useState(null);
     const [madrasas, setMadrasas] = useState([]);
+    const [programs, setPrograms] = useState([]);  // New state for programs
+    const [filteredPrograms, setFilteredPrograms] = useState([]);  // New state for filtered programs
     const [selectedMadrasa, setSelectedMadrasa] = useState(null);
     const [sessions, setSessions] = useState([]);
     const [teachers, setTeachers] = useState([]);
@@ -33,23 +35,34 @@ function Sessions() {
         startTime: null,
         endTime: null,
         gender: '',
-        teachers: []
+        teachers: [],
+        program: '',  // New field for selected program
     });
     const [loading, setLoading] = useState(true);
 
     async function fetchSessions() {
-        const response = await new NetworkHandler().getSessions();
+        let response = await new NetworkHandler().getSessions();
+        let programsData = response.programs;
+        response = response.madrasas;
         setMadrasas(response);
+        setPrograms(programsData);  // Store programs in state
         setSelectedMadrasa(response[selectedIndex]);
         setSessions(response[selectedIndex].sessions);
         setTeachers(response[selectedIndex].teachers);
+        // filterPrograms(response[selectedIndex].id);  // Filter programs based on madrasa
+        const filtered = programsData.filter(program => program.madrasa === response[selectedIndex].id);
+        setFilteredPrograms(filtered);
         setLoading(false);
     }
 
     useEffect(() => {
-        // Fetch madrasas and their sessions
         fetchSessions();
     }, []);
+
+    const filterPrograms = (madrasaId) => {
+        const filtered = programs.filter(program => program.madrasa === madrasaId);
+        setFilteredPrograms(filtered);
+    };
 
     const handleMadrasaChange = (event) => {
         const madrasa = madrasas.find(m => m.id === event.target.value);
@@ -57,7 +70,8 @@ function Sessions() {
         setSelectedIndex(madrasaIndex);
         setSelectedMadrasa(madrasa);
         setSessions(madrasa.sessions);
-        setTeachers(madrasa.teachers); // Update teachers when madrasa changes
+        setTeachers(madrasa.teachers);
+        filterPrograms(madrasa.id);  // Filter programs when madrasa changes
     };
 
     const handleOpen = (session) => {
@@ -70,6 +84,7 @@ function Sessions() {
                 gender: session.row.gender,
                 teachers: session.row.teachers,
                 name: session.row.name,
+                program: session.row.program?.id || '',  // Set program for edit
             });
         } else {
             setFormData({
@@ -79,6 +94,7 @@ function Sessions() {
                 gender: '',
                 teachers: [],
                 name: '',
+                program: '',  // Reset program for add
             });
         }
         setOpen(true);
@@ -89,18 +105,20 @@ function Sessions() {
     };
 
     const handleSave = async () => {
-        const { day, startTime, endTime, gender, teachers, name } = formData;
+        const { day, startTime, endTime, gender, teachers, name, program } = formData;
         const teacherIds = teachers;
         const formattedStartTime = startTime ? startTime.format('HH:mm') : '';
         const formattedEndTime = endTime ? endTime.format('HH:mm') : '';
 
         if (selectedSession) {
-            // Edit existing session
-            await new NetworkHandler().editSession(selectedMadrasa.id, day, formattedStartTime, formattedEndTime, gender, selectedSession.id, teacherIds, name);
+            await new NetworkHandler().editSession(
+                selectedMadrasa.id, day, formattedStartTime, formattedEndTime, gender, selectedSession.id, teacherIds, name, program
+            );
             await fetchSessions();
         } else {
-            // Add new session
-            await new NetworkHandler().addSession(selectedMadrasa.id, day, formattedStartTime, formattedEndTime, gender, teacherIds, name);
+            await new NetworkHandler().addSession(
+                selectedMadrasa.id, day, formattedStartTime, formattedEndTime, gender, teacherIds, name, program
+            );
             await fetchSessions();
         }
         handleClose();
@@ -133,10 +151,15 @@ function Sessions() {
             width: 200,
             flex: 1,
             valueGetter: (params) => {
-                // Safely handle cases where teachers might be undefined
                 return params ? params.map(t => t.profile.name).join(', ') : '';
             },
         },
+        // {
+        //     field: 'program',
+        //     headerName: 'Program',
+        //     width: 150,
+        //     valueGetter: (params) => params.row?.program?.name || '',  // Display program name
+        // },
         {
             field: 'action',
             headerName: 'Action',
@@ -194,20 +217,34 @@ function Sessions() {
                     <DialogTitle>{selectedSession ? "Edit Session" : "Add Session"}</DialogTitle>
                     <DialogContent sx={{ maxWidth: '400px' }}>
                         <Box sx={{ '& .MuiFormControl-root': { mb: 2, width: '100%' } }}>
-                            <TextField
+                            <FormControl
                                 sx={{ mt: 1 }}
+                            >
+                                <InputLabel>Select a Program</InputLabel>
+                                <Select
+                                    name="program"
+                                    value={formData.program}
+                                    onChange={handleChange}
+                                    label="Select a Program"
+                                >
+                                    {filteredPrograms.map(program => (
+                                        <MenuItem key={program.id} value={program.id}>{program.name}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                            <TextField
+
                                 label="Session Name"
                                 type="text"
                                 name="name"
                                 value={formData.name}
                                 onChange={handleChange}
                                 fullWidth
-
                                 InputLabelProps={{
                                     shrink: true,
                                 }}
                             />
-                            <FormControl  >
+                            <FormControl>
                                 <InputLabel>Session Day</InputLabel>
                                 <Select
                                     name="day"
@@ -224,20 +261,22 @@ function Sessions() {
                                     <MenuItem value="Saturday">Saturday</MenuItem>
                                 </Select>
                             </FormControl>
-                            <TimePicker
-                                label="Start Time"
-                                size="small"
-                                value={formData.startTime}
-                                onChange={(newValue) => handleTimeChange('startTime', newValue)}
-                                renderInput={(params) => <TextField {...params} size="small" fullWidth />}
-                            />
-                            <TimePicker
-                                label="End Time"
-                                size="small"
-                                value={formData.endTime}
-                                onChange={(newValue) => handleTimeChange('endTime', newValue)}
-                                renderInput={(params) => <TextField {...params} size="small" fullWidth />}
-                            />
+
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <TimePicker
+                                    label="Start Time"
+                                    value={formData.startTime}
+                                    onChange={(newValue) => handleTimeChange('startTime', newValue)}
+                                    renderInput={(params) => <TextField {...params} />}
+                                />
+                                <TimePicker
+                                    label="End Time"
+                                    value={formData.endTime}
+                                    onChange={(newValue) => handleTimeChange('endTime', newValue)}
+                                    renderInput={(params) => <TextField {...params} />}
+                                />
+                            </LocalizationProvider>
+
                             <FormControl >
                                 <InputLabel>Gender</InputLabel>
                                 <Select
@@ -252,6 +291,7 @@ function Sessions() {
                                     <MenuItem value="Adult Female">Adult Female</MenuItem>
                                 </Select>
                             </FormControl>
+
                             <Autocomplete
                                 multiple
                                 options={teachers}
@@ -273,11 +313,15 @@ function Sessions() {
                                     />
                                 )}
                             />
+
+
                         </Box>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleClose} color="secondary">Cancel</Button>
-                        <Button onClick={handleSave} color="primary" variant="contained">Save</Button>
+                        <Button onClick={handleClose}>Cancel</Button>
+                        <Button onClick={handleSave} variant="contained" color="primary">
+                            {selectedSession ? "Save Changes" : "Add Session"}
+                        </Button>
                     </DialogActions>
                 </Dialog>
             </div>
