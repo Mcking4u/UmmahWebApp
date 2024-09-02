@@ -13,7 +13,9 @@ import {
   Mosque,
   Timeline,
   AnnouncementOutlined,
+  Event,
 } from "@mui/icons-material";
+import EventManager from "./events";
 
 const navLinks = [
   { path: "/masjid/", label: "Dashboard", icon: <DashboardIcon /> },
@@ -23,6 +25,11 @@ const navLinks = [
     path: "/masjid/announcements",
     label: "Announcements",
     icon: <AnnouncementOutlined />,
+  },
+  {
+    path: "/masjid/events",
+    label: "Events",
+    icon: <Event />,
   },
 ];
 
@@ -36,7 +43,7 @@ const MasjidHome = () => {
     let responseData = localStorage.getItem(NetworkHandler.loginResponseKey);
     responseData = JSON.parse(responseData);
     let is_masjid_admin = responseData.is_masjid_admin;
-    if(!is_masjid_admin){
+    if (!is_masjid_admin) {
       navigate("/login");
     }
   }, []);
@@ -66,6 +73,13 @@ const MasjidHome = () => {
           path="/announcements"
           element={
             <Announcements route={navLinks[3].path} label={navLinks[3].label} />
+          }
+        />
+
+        <Route
+          path="/events"
+          element={
+            <EventManager route={navLinks[4].path} label={navLinks[4].label} />
           }
         />
         <Route path="/*" element={<NotFound />} />

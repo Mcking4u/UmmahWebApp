@@ -5,6 +5,7 @@ export const host = "https://objects.ummah-app.com";
 const baseUrls = {
   landing: `${host}/landing/api`,
   masjid: `${host}/masjid/api`,
+  madrasa: `${host}/madrasa/api`,
   faq: `${host}/faq/api`,
   root: host,
 };
@@ -1016,7 +1017,141 @@ class NetworkHandler {
   }
 
 
+  async getFeesInit() {
+    const url = `${baseUrls.madrasa}/fetch-monthly-fee/init`;
 
+    const token = localStorage.getItem(NetworkHandler.loginTokenKey);
+
+    const headers = {
+      "Authorization": `Token ${token}`,
+      "Content-Type": "application/json"
+    };
+
+    try {
+      const response = await this.axiosInstance.get(url, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
+  async getFees(madrasaId, programId, monthDate) {
+    const url = `${baseUrls.madrasa}/fetch-monthly-fee`;
+
+    const token = localStorage.getItem(NetworkHandler.loginTokenKey);
+
+    const headers = {
+      "Authorization": `Token ${token}`,
+      "Content-Type": "application/json"
+
+    };
+
+    const params = {
+      madrasa_id: madrasaId,
+      program_id: programId,
+      month_date: monthDate
+    };
+
+    try {
+      const response = await this.axiosInstance.get(url, { headers, params });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async markFee(feeId, isPaid) {
+    const url = `${baseUrls.madrasa}/fetch-monthly-fee`;
+
+    const token = localStorage.getItem(NetworkHandler.loginTokenKey);
+
+    const headers = {
+      "Authorization": `Token ${token}`,
+      "Content-Type": "application/json"
+    };
+
+    const data = {
+      fee_id: feeId,
+      is_paid: isPaid
+    };
+
+    try {
+      const response = await this.axiosInstance.post(url, data, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
+
+  async addMasjidEvent(eventDate, title, description) {
+    const url = `${baseUrls.masjid}/masjid-events-admin`;
+
+    const token = localStorage.getItem(NetworkHandler.loginTokenKey);
+
+    const headers = {
+      "Authorization": `Token ${token}`
+    };
+
+    const formData = new FormData();
+    formData.append('event_date', eventDate);
+    formData.append('title', title);
+    formData.append('description', description);
+
+    try {
+      const response = await this.axiosInstance.post(url, formData, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
+  async getMasjidEvent() {
+    const url = `${baseUrls.masjid}/masjid-events-admin`;
+
+    const token = localStorage.getItem(NetworkHandler.loginTokenKey);
+
+    const headers = {
+      "Accept": "*/*",
+      "User-Agent": "Thunder Client (https://www.thunderclient.com)",
+      "Authorization": `Token ${token}`
+    };
+
+    try {
+      const response = await this.axiosInstance.get(url, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async editMasjidEvent(eventId, eventDate, title, description) {
+    const url = `${baseUrls.masjid}/masjid-events-admin`; // Use the correct endpoint
+
+    const token = localStorage.getItem(NetworkHandler.loginTokenKey);
+
+    const headers = {
+      "Accept": "*/*",
+      "User-Agent": "Thunder Client (https://www.thunderclient.com)",
+      "Authorization": `Token ${token}`
+    };
+
+    const formData = new FormData();
+    formData.append('event_date', eventDate);
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('id', eventId); // Include the event ID
+
+    try {
+      const response = await this.axiosInstance.put(url, formData, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
 
 }
 

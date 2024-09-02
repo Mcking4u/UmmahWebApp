@@ -10,6 +10,7 @@ import {
   People,
   Timeline,
   School,
+  Payment,
 } from "@mui/icons-material";
 import GraphicEqIcon from "@mui/icons-material/GraphicEq";
 import NotFoundPage from "../../404/not_found";
@@ -23,34 +24,20 @@ import NetworkHandler from "../../../network/network_handler";
 import Dashboard from "./madrasa_dashboard";
 import Students from "./students";
 import Sessions from "./sessions";
-import Programs from "./programs"; // Import the Programs component
+import Programs from "./programs";
+import Payments from "./payments";
 
 const navLinks = [
   { path: "/madrasa/", label: "Dashboard", icon: <DashboardIcon /> },
   { path: "/madrasa/details", label: "My Madrasas", icon: <Mosque /> },
   { path: "/madrasa/programs", label: "Programs", icon: <School /> },
-  {
-    path: "/madrasa/announcements",
-    label: "Announcements",
-    icon: <AnnouncementOutlined />,
-  },
-  {
-    path: "/madrasa/enrollments",
-    label: "Enrollments",
-    icon: <ListOutlined />,
-  },
   { path: "/madrasa/teachers", label: "Teachers", icon: <Person2 /> },
   { path: "/madrasa/sessions", label: "Sessions", icon: <Timeline /> },
-  {
-    path: "/madrasa/students",
-    label: "Students",
-    icon: <People />,
-  },
-  {
-    path: "/madrasa/mapping",
-    label: "Teachers Mapping",
-    icon: <GraphicEqIcon />,
-  },
+  { path: "/madrasa/students", label: "Students", icon: <People /> },
+  { path: "/madrasa/mapping", label: "Teachers Mapping", icon: <GraphicEqIcon /> },
+  { path: "/madrasa/payments", label: "Payments", icon: <Payment /> },
+  { path: "/madrasa/announcements", label: "Announcements", icon: <AnnouncementOutlined /> },
+  { path: "/madrasa/enrollments", label: "Enrollments", icon: <ListOutlined /> },
 ];
 
 const MadrasaHome = () => {
@@ -90,39 +77,45 @@ const MadrasaHome = () => {
           }
         />
         <Route
-          path="/announcements"
-          element={
-            <Announcements route={navLinks[3].path} label={navLinks[3].label} />
-          }
-        />
-        <Route
-          path="/enrollments"
-          element={
-            <Enrollments route={navLinks[4].path} label={navLinks[4].label} />
-          }
-        />
-        <Route
           path="/teachers"
           element={
-            <Teachers route={navLinks[5].path} label={navLinks[5].label} />
+            <Teachers route={navLinks[3].path} label={navLinks[3].label} />
           }
         />
         <Route
           path="/sessions"
           element={
-            <Sessions route={navLinks[6].path} label={navLinks[6].label} />
+            <Sessions route={navLinks[4].path} label={navLinks[4].label} />
           }
         />
         <Route
           path="/students"
           element={
-            <Students route={navLinks[7].path} label={navLinks[7].label} />
+            <Students route={navLinks[5].path} label={navLinks[5].label} />
           }
         />
         <Route
           path="/mapping"
           element={
-            <Mapping route={navLinks[8].path} label={navLinks[8].label} />
+            <Mapping route={navLinks[6].path} label={navLinks[6].label} />
+          }
+        />
+        <Route
+          path="/payments"
+          element={
+            <Payments route={navLinks[7].path} label={navLinks[7].label} />
+          }
+        />
+        <Route
+          path="/announcements"
+          element={
+            <Announcements route={navLinks[8].path} label={navLinks[8].label} />
+          }
+        />
+        <Route
+          path="/enrollments"
+          element={
+            <Enrollments route={navLinks[9].path} label={navLinks[9].label} />
           }
         />
         <Route path="/*" element={<NotFoundPage />} />
