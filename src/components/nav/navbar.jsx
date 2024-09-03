@@ -106,7 +106,7 @@ function NavBar(props) {
       <Divider />
       <List>
         {navLinks.map((link, index) => (
-          <React.Fragment  key={link.path}>
+          <React.Fragment key={link.path}>
             <ListItem disablePadding>
               <ListItemButton
                 selected={activeLink === link.path}
@@ -140,9 +140,9 @@ function NavBar(props) {
               <div></div>
             )}
 
-            {useDividers && index === 0 || index === 9 ? (
+            {useDividers && index === 0 || index === 10 ? (
               <div>
-                <Divider sx={{mb:1}} />
+                <Divider sx={{ mb: 1 }} />
               </div>
             ) : (
               <div></div>

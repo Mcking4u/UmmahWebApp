@@ -30,7 +30,9 @@ import {
   FlightTakeoff as UmrahHajjIcon,
   QuestionAnswer as FaqIcon,
   Book as LearningIcon,
+  ProductionQuantityLimits,
 } from "@mui/icons-material";
+import HalalProducts from "./halal_products";
 
 const navLinks = [
   { path: "/admin/", label: "Dashboard", icon: <DashboardIcon /> },
@@ -42,11 +44,13 @@ const navLinks = [
   { path: "/admin/daawah", label: "Daawah", icon: <DaawahIcon /> },
   { path: "/admin/activity", label: "Activity", icon: <ActivityIcon /> },
   { path: "/admin/event", label: "Event", icon: <EventIcon /> },
+  // Updated index for Halal Products
+  { path: "/admin/halal-products", label: "Halal Products", icon: <ProductionQuantityLimits /> },
+  // Updated index for Networking
   { path: "/admin/networking", label: "Networking", icon: <NetworkingIcon /> },
   { path: "/admin/umrah-hajj", label: "Umrah and Hajj", icon: <UmrahHajjIcon /> },
   { path: "/admin/learning", label: "Islamic Learning", icon: <LearningIcon /> },
   { path: "/admin/faq", label: "Faq's", icon: <FaqIcon /> },
-
 ];
 
 const AdminHome = () => {
@@ -115,26 +119,34 @@ const AdminHome = () => {
           path="/event"
           element={<Event route={navLinks[8].path} label={navLinks[8].label} />}
         />
+        {/* Updated index for Halal Products */}
+        <Route
+          path="/halal-products"
+          element={
+            <HalalProducts route={navLinks[9].path} label={navLinks[9].label} />
+          }
+        />
+        {/* Updated index for Networking */}
         <Route
           path="/networking"
           element={
-            <Networking route={navLinks[9].path} label={navLinks[9].label} />
+            <Networking route={navLinks[10].path} label={navLinks[10].label} />
           }
         />
         <Route
           path="/umrah-hajj"
           element={
-            <UmrahHajj route={navLinks[10].path} label={navLinks[10].label} />
+            <UmrahHajj route={navLinks[11].path} label={navLinks[11].label} />
           }
         />
         <Route
           path="/learning"
-          element={<Learning route={navLinks[11].path} label={navLinks[11].label} />}
+          element={<Learning route={navLinks[12].path} label={navLinks[12].label} />}
         />
         <Route
           path="/faq"
           element={
-            <Faq route={navLinks[12].path} label={navLinks[12].label} />
+            <Faq route={navLinks[13].path} label={navLinks[13].label} />
           }
         />
         <Route path="/*" element={<NotFound />} />

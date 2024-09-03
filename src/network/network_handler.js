@@ -1086,7 +1086,7 @@ class NetworkHandler {
 
 
 
-  async addMasjidEvent(eventDate, title, description) {
+  async addMasjidEvent(eventDate, endDate, title, description, venue) {
     const url = `${baseUrls.masjid}/masjid-events-admin`;
 
     const token = localStorage.getItem(NetworkHandler.loginTokenKey);
@@ -1100,6 +1100,8 @@ class NetworkHandler {
     formData.append('title', title);
     formData.append('description', description);
 
+    formData.append('end_date', endDate);
+    formData.append('venue', venue);
     try {
       const response = await this.axiosInstance.post(url, formData, { headers });
       return response.data;
@@ -1115,8 +1117,6 @@ class NetworkHandler {
     const token = localStorage.getItem(NetworkHandler.loginTokenKey);
 
     const headers = {
-      "Accept": "*/*",
-      "User-Agent": "Thunder Client (https://www.thunderclient.com)",
       "Authorization": `Token ${token}`
     };
 
@@ -1128,14 +1128,12 @@ class NetworkHandler {
     }
   }
 
-  async editMasjidEvent(eventId, eventDate, title, description) {
+  async editMasjidEvent(eventId, eventDate, endDate, title, description, venue) {
     const url = `${baseUrls.masjid}/masjid-events-admin`; // Use the correct endpoint
 
     const token = localStorage.getItem(NetworkHandler.loginTokenKey);
 
     const headers = {
-      "Accept": "*/*",
-      "User-Agent": "Thunder Client (https://www.thunderclient.com)",
       "Authorization": `Token ${token}`
     };
 
@@ -1143,7 +1141,10 @@ class NetworkHandler {
     formData.append('event_date', eventDate);
     formData.append('title', title);
     formData.append('description', description);
-    formData.append('id', eventId); // Include the event ID
+    formData.append('id', eventId);
+    formData.append('end_date', endDate);
+    formData.append('venue', venue);
+
 
     try {
       const response = await this.axiosInstance.put(url, formData, { headers });
@@ -1153,6 +1154,108 @@ class NetworkHandler {
     }
   }
 
+  async getHalalProducts() {
+    const url = `${host}/halal/api/get-products`;
+    const token = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const headers = {
+      "Authorization": `Token ${token}`
+    };
+
+    try {
+      const response = await this.axiosInstance.get(url, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async markHalalProducts(productId, isApproved) {
+    const url = `${host}/halal/api/get-products`;
+
+    const token = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const headers = {
+      "Authorization": `Token ${token}`
+    };
+
+
+    const data = {
+      product_id: productId,
+      is_approved: isApproved
+    };
+
+    try {
+      const response = await this.axiosInstance.post(url, data, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async editHalalProduct(productId, isApproved, productName, halalStatus, fallbackImage, nutritionGrade) {
+    const url = `${host}/halal/api/get-products`;
+    const token = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const headers = {
+      "Authorization": `Token ${token}`
+    };
+
+    const productData = {
+      product_id: productId,
+      is_approved: isApproved,
+      product_name: productName,
+      halal_status: halalStatus,
+      fallback_image: fallbackImage,
+      nutrition_grade: nutritionGrade
+    };
+
+    try {
+      const response = await this.axiosInstance.put(url, productData, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async addHalalProduct(productName, halalStatus, barcode, nutritionGrade, fallbackImage) {
+    const url = `${host}/halal/api/get-products`;
+
+    const token = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const headers = {
+      "Authorization": `Token ${token}`
+    };
+    const productData = {
+      should_add: true,
+      product_name: productName,
+      halal_status: halalStatus,
+      barcode: barcode,
+      nutrition_grade: nutritionGrade,
+      fallback_image: fallbackImage
+    };
+
+    try {
+      const response = await this.axiosInstance.post(url, productData, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async uploadHalalProducts(file) {
+    const url = `${host}/halal/api/upload_xlsx`; // Adjust if needed 
+
+    const token = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const headers = {
+      "Authorization": `Token ${token}`
+    };
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await this.axiosInstance.post(url, formData, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export default NetworkHandler;

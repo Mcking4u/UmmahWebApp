@@ -19,8 +19,10 @@ const EventManager = () => {
     const [currentEvent, setCurrentEvent] = useState({
         id: null,
         event_date: '',
+        end_date: '',
         title: '',
-        description: ''
+        description: '',
+        venue: ''
     });
 
     useEffect(() => {
@@ -41,8 +43,10 @@ const EventManager = () => {
             setCurrentEvent({
                 id: null,
                 event_date: new Date().toISOString().slice(0, 16),
+                end_date: new Date().toISOString().slice(0, 16),
                 title: '',
-                description: ''
+                description: '',
+                venue: ''
             });
         }
         setOpen(true);
@@ -58,13 +62,14 @@ const EventManager = () => {
             setErrors(validationErrors);
             return; // Prevent saving if there are errors
         }
-        const { id, event_date, title, description } = currentEvent;
-        const formattedEventDate = new Date(event_date).toISOString().slice(0, 19).replace('T', ' ');
+        const { id, event_date, end_date, title, description, venue } = currentEvent;
+        const formattedEventDate = `${event_date.toString().replace('T', ' ')}:00`;
+        const formattedEndDate = `${end_date.toString().replace('T', ' ')}:00`;
 
         if (isEditMode) {
-            await new NetworkHandler().editMasjidEvent(id, formattedEventDate, title, description);
+            await new NetworkHandler().editMasjidEvent(id, formattedEventDate, formattedEndDate, title, description, venue);
         } else {
-            await new NetworkHandler().addMasjidEvent(formattedEventDate, title, description);
+            await new NetworkHandler().addMasjidEvent(formattedEventDate, formattedEndDate, title, description, venue);
         }
 
         fetchEvents();
@@ -88,8 +93,22 @@ const EventManager = () => {
             }
         }
 
+        if (!currentEvent.end_date) {
+            newErrors.end_date = 'End date is required';
+        } else {
+            const selectedEndDate = new Date(currentEvent.end_date);
+            const selectedEventDate = new Date(currentEvent.event_date);
+            if (selectedEndDate < selectedEventDate) {
+                newErrors.end_date = 'End date cannot be before the event date';
+            }
+        }
+
         if (!currentEvent.description.trim()) {
             newErrors.description = 'Description is required';
+        }
+
+        if (!currentEvent.venue.trim()) {
+            newErrors.venue = 'Venue is required';
         }
 
         return newErrors;
@@ -103,24 +122,20 @@ const EventManager = () => {
     };
 
     const columns = [
-
         { field: 'event_date', headerName: 'Event Date', width: 200 },
+        { field: 'end_date', headerName: 'End Date', width: 200 },
         { field: 'title', headerName: 'Title', width: 150 },
         { field: 'yes_count', headerName: 'Attending', width: 100 },
         { field: 'no_count', headerName: 'Not Attending', width: 100 },
         { field: 'maybe_count', headerName: 'Maybe Attending', width: 150 },
-
-        { field: 'description', headerName: 'Description', width: 300, flex: 1, },
-        { field: 'event_date', headerName: 'Date', width: 200 },
+        // { field: 'description', headerName: 'Description', width: 300, flex: 1 },
+        { field: 'venue', headerName: 'Venue', width: 200 },
         {
-
             field: 'edit',
             headerName: 'Edit',
             width: 100,
-
             renderCell: (params) => (
                 <Button
-
                     color="primary"
                     size='small'
                     startIcon={<EditIcon startIcon={<Edit />} />}
@@ -156,7 +171,6 @@ const EventManager = () => {
                 open={open}
                 TransitionComponent={Transition}
                 keepMounted
-
                 onClose={handleClose}
             >
                 <DialogTitle>{isEditMode ? 'Edit Event' : 'Add Event'}</DialogTitle>
@@ -184,6 +198,28 @@ const EventManager = () => {
                         }}
                         value={currentEvent.event_date}
                         onChange={(e) => handleChange('event_date', e.target.value)}
+                    />
+                    <TextField
+                        margin="dense"
+                        label="End Date"
+                        type="datetime-local"
+                        error={!!errors.end_date}
+                        helperText={errors.end_date}
+                        fullWidth
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        value={currentEvent.end_date}
+                        onChange={(e) => handleChange('end_date', e.target.value)}
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Venue"
+                        error={!!errors.venue}
+                        helperText={errors.venue}
+                        fullWidth
+                        value={currentEvent.venue}
+                        onChange={(e) => handleChange('venue', e.target.value)}
                     />
                     <ReactQuill
                         theme="snow"
