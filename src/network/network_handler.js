@@ -1256,6 +1256,24 @@ class NetworkHandler {
       throw error;
     }
   }
+
+  async bulkUploadVideos(file) {
+    const url = `${host}/IslamicLearning/api/bulk-upload`; // Adjust if needed 
+
+    const token = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const headers = {
+      "Authorization": `Token ${token}`
+    };
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await this.axiosInstance.post(url, formData, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export default NetworkHandler;
