@@ -491,10 +491,10 @@ const Students = () => {
               <Typography variant="body1">{info.name}</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="subtitle1"><strong>Age:</strong></Typography>
+              <Typography variant="subtitle1"><strong>DOB:</strong></Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="body1">{info.age}</Typography>
+              <Typography variant="body1">{info.dob}</Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography variant="subtitle1"><strong>Gender:</strong></Typography>

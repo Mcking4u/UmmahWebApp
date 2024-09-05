@@ -176,7 +176,7 @@ const HalalProducts = () => {
                         startIcon={<AddIcon />}
                         onClick={handleOpenUploadDialog}
                     >
-                        Build Add
+                        Bulk Add
                     </Button>
                 </Grid>
                 <Grid item>
