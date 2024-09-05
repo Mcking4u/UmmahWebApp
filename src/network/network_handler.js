@@ -1204,7 +1204,7 @@ class NetworkHandler {
       product_name: productName,
       halal_status: halalStatus,
       fallback_image: fallbackImage,
-      nutrition_grade: nutritionGrade
+      nutrition_grade: nutritionGrade,
     };
 
     try {
@@ -1215,7 +1215,7 @@ class NetworkHandler {
     }
   }
 
-  async addHalalProduct(productName, halalStatus, barcode, nutritionGrade, fallbackImage) {
+  async addHalalProduct(productName, halalStatus, nutritionGrade, fallbackImage, barcode) {
     const url = `${host}/halal/api/get-products`;
 
     const token = localStorage.getItem(NetworkHandler.loginTokenKey);
@@ -1228,7 +1228,8 @@ class NetworkHandler {
       halal_status: halalStatus,
       barcode: barcode,
       nutrition_grade: nutritionGrade,
-      fallback_image: fallbackImage
+      fallback_image: fallbackImage,
+      barcode: barcode
     };
 
     try {

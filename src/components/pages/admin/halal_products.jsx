@@ -23,6 +23,8 @@ const HalalProducts = () => {
     const [productName, setProductName] = useState('');
     const [fallbackImage, setFallbackImage] = useState('');
     const [nutritionGrade, setNutritionGrade] = useState('');
+    const [barcode, setBarcode] = useState('');
+
     const [halalStatus, setHalalStatus] = useState('');
     const [errors, setErrors] = useState({});
     const [openUploadDialog, setOpenUploadDialog] = useState(false);
@@ -41,6 +43,7 @@ const HalalProducts = () => {
 
     const validateForm = () => {
         let formErrors = {};
+        if (!barcode.trim()) formErrors.barcode = "Barcode is required";
         if (!productName.trim()) formErrors.productName = "Product name is required";
         if (!fallbackImage.trim()) formErrors.fallbackImage = "Image URL is required";
         if (!nutritionGrade) formErrors.nutritionGrade = "Nutrition grade is required";
@@ -57,15 +60,18 @@ const HalalProducts = () => {
             setFallbackImage(product.fallback_image || product.product_image || '');
             setNutritionGrade(product.nutrition_grade || 'unknown');
             setHalalStatus(product.halal_status || 'halal');
+            setBarcode(product.barcode || '');
         } else {
             setProductName('');
             setFallbackImage('');
             setNutritionGrade('unknown');
             setHalalStatus('halal');
+            setBarcode('');
         }
         setErrors({});
         setOpenDialog(true);
     };
+
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
@@ -78,11 +84,12 @@ const HalalProducts = () => {
         if (editMode) {
             await new NetworkHandler().editHalalProduct(currentProduct.id, currentProduct.isapproved, productName, halalStatus, fallbackImage, nutritionGrade);
         } else {
-            await new NetworkHandler().addHalalProduct(productName, halalStatus, currentProduct?.barcode, nutritionGrade, fallbackImage);
+            await new NetworkHandler().addHalalProduct(productName, halalStatus, nutritionGrade, fallbackImage, barcode);
         }
         handleCloseDialog();
         fetchProducts();
     };
+
 
     const handleApproveReject = async (productId, isApproved) => {
         await new NetworkHandler().markHalalProducts(productId, isApproved);
@@ -204,6 +211,18 @@ const HalalProducts = () => {
                 <DialogTitle>{editMode ? 'Edit Product' : 'Add Product'}</DialogTitle>
                 <DialogContent>
                     <TextField
+                        margin="dense"
+                        label="Barcode"
+                        type="text"
+                        disabled={editMode}
+                        fullWidth
+                        value={barcode}
+                        onChange={(e) => setBarcode(e.target.value)}
+                        error={!!errors.barcode}
+                        helperText={errors.barcode}
+                    />
+
+                    <TextField
                         autoFocus
                         margin="dense"
                         label="Product Name"
@@ -278,7 +297,7 @@ const HalalProducts = () => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseUploadDialog}>Cancel</Button>
-                    <Button onClick={handleUploadFile} disabled={!selectedFile || loading}>
+                    <Button onClick={handleUploadFile} disabled={loading}>
                         {loading ? <CircularProgress size={24} /> : 'Upload'}
                     </Button>
                 </DialogActions>
