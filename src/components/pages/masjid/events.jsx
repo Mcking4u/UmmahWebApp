@@ -37,7 +37,14 @@ const EventManager = () => {
     const handleOpen = (event = null) => {
         if (event) {
             setIsEditMode(true);
-            setCurrentEvent(event);
+            const formattedEventDate = event.formatted_event_date.slice(0, 16);
+            const formattedEndDate = event.formatted_end_date.slice(0, 16);
+
+            setCurrentEvent({
+                ...event,
+                event_date: formattedEventDate,
+                end_date: formattedEndDate,
+            });
         } else {
             setIsEditMode(false);
             setCurrentEvent({

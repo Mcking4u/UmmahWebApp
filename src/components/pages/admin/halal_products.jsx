@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Button, Dialog, DialogActions, DialogContent, DialogTitle, Slide, TextField, Select, MenuItem, Grid, IconButton, CircularProgress, Box
+    Button, Dialog, DialogActions, DialogContent, DialogTitle, Slide, TextField, Select, MenuItem, Grid, IconButton, CircularProgress, Box,
+    ButtonGroup
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import EditIcon from '@mui/icons-material/Edit';
@@ -8,7 +9,7 @@ import AddIcon from '@mui/icons-material/Add';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import withNavUpdate from '../../wrappers/with_nav_update';
 import NetworkHandler from '../../../network/network_handler';
-import { Cancel, Check } from '@mui/icons-material';
+import { Cancel, Check, Search } from '@mui/icons-material';
 import { host } from '../../../network/network_handler';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -18,6 +19,8 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const HalalProducts = () => {
     const [products, setProducts] = useState({ approved: [], pending: [] });
     const [openDialog, setOpenDialog] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filterStatus, setFilterStatus] = useState('all');
     const [editMode, setEditMode] = useState(false);
     const [currentProduct, setCurrentProduct] = useState(null);
     const [productName, setProductName] = useState('');
@@ -40,6 +43,29 @@ const HalalProducts = () => {
         const data = await new NetworkHandler().getHalalProducts();
         setProducts(data);
     };
+
+    const handleSearch = (query) => {
+        setSearchQuery(query.toLowerCase());
+    };
+
+    // Handle Filter
+    const handleFilter = (status) => {
+        setFilterStatus(status);
+    };
+
+    const filterAndSearchProducts = (list) => {
+        return list
+            .filter((product) => {
+                // Filter by halal_status
+                if (filterStatus !== 'all' && product.halal_status !== filterStatus) {
+                    return false;
+                }
+                // Search by product_name
+                return product.product_name.toLowerCase().includes(searchQuery);
+            });
+    };
+
+
 
     const validateForm = () => {
         let formErrors = {};
@@ -191,14 +217,35 @@ const HalalProducts = () => {
                 </Grid>
             </Grid>
 
+            <Grid container spacing={2} alignItems="center" sx={{ mt: 2 }}>
+                <Grid item xs={3} md={3}>
+                    <TextField
+                        size='small'
+                        fullWidth
+                        label="Search by Product Name"
+                        variant="outlined"
+                        value={searchQuery}
+                        onChange={(e) => handleSearch(e.target.value)}
+                    />
+                </Grid>
+                <Grid item xs={3} md={3}>
+                    <ButtonGroup variant="contained">
+                        <Button onClick={() => handleFilter('all')}>All</Button>
+                        <Button onClick={() => handleFilter('halal')}>Halal</Button>
+                        <Button onClick={() => handleFilter('haram')}>Haram</Button>
+                        <Button onClick={() => handleFilter('mushbooh')}>Mushbooh</Button>
+                    </ButtonGroup>
+                </Grid>
+            </Grid>
+
             <h2>Pending</h2>
             <div style={{ height: 400, marginBottom: 20 }}>
-                <DataGrid rows={products.pending} columns={columns(true)} pageSize={5} />
+                <DataGrid rows={filterAndSearchProducts(products.pending)} columns={columns(true)} pageSize={5} />
             </div>
 
             <h2>Approved</h2>
             <div style={{ height: 400 }}>
-                <DataGrid rows={products.approved} columns={columns(false)} pageSize={5} />
+                <DataGrid rows={filterAndSearchProducts(products.approved)} columns={columns(false)} pageSize={5} />
             </div>
 
             <Dialog
