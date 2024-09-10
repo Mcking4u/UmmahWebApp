@@ -82,7 +82,7 @@ const AddAnnouncementDialog = ({ open, onClose, madrasas, onSave }) => {
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{maxWidth:300}}>
+      <DialogContent sx={{ maxWidth: 300 }}>
         <TextField
           margin="dense"
           label="Title"
@@ -90,7 +90,7 @@ const AddAnnouncementDialog = ({ open, onClose, madrasas, onSave }) => {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                 <Title />
+                <Title />
               </InputAdornment>
             ),
           }}
@@ -109,7 +109,7 @@ const AddAnnouncementDialog = ({ open, onClose, madrasas, onSave }) => {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                  <Description />
+                <Description />
               </InputAdornment>
             ),
           }}
@@ -142,7 +142,7 @@ const AddAnnouncementDialog = ({ open, onClose, madrasas, onSave }) => {
         </FormControl>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}  color="secondary" >Cancel</Button>
+        <Button onClick={onClose} color="secondary" >Cancel</Button>
         <Button onClick={handleSave} color="primary">
           Save
         </Button>
@@ -247,8 +247,8 @@ const Announcements = () => {
         <Grid item flexGrow={1}>
           <Box sx={{ with: "100%", textAlign: "right" }}>
             <Button
-            size="small"
-            startIcon={<Add />}
+              size="small"
+              startIcon={<Add />}
               variant="contained"
               color="primary"
               onClick={handleDialogOpen}

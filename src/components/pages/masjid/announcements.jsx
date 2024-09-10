@@ -49,7 +49,8 @@ const Announcements = () => {
   };
 
   const handleSendAnnouncement = async () => {
-    if (!announcementMessage || !announcementDate) return;
+    // if (!announcementMessage || !announcementDate) return;
+    if (!announcementMessage) return;
     setLoading(true);
     try {
       /*
@@ -73,7 +74,7 @@ const Announcements = () => {
         Make Announcements
       </Typography>
 
-      <Paper sx={{ mb: 2, mt:1 }} elevation={3}>
+      <Paper sx={{ mb: 2, mt: 1 }} elevation={3}>
         <form style={{ padding: "10px" }} noValidate autoComplete="off">
           <TextField
             id="announcement-message"
@@ -87,7 +88,7 @@ const Announcements = () => {
             onChange={(e) => setAnnouncementMessage(e.target.value)}
           />
           <Grid container spacing={2} alignItems="center" sx={{ mt: 2 }}>
-            <Grid item xs={12} md={6}>
+            {/* <Grid item xs={12} md={6}>
               <TextField
                 id="announcement-date"
                 label="Announcement Date"
@@ -100,7 +101,7 @@ const Announcements = () => {
                 value={announcementDate}
                 onChange={(e) => setAnnouncementDate(e.target.value)}
               />
-            </Grid>
+            </Grid> */}
             <Grid item xs={12} md={6}>
               <Button
                 variant="contained"
