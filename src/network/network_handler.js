@@ -1111,6 +1111,24 @@ class NetworkHandler {
   }
 
 
+  async getIssues(masjidId) {
+    const url = `${baseUrls.masjid}/get-issues/${masjidId}`;
+
+    const token = localStorage.getItem(NetworkHandler.loginTokenKey);
+
+    const headers = {
+      "Authorization": `Token ${token}`
+    };
+
+    try {
+      const response = await this.axiosInstance.get(url, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
   async getMasjidEvent() {
     const url = `${baseUrls.masjid}/masjid-events-admin`;
 

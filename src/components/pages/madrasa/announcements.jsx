@@ -34,6 +34,7 @@ const AddAnnouncementDialog = ({ open, onClose, madrasas, onSave }) => {
   const [titleError, setTitleError] = useState("");
   const [descriptionError, setDescriptionError] = useState("");
   const [madrasaError, setMadrasaError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
     // Reset errors
@@ -59,6 +60,7 @@ const AddAnnouncementDialog = ({ open, onClose, madrasas, onSave }) => {
 
     if (!valid) return;
 
+    setLoading(true);
     const payload = {
       title,
       description,
@@ -66,6 +68,7 @@ const AddAnnouncementDialog = ({ open, onClose, madrasas, onSave }) => {
     };
     await new NetworkHandler().addMadrasaAnnouncement(payload);
     onSave();
+    setLoading(false);
     onClose();
   };
 
@@ -143,7 +146,7 @@ const AddAnnouncementDialog = ({ open, onClose, madrasas, onSave }) => {
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="secondary" >Cancel</Button>
-        <Button onClick={handleSave} color="primary">
+        <Button disabled={loading} onClick={handleSave} color="primary">
           Save
         </Button>
       </DialogActions>

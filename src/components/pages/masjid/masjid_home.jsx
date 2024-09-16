@@ -16,6 +16,7 @@ import {
   Event,
 } from "@mui/icons-material";
 import EventManager from "./events";
+import ViewIssues from "./view_issues";
 
 const navLinks = [
   { path: "/masjid/", label: "Dashboard", icon: <DashboardIcon /> },
@@ -80,6 +81,13 @@ const MasjidHome = () => {
           path="/events"
           element={
             <EventManager route={navLinks[4].path} label={navLinks[4].label} />
+          }
+        />
+
+        <Route
+          path="/issues/:id"
+          element={
+            <ViewIssues route={navLinks[1].path} label={navLinks[1].label} />
           }
         />
         <Route path="/*" element={<NotFound />} />

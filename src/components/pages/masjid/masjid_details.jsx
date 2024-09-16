@@ -7,9 +7,13 @@ import {
   Snackbar,
   Alert,
   Avatar,
+  Box,
+  IconButton,
 } from "@mui/material";
 import NetworkHandler from "../../../network/network_handler";
 import withNavUpdate from "../../wrappers/with_nav_update";
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import { useNavigate } from "react-router-dom";
 
 function MasjidDetails() {
   useEffect(() => {
@@ -18,6 +22,7 @@ function MasjidDetails() {
       try {
         let data = await new NetworkHandler().getMasjidProfile();
         data[0]["Password"] = "";
+        setMasjidId(data[0].id);
         setMasjidDetails(data[0]);
       } catch (error) {
         console.error("Error fetching Masjid details:", error);
@@ -43,6 +48,8 @@ function MasjidDetails() {
   });
 
   const [masjidDetailsEditable, setMasjidDetailsEditable] = useState(false);
+  const [masjidId, setMasjidId] = useState("");
+  const navigate = useNavigate();
   const [contactPersonEditable, setContactPersonEditable] = useState(false);
 
   const handleEditClick = (section) => {
@@ -126,9 +133,22 @@ function MasjidDetails() {
   return (
     <div>
       {/* Masjid Details Section */}
-      <Typography variant="h5" gutterBottom>
-        Masjid Details
-      </Typography>
+      <Box sx={{ display: "flex", gap: 3, marginBottom: 2 }}>
+        <Typography variant="h5" gutterBottom>
+          Masjid Details
+        </Typography>
+        <Button
+          variant="outlined"
+          size="small"
+          disabled={masjidId === ""}
+          onClick={() => {
+            navigate(`/masjid/issues/${masjidId}`)
+          }}
+          startIcon={<ErrorOutlineIcon />}
+        >
+          View Issues
+        </Button>
+      </Box>
       <Grid container spacing={2}>
         {[
           { label: "Masjid Name", name: "name" },

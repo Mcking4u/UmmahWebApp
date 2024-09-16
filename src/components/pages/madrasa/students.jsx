@@ -16,6 +16,7 @@ import {
   Typography,
   Avatar,
   IconButton,
+  Box,
 } from "@mui/material";
 import NetworkHandler from "../../../network/network_handler";
 import withNavUpdate from "../../wrappers/with_nav_update";
@@ -435,22 +436,25 @@ const Students = () => {
           {allRows
             .find((row) => row.id === selectedStudentId)
             ?.sessions.map((session) => (
-              <FormControl fullWidth key={session.id} margin="normal">
-                <InputLabel>Select teacher for {session.name}</InputLabel>
-                <Select
-                  value={selectedSessions[session.id] || ""}
-                  label={`Select teacher for ${session.name}`}
-                  onChange={(e) =>
-                    handleSessionTeacherChange(session.id, e.target.value)
-                  }
-                >
-                  {session.teachers.map((teacher) => (
-                    <MenuItem key={teacher.id} value={teacher.id}>
-                      {teacher.profile.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <Box key={session.id} >
+                <Typography component="div" variant="h6" >{session.name}</Typography>
+                <FormControl fullWidth margin="normal" sx={{ mt: 1, pt: 0 }}>
+                  <InputLabel>Select teacher for {session.name}</InputLabel>
+                  <Select
+                    value={selectedSessions[session.id] || ""}
+                    label={`Select teacher for ${session.name}`}
+                    onChange={(e) =>
+                      handleSessionTeacherChange(session.id, e.target.value)
+                    }
+                  >
+                    {session.teachers.map((teacher) => (
+                      <MenuItem key={teacher.id} value={teacher.id}>
+                        {teacher.profile.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
             ))}
 
 
@@ -509,10 +513,17 @@ const Students = () => {
               <Typography variant="body1">{info.proficiency}</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="subtitle1"><strong>Parent Name:</strong></Typography>
+              <Typography variant="subtitle1"><strong>Father Name:</strong></Typography>
             </Grid>
+
             <Grid item xs={6}>
               <Typography variant="body1">{info.parent_name}</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="subtitle1"><strong>Father Contact:</strong></Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body1">{info.spouse_contact || 'N/A'}</Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography variant="subtitle1"><strong>Emergency Contact:</strong></Typography>
@@ -530,7 +541,7 @@ const Students = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleInfoClose} color="primary">
-            Okay
+            Close
           </Button>
         </DialogActions>
       </Dialog>
