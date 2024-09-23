@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Slide, TextField } from '@mui/material';
-import { Add as AddIcon, Edit, Edit as EditIcon } from '@mui/icons-material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Slide, TextField, Switch, FormControlLabel, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
+import { Add as AddIcon, Edit as EditIcon } from '@mui/icons-material';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import NetworkHandler from '../../../network/network_handler';
 import withNavUpdate from '../../wrappers/with_nav_update';
+import Tooltip from '@mui/material/Tooltip';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -22,7 +23,9 @@ const EventManager = () => {
         end_date: '',
         title: '',
         description: '',
-        venue: ''
+        venue: '',
+        show_attendance: true,
+        recurrence: 'none',
     });
 
     useEffect(() => {
@@ -44,6 +47,8 @@ const EventManager = () => {
                 ...event,
                 event_date: formattedEventDate,
                 end_date: formattedEndDate,
+                show_attendance: event.show_attendance || false,
+                recurrence: event.recurrence || 'none',
             });
         } else {
             setIsEditMode(false);
@@ -53,7 +58,9 @@ const EventManager = () => {
                 end_date: new Date().toISOString().slice(0, 16),
                 title: '',
                 description: '',
-                venue: ''
+                venue: '',
+                show_attendance: false,
+                recurrence: 'none',
             });
         }
         setOpen(true);
@@ -67,16 +74,16 @@ const EventManager = () => {
         const validationErrors = validateForm();
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
-            return; // Prevent saving if there are errors
+            return;
         }
-        const { id, event_date, end_date, title, description, venue } = currentEvent;
+        const { id, event_date, end_date, title, description, venue, show_attendance, recurrence } = currentEvent;
         const formattedEventDate = `${event_date.toString().replace('T', ' ')}:00`;
         const formattedEndDate = `${end_date.toString().replace('T', ' ')}:00`;
 
         if (isEditMode) {
-            await new NetworkHandler().editMasjidEvent(id, formattedEventDate, formattedEndDate, title, description, venue);
+            await new NetworkHandler().editMasjidEvent(id, formattedEventDate, formattedEndDate, title, description, venue, show_attendance, recurrence);
         } else {
-            await new NetworkHandler().addMasjidEvent(formattedEventDate, formattedEndDate, title, description, venue);
+            await new NetworkHandler().addMasjidEvent(formattedEventDate, formattedEndDate, title, description, venue, show_attendance, recurrence);
         }
 
         fetchEvents();
@@ -135,7 +142,6 @@ const EventManager = () => {
         { field: 'yes_count', headerName: 'Attending', width: 100 },
         { field: 'no_count', headerName: 'Not Attending', width: 100 },
         { field: 'maybe_count', headerName: 'Maybe Attending', width: 150 },
-        // { field: 'description', headerName: 'Description', width: 300, flex: 1 },
         { field: 'venue', headerName: 'Venue', width: 200 },
         {
             field: 'edit',
@@ -145,7 +151,7 @@ const EventManager = () => {
                 <Button
                     color="primary"
                     size='small'
-                    startIcon={<EditIcon startIcon={<Edit />} />}
+                    startIcon={<EditIcon />}
                     onClick={() => handleOpen(params.row)}
                 >
                     Edit
@@ -182,13 +188,13 @@ const EventManager = () => {
             >
                 <DialogTitle>{isEditMode ? 'Edit Event' : 'Add Event'}</DialogTitle>
                 <DialogContent
-                    sx={{ height: "80vh", }}
+                    sx={{ height: "80vh" }}
                 >
                     <TextField
                         margin="dense"
                         label="Title"
-                        error={!!errors.title} // Highlight the field if there's an error
-                        helperText={errors.title} // Display the error message
+                        error={!!errors.title}
+                        helperText={errors.title}
                         fullWidth
                         value={currentEvent.title}
                         onChange={(e) => handleChange('title', e.target.value)}
@@ -228,13 +234,40 @@ const EventManager = () => {
                         value={currentEvent.venue}
                         onChange={(e) => handleChange('venue', e.target.value)}
                     />
+                    <Tooltip title="Controls if the total people attending is visible in the UI" arrow>
+                        <FormControlLabel
+                            sx={{ mt: 1, mb: 1 }}
+                            control={
+                                <Switch
+                                    checked={currentEvent.show_attendance}
+                                    onChange={(e) => handleChange('show_attendance', e.target.checked)}
+                                    color="primary"
+                                />
+                            }
+                            label="Show Attendance"
+                        />
+                    </Tooltip>
+                    <FormControl fullWidth margin="dense">
+                        <InputLabel >Recurrence</InputLabel>
+                        <Select
+                            label="Recurrence"
+                            value={currentEvent.recurrence}
+                            onChange={(e) => handleChange('recurrence', e.target.value)}
+                        >
+                            <MenuItem value="none">Does not repeat</MenuItem>
+                            <MenuItem value="repeats_daily">Repeats Daily</MenuItem>
+                            <MenuItem value="repeats_weekly">Repeats Weekly</MenuItem>
+                            <MenuItem value="repeats_monthly">Repeats Monthly</MenuItem>
+                            <MenuItem value="repeats_yearly">Repeats Yearly</MenuItem>
+                        </Select>
+                    </FormControl>
                     <ReactQuill
                         theme="snow"
                         value={currentEvent.description}
                         onChange={(value) => handleChange('description', value)}
                         style={{ marginTop: '16px', height: '70%' }}
                     />
-                    {errors.description && ( // Display description error below the editor
+                    {errors.description && (
                         <p style={{ color: 'rgb(211, 47, 47)', fontSize: 13, marginLeft: 10 }}>{errors.description}</p>
                     )}
                 </DialogContent>

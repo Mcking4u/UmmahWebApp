@@ -107,6 +107,46 @@ class NetworkHandler {
     }
   }
 
+  async updateNamazTiming(namazData) {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/updatenamaztimings";
+
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      "Content-Type": "application/json",
+    };
+
+    try {
+      const response = await this.axiosInstance.post(url, namazData, {
+        baseURL: baseUrls.masjid,
+        headers,
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async rangeUpdateNamazTiming(namazData) {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/range-updatenamaztimings";
+
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      "Content-Type": "application/json",
+    };
+
+    try {
+      const response = await this.axiosInstance.post(url, namazData, {
+        baseURL: baseUrls.masjid,
+        headers,
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
 
 
   async editMasjidProfile(profileData) {
@@ -1086,7 +1126,7 @@ class NetworkHandler {
 
 
 
-  async addMasjidEvent(eventDate, endDate, title, description, venue) {
+  async addMasjidEvent(eventDate, endDate, title, description, venue, show_attendance, recurrence) {
     const url = `${baseUrls.masjid}/masjid-events-admin`;
 
     const token = localStorage.getItem(NetworkHandler.loginTokenKey);
@@ -1102,6 +1142,9 @@ class NetworkHandler {
 
     formData.append('end_date', endDate);
     formData.append('venue', venue);
+    formData.append('recurrence', recurrence);
+    formData.append('show_attendance', show_attendance);
+
     try {
       const response = await this.axiosInstance.post(url, formData, { headers });
       return response.data;
@@ -1146,7 +1189,7 @@ class NetworkHandler {
     }
   }
 
-  async editMasjidEvent(eventId, eventDate, endDate, title, description, venue) {
+  async editMasjidEvent(eventId, eventDate, endDate, title, description, venue, show_attendance, recurrence) {
     const url = `${baseUrls.masjid}/masjid-events-admin`; // Use the correct endpoint
 
     const token = localStorage.getItem(NetworkHandler.loginTokenKey);
@@ -1162,6 +1205,9 @@ class NetworkHandler {
     formData.append('id', eventId);
     formData.append('end_date', endDate);
     formData.append('venue', venue);
+    formData.append('show_attendance', show_attendance);
+    formData.append('recurrence', recurrence);
+
 
 
     try {

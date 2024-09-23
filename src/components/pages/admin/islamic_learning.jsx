@@ -29,7 +29,7 @@ const VideoManager = () => {
   const [selectedCategory, setSelectedCategory] = useState(0);
   const [addCategoryOpen, setAddCategoryOpen] = useState(false);
   const [addVideoOpen, setAddVideoOpen] = useState(false);
-  const [bulkUploadOpen, setBulkUploadOpen] = useState(false); // Bulk upload dialog state
+  const [bulkUploadOpen, setBulkUploadOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const xlsSampleDownloadUrl = host + "/IslamicLearning/api/download-sample";
   const [newVideoData, setNewVideoData] = useState({
@@ -38,16 +38,17 @@ const VideoManager = () => {
     videourl: "",
     pg_rating: "A",
     media_type: "video",
+    language: "english", // Default value
   });
   const [loading, setLoading] = useState(false);
-  const [bulkUploadLoading, setBulkUploadLoading] = useState(false); // Loading state for bulk upload
+  const [bulkUploadLoading, setBulkUploadLoading] = useState(false);
   const [categoryTouched, setCategoryTouched] = useState(false);
   const [videoTouched, setVideoTouched] = useState({
     title: false,
     thumbnailUrl: false,
     videourl: false,
   });
-  const [bulkUploadFile, setBulkUploadFile] = useState(null); // State to store the selected file
+  const [bulkUploadFile, setBulkUploadFile] = useState(null);
 
   const fetchData = async () => {
     const result = await new NetworkHandler().getIslamicLearningData();
@@ -97,6 +98,7 @@ const VideoManager = () => {
         videourl: "",
         pg_rating: "A",
         media_type: "video",
+        language: "english",
       });
       setVideoTouched({
         title: false,
@@ -146,6 +148,7 @@ const VideoManager = () => {
     { field: "video_url", headerName: "Video Url", flex: 1 },
     { field: "pg_rating", headerName: "PG Rating", flex: 1 },
     { field: "media_type", headerName: "Media Type", flex: 1 },
+    { field: "language", headerName: "Language", flex: 1 }, // Add language column
     {
       field: "delete",
       headerName: "Delete",
@@ -214,12 +217,11 @@ const VideoManager = () => {
             >
               Download Sample XLS
             </Button>
-
             <Button
               size="small"
               variant="contained"
               startIcon={<Upload />}
-              onClick={() => setBulkUploadOpen(true)} // Open bulk upload dialog
+              onClick={() => setBulkUploadOpen(true)}
             >
               Bulk Upload
             </Button>
@@ -362,7 +364,22 @@ const VideoManager = () => {
               <MenuItem value="video">Video</MenuItem>
               <MenuItem value="short">Short</MenuItem>
             </TextField>
+
           </Box>
+          <TextField
+            select
+            label="Language"
+            value={newVideoData.language}
+            onChange={(e) =>
+              setNewVideoData({ ...newVideoData, language: e.target.value })
+            }
+            fullWidth
+            margin="dense"
+          >
+            <MenuItem value="english">English</MenuItem>
+            <MenuItem value="finnish">Finnish</MenuItem>
+            <MenuItem value="french">French</MenuItem>
+          </TextField>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setAddVideoOpen(false)} color="secondary">
