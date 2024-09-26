@@ -73,7 +73,7 @@ const Programs = () => {
     };
 
     const filteredPrograms = programs.filter(
-        (program) => program.madrasa === selectedMadrasa
+        (program) => program.madrasa.id === selectedMadrasa
     );
 
     const columns = [
