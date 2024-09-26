@@ -438,6 +438,24 @@ class NetworkHandler {
     }
   }
 
+  async changeProgram(payload) {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/ummah/change-program";
+
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json",
+    };
+
+    try {
+      const response = await this.axiosInstance.post(url, payload, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
 
   async rejectEnrollment(rejectionData) {
     const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);

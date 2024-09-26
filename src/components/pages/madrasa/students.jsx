@@ -269,20 +269,20 @@ const Students = () => {
       width: 150,
       flex: 1,
     },
-    {
-      field: "approve",
-      headerName: "Reassign",
-      renderCell: (params) => (
-        <IconButton
-          color="primary"
-          onClick={() => handleOpenApproveDialog(params.row.id)}
-        >
-          <ReplayIcon />
-        </IconButton>
-      ),
-      width: 150,
-      flex: 0.5,
-    },
+    // {
+    //   field: "approve",
+    //   headerName: "Reassign",
+    //   renderCell: (params) => (
+    //     <IconButton
+    //       color="primary"
+    //       onClick={() => handleOpenApproveDialog(params.row.id)}
+    //     >
+    //       <ReplayIcon />
+    //     </IconButton>
+    //   ),
+    //   width: 150,
+    //   flex: 0.5,
+    // },
     {
       field: "view_more",
       headerName: "More Info",

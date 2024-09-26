@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import NetworkHandler from "../../../network/network_handler";
 import withNavUpdate from "../../wrappers/with_nav_update";
-import { Cancel, Check, RemoveRedEye } from "@mui/icons-material";
+import { Cancel, Check, RemoveRedEye, School } from "@mui/icons-material";
 import ReplayIcon from "@mui/icons-material/Replay";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -45,6 +45,8 @@ const EnrollmentDataGrid = () => {
   const [selectedSessions, setSelectedSessions] = useState({});
   const [rejectReason, setRejectReason] = useState("");
   const [approveLoading, setAppRoveLoading] = useState(false);
+  const [programs, setPrograms] = useState([]);
+  const [filteredPrograms, setFilteredPrograms] = useState([]);
   const [info, setInfo] = useState(
     {
       id: "",
@@ -59,6 +61,7 @@ const EnrollmentDataGrid = () => {
     }
   );
   const [showInfo, setShowInfo] = useState(false);
+
 
   async function fetchData() {
     try {
@@ -77,6 +80,8 @@ const EnrollmentDataGrid = () => {
       setEnrollments(allEnrollments);
       setCompletedEnrollments(allCompletedEnrollments);
       setRejectedEnrollments(allRejectedEnrollments);
+      const res = await new NetworkHandler().getPrograms();
+      setPrograms(res.programs)
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -101,12 +106,18 @@ const EnrollmentDataGrid = () => {
       (enrollment) => enrollment.enrolled_madrasa.name === selectedMadrasa
     );
     setFilteredRejectedEnrollments(filteredRejected);
+
+    const filteredPrograms_ = programs.filter(
+      (program) => program.madrasa.name === selectedMadrasa
+    );
+    setFilteredPrograms(filteredPrograms_);
   }, [
     selectedMadrasa,
     enrollments,
     completedEnrollments,
     rejectedEnrollments,
     madrasas,
+    programs,
   ]);
 
   const handleMadrasaChange = (event) => {
@@ -147,12 +158,12 @@ const EnrollmentDataGrid = () => {
       teacher_id: selectedSessions[sessionId],
     }));
 
-    if (sessions.length != allRows
-      .find((row) => row.id === selectedStudentId)
-      ?.sessions.length) {
-      alert("Please select teachers");
-      return;
-    }
+    // if (sessions.length != allRows
+    //   .find((row) => row.id === selectedStudentId)
+    //   ?.sessions.length) {
+    //   alert("Please select teachers");
+    //   return;
+    // }
     setAppRoveLoading(true);
 
     const assignmentData = {
@@ -297,7 +308,54 @@ const EnrollmentDataGrid = () => {
       width: 150,
       flex: 0.5,
     },
+    {
+      field: "change_program",
+      headerName: "Change Program",
+      renderCell: (params) => (
+        <IconButton
+          color="primary"
+          disabled={filteredPrograms.length <= 0}
+          onClick={() => showReassign(params.row.enrollment)}
+        >
+          <School />
+        </IconButton>
+      ),
+      width: 150,
+      flex: 0.5,
+    },
   ];
+
+
+  const [showReassignProgram, setShowReassignProgram] = useState(false);
+  const [reassignProgram, setReassignProgram] = useState({
+    student_id: 1,
+    program_id: 1,
+  });
+
+  const showReassign = (enrollment) => {
+    setShowReassignProgram(true);
+    const data = {
+      student_id: enrollment.id,
+      program_id: enrollment.program.id
+    }
+    setReassignProgram(data);
+  }
+  const handleReassignProgramClose = () => {
+    setShowReassignProgram(false);
+    setReassignLoading(false);
+  }
+  const [reassignLoading, setReassignLoading] = useState(false);
+
+  const handleReassign = async () => {
+    setReassignLoading(true);
+
+    await new NetworkHandler().changeProgram(reassignProgram);
+    fetchData();
+
+    handleReassignProgramClose()
+
+  }
+
 
   const rejectedColumns = [
     {
@@ -343,6 +401,8 @@ const EnrollmentDataGrid = () => {
     emergency_contact: enrollment.emergency_contact,
     sessions: enrollment.sessions,
     enrollment: enrollment,
+    program_sessions: enrollment.program_sessions,
+    program: enrollment.program,
   }));
 
   const allRows = allEnrollments.map((enrollment) => ({
@@ -351,6 +411,8 @@ const EnrollmentDataGrid = () => {
     parent_name: enrollment.parent_name,
     emergency_contact: enrollment.emergency_contact,
     sessions: enrollment.sessions,
+    program_sessions: enrollment.program_sessions,
+    program: enrollment.program,
     enrollment: enrollment,
 
   }));
@@ -362,6 +424,8 @@ const EnrollmentDataGrid = () => {
     emergency_contact: enrollment.emergency_contact,
     status: enrollment.status,
     enrollment: enrollment,
+    program_sessions: enrollment.program_sessions,
+    program: enrollment.program,
 
   }));
 
@@ -372,6 +436,8 @@ const EnrollmentDataGrid = () => {
     emergency_contact: enrollment.emergency_contact,
     reason: enrollment.enrolled_comment,
     enrollment: enrollment,
+    program_sessions: enrollment.program_sessions,
+    program: enrollment.program,
   }));
 
   return (
@@ -429,13 +495,18 @@ const EnrollmentDataGrid = () => {
         keepMounted
         onClose={handleCloseApproveDialog}
       >
-        <DialogTitle>Assign Teachers</DialogTitle>
+        {allRows
+          .find((row) => row.id === selectedStudentId) && (
+            <DialogTitle>Assign Teachers for program - {allRows
+              .find((row) => row.id === selectedStudentId).program.name} </DialogTitle>
+          )}
+
         <DialogContent
           sx={{ minWidth: 400 }}
         >
           {allRows
             .find((row) => row.id === selectedStudentId)
-            ?.sessions.map((session) => (
+            ?.program_sessions.map((session) => (
               <Box key={session.id} >
                 <Typography component="div" variant="h6" >{session.name}</Typography>
                 <FormControl fullWidth margin="normal" sx={{ mt: 1, pt: 0 }}>
@@ -542,6 +613,50 @@ const EnrollmentDataGrid = () => {
         <DialogActions>
           <Button onClick={handleInfoClose} color="primary">
             Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={showReassignProgram}
+        TransitionComponent={Transition}
+        keepMounted
+        onClose={handleReassignProgramClose}
+      >
+        <DialogTitle>Reassign Program</DialogTitle>
+        <DialogContent>
+          <FormControl fullWidth sx={{ mt: 1 }}>
+            <InputLabel >Select Program</InputLabel>
+            <Select
+
+              value={reassignProgram.program_id}
+              label='Select Program'
+              onChange={(e) => {
+                const reassignProgram_ = { ...reassignProgram }
+                reassignProgram_.program_id = e.target.value;
+                setReassignProgram(reassignProgram_);
+              }
+              }
+            >
+
+              {filteredPrograms.length > 0 && (
+                filteredPrograms.map((program) => (
+                  <MenuItem key={program.id} value={program.id}>
+                    {program.name}
+                  </MenuItem>
+                ))
+              )}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleReassignProgramClose} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleReassign}
+            disabled={reassignLoading}
+            color="primary">
+            Reassign
           </Button>
         </DialogActions>
       </Dialog>

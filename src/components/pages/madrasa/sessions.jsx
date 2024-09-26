@@ -142,6 +142,14 @@ function Sessions() {
     const columns = [
         { field: 'day', headerName: 'Session Day', width: 150 },
         { field: 'name', headerName: 'Session Name', width: 150 },
+        {
+            field: 'program', headerName: 'Program Name', width: 150,
+            valueGetter: (params) => {
+                return params.name;
+            },
+
+        },
+
         { field: 'start_time', headerName: 'Start Time', width: 150 },
         { field: 'end_time', headerName: 'End Time', width: 150 },
         { field: 'gender', headerName: 'Gender', width: 150 },
@@ -217,21 +225,26 @@ function Sessions() {
                     <DialogTitle>{selectedSession ? "Edit Session" : "Add Session"}</DialogTitle>
                     <DialogContent sx={{ maxWidth: '400px' }}>
                         <Box sx={{ '& .MuiFormControl-root': { mb: 2, width: '100%' } }}>
-                            <FormControl
-                                sx={{ mt: 1 }}
-                            >
-                                <InputLabel>Select a Program</InputLabel>
-                                <Select
-                                    name="program"
-                                    value={formData.program}
-                                    onChange={handleChange}
-                                    label="Select a Program"
+                            {selectedSession ? (
+                                <div style={{ marginTop: '10px' }} />
+                            ) : (
+                                <FormControl
+                                    sx={{ mt: 1 }}
                                 >
-                                    {filteredPrograms.map(program => (
-                                        <MenuItem key={program.id} value={program.id}>{program.name}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                                    <InputLabel>Select a Program</InputLabel>
+                                    <Select
+                                        name="program"
+                                        value={formData.program}
+                                        onChange={handleChange}
+                                        label="Select a Program"
+                                    >
+                                        {filteredPrograms.map(program => (
+                                            <MenuItem key={program.id} value={program.id}>{program.name}</MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            )}
+
                             <TextField
 
                                 label="Session Name"

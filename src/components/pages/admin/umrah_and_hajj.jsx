@@ -198,11 +198,11 @@ const UmrahAndHajj = () => {
     };
 
     if (isEditMode) {
-    //   await new NetworkHandler().editCategoryAdmin(
-    //     editCategoryEndpoint,
-    //     selectedCategoryId,
-    //     categoryData
-    //   );
+      //   await new NetworkHandler().editCategoryAdmin(
+      //     editCategoryEndpoint,
+      //     selectedCategoryId,
+      //     categoryData
+      //   );
     } else {
       await new NetworkHandler().addVendorAdmin(
         categoryData
@@ -233,7 +233,7 @@ const UmrahAndHajj = () => {
       width: 100,
       renderCell: (params) => (
         <img
-          src={`${host}${params.row.logo}`}
+          src={`${params.row.logo}`}
           alt="Category"
           style={{ width: "50px" }}
         />
@@ -245,7 +245,7 @@ const UmrahAndHajj = () => {
       width: 100,
       renderCell: (params) => (
         <img
-          src={`${host}${params.row.thumbnail}`}
+          src={`${params.row.thumbnail}`}
           alt="Category"
           style={{ width: "50px" }}
         />
@@ -327,7 +327,7 @@ const UmrahAndHajj = () => {
             <Close />
           </IconButton>
         </DialogTitle>
-        <DialogContent sx={{ minWidth: 300, maxWidth:300 }}>
+        <DialogContent sx={{ minWidth: 300, maxWidth: 300 }}>
           <TextField
             autoFocus
             margin="dense"
