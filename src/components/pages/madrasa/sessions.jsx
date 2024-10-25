@@ -50,7 +50,7 @@ function Sessions() {
         setSessions(response[selectedIndex].sessions);
         setTeachers(response[selectedIndex].teachers);
         // filterPrograms(response[selectedIndex].id);  // Filter programs based on madrasa
-        const filtered = programsData.filter(program => program.madrasa === response[selectedIndex].id);
+        const filtered = programsData.filter(program => program.madrasa.id === response[selectedIndex].id);
         setFilteredPrograms(filtered);
         setLoading(false);
     }
@@ -60,7 +60,7 @@ function Sessions() {
     }, []);
 
     const filterPrograms = (madrasaId) => {
-        const filtered = programs.filter(program => program.madrasa === madrasaId);
+        const filtered = programs.filter(program => program.madrasa.id === madrasaId);
         setFilteredPrograms(filtered);
     };
 
@@ -238,6 +238,7 @@ function Sessions() {
                                         onChange={handleChange}
                                         label="Select a Program"
                                     >
+
                                         {filteredPrograms.map(program => (
                                             <MenuItem key={program.id} value={program.id}>{program.name}</MenuItem>
                                         ))}
