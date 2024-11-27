@@ -20,8 +20,8 @@ import {
 } from "@mui/material";
 import NetworkHandler from "../../../network/network_handler";
 import withNavUpdate from "../../wrappers/with_nav_update";
-import { Cancel, Check, RemoveRedEye } from "@mui/icons-material";
-import ReplayIcon from "@mui/icons-material/Replay";
+import { ArrowDownward, Cancel, Check, RemoveRedEye } from "@mui/icons-material";
+import ExcelJS from 'exceljs';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -374,28 +374,85 @@ const Students = () => {
     enrollment: enrollment,
   }));
 
+  const onExport = async () => {
+    if (completedEnrollments === null || completedEnrollments === undefined || completedEnrollments.length <= 0) {
+      return;
+    }
+    const exportList = [...completedEnrollments];
+    const filteredExportList = exportList.map(item => ({
+      name: item.name || "N/A",
+      profile_picture: item.profile_picture || "N/A",
+      dob: item.dob || "N/A",
+      gender: item.gender || "N/A",
+      proficiency: item.proficiency || "N/A",
+      parent_name: item.parent_name || "N/A",
+      spouse_contact: item.spouse_contact || "N/A",
+      emergency_contact: item.emergency_contact || "N/A",
+      enrolled_comment: item.enrolled_comment || "N/A"
+    }));
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Sheet1');
+
+    // Set column headers
+    worksheet.columns = [
+      { header: 'Name', key: 'name', width: 30 },
+      { header: 'Profile Picture', key: 'profile_picture', width: 20 },
+      { header: 'DOB', key: 'dob', width: 15 },
+      { header: 'Gender', key: 'gender', width: 10 },
+      { header: 'Proficiency', key: 'proficiency', width: 20 },
+      { header: 'Parent Name', key: 'parent_name', width: 25 },
+      { header: 'Spouse Contact', key: 'spouse_contact', width: 20 },
+      { header: 'Emergency Contact', key: 'emergency_contact', width: 20 },
+      { header: 'Enrolled Comment', key: 'enrolled_comment', width: 30 },
+    ];
+
+    // Add data rows
+    worksheet.addRows(filteredExportList);
+
+    // Save the workbook to a file and trigger download
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'student_data.xlsx';
+    link.click();
+  }
+
   return (
     <div>
-      <FormControl
-        variant="outlined"
-        style={{ marginBottom: "20px", minWidth: 200 }}
-      >
-        <InputLabel id="madrasa-select-label">Filter by Madrasa</InputLabel>
-        <Select
-          labelId="madrasa-select-label"
-          id="madrasa-select"
-          value={selectedMadrasa}
-          onChange={handleMadrasaChange}
-          label="Filter by Madrasa"
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
+        <FormControl
+          variant="outlined"
+          style={{ marginBottom: "20px", minWidth: 200 }}
         >
-          {madrasas.map((madrasa) => (
-            <MenuItem key={madrasa.name} value={madrasa.name}>
-              {madrasa.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+          <InputLabel id="madrasa-select-label">Filter by Madrasa</InputLabel>
+          <Select
+            labelId="madrasa-select-label"
+            id="madrasa-select"
+            value={selectedMadrasa}
+            onChange={handleMadrasaChange}
+            label="Filter by Madrasa"
+          >
+            {madrasas.map((madrasa) => (
+              <MenuItem key={madrasa.name} value={madrasa.name}>
+                {madrasa.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
 
+        <Box>
+          <Button
+            variant="contained" color="primary"
+            onClick={onExport}
+            endIcon={<ArrowDownward />}
+          >
+            Export
+          </Button>
+        </Box>
+
+      </Box>
       {/* <div style={{ height: 400, width: "100%", marginBottom: "20px" }}>
         <DataGrid
           rows={rows}
@@ -405,7 +462,7 @@ const Students = () => {
         />
       </div> */}
 
-      <div style={{ height: 400, width: "100%", marginBottom: "20px" }}>
+      <div style={{ height: 700, width: "100%", marginBottom: "20px" }}>
         <DataGrid
           rows={completedRows}
           columns={completedColumns}
