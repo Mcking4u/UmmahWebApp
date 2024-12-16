@@ -44,6 +44,15 @@ function MasjidDetails() {
     longitude: "",
     Password: "",
     donation_text: "", // New state for donation text
+    clock_background: null,
+    time_card_color: "#ffffff",
+    time_card_text_color: "#000000",
+    salah_card_color: "#ffffff",
+    salah_card_text_color: "#000000",
+    salah_card_active_color: "#4CAF51",
+    salah_card_active_text_color: "#ffffff",
+    time_remaining_card_color: "#FB7615",
+    time_remaining_text_color: "#ffffff",
   });
 
   const [masjidDetailsEditable, setMasjidDetailsEditable] = useState(false);
@@ -100,6 +109,20 @@ function MasjidDetails() {
     }));
   };
 
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setMasjidDetails(prev => ({
+          ...prev,
+          clock_background: reader.result
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const [toastState, setToastState] = useState({
     open: false,
     vertical: "top",
@@ -151,6 +174,83 @@ function MasjidDetails() {
             />
           </Grid>
         ))}
+
+        {/* Salat Clock Theme */}
+        <Grid item xs={12}>
+          <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
+            Salat Clock Theme
+          </Typography>
+          
+          {/* Background Image Upload - Full Width Row */}
+          <Grid container sx={{ mb: 3 }}>
+            <Grid item xs={12}>
+              <Typography variant="subtitle2">Clock Background</Typography>
+              <input
+                accept="image/*"
+                type="file"
+                onChange={handleImageUpload}
+                disabled={!masjidDetailsEditable}
+                style={{ display: 'none' }}
+                id="clock-background-upload"
+              />
+              <label htmlFor="clock-background-upload">
+                <Button
+                  variant="outlined"
+                  component="span"
+                  disabled={!masjidDetailsEditable}
+                >
+                  Upload Image
+                </Button>
+              </label>
+              {masjidDetails.clock_background && (
+                <Box sx={{ mt: 1 }}>
+                  <img 
+                    src={masjidDetails.clock_background} 
+                    alt="Clock Background" 
+                    style={{ maxWidth: '200px' }} 
+                  />
+                </Box>
+              )}
+            </Grid>
+          </Grid>
+
+          {/* Color Pickers - New Row */}
+          <Grid container spacing={2}>
+            {[
+              { label: "Time Card Color", name: "time_card_color" },
+              { label: "Time Card Text Color", name: "time_card_text_color" },
+              { label: "Salah Card Color", name: "salah_card_color" },
+              { label: "Salah Card Text Color", name: "salah_card_text_color" },
+              { label: "Salah Card Active Color", name: "salah_card_active_color" },
+              { label: "Salah Card Active Text Color", name: "salah_card_active_text_color" },
+              { label: "Time Remaining Card Color", name: "time_remaining_card_color" },
+              { label: "Time Remaining Text Color", name: "time_remaining_text_color" },
+            ].map((field) => (
+              <Grid item xs={12} sm={6} key={field.name}>
+                <Typography variant="subtitle2">{field.label}</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <input
+                    type="color"
+                    value={masjidDetails[field.name]}
+                    onChange={(e) => handleInputChange({
+                      target: { name: field.name, value: e.target.value }
+                    })}
+                    disabled={!masjidDetailsEditable}
+                    style={{ width: '50px', height: '50px' }}
+                  />
+                  <TextField
+                    value={masjidDetails[field.name]}
+                    onChange={(e) => handleInputChange({
+                      target: { name: field.name, value: e.target.value }
+                    })}
+                    disabled={!masjidDetailsEditable}
+                    size="small"
+                  />
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        </Grid>
 
         {/* Donation Text */}
         <Grid item xs={12}>
