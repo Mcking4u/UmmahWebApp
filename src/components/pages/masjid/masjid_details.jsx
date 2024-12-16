@@ -53,6 +53,8 @@ function MasjidDetails() {
     salah_card_active_text_color: "#ffffff",
     time_remaining_card_color: "#FB7615",
     time_remaining_text_color: "#ffffff",
+    clock_footer: "",
+    clock_footer_text_color: "#000000",
   });
 
   const [masjidDetailsEditable, setMasjidDetailsEditable] = useState(false);
@@ -249,6 +251,47 @@ function MasjidDetails() {
                 </Box>
               </Grid>
             ))}
+          </Grid>
+        </Grid>
+
+        {/* Clock Footer */}
+        <Grid item xs={12}>
+          <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
+            Clock Footer
+          </Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                label="Footer Text"
+                name="clock_footer"
+                value={masjidDetails.clock_footer || ""}
+                onChange={handleInputChange}
+                fullWidth
+                disabled={!masjidDetailsEditable}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="subtitle2">Footer Text Color</Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <input
+                  type="color"
+                  value={masjidDetails.clock_footer_text_color}
+                  onChange={(e) => handleInputChange({
+                    target: { name: 'clock_footer_text_color', value: e.target.value }
+                  })}
+                  disabled={!masjidDetailsEditable}
+                  style={{ width: '50px', height: '50px' }}
+                />
+                <TextField
+                  value={masjidDetails.clock_footer_text_color}
+                  onChange={(e) => handleInputChange({
+                    target: { name: 'clock_footer_text_color', value: e.target.value }
+                  })}
+                  disabled={!masjidDetailsEditable}
+                  size="small"
+                />
+              </Box>
+            </Grid>
           </Grid>
         </Grid>
 
