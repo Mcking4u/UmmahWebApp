@@ -82,6 +82,11 @@ function MasjidDetails() {
 
         // Prepare the payload
         const payload = { ...masjidDetails };
+        let clock_background = payload.clock_background;
+        if (clock_background && !clock_background.startsWith("http")) {
+          clock_background = clock_background.replace("data:", "").replace(/^.+,/, "");
+          payload.clock_background = clock_background;
+        }
         await new NetworkHandler().editMasjidProfile(payload);
       } catch (error) {
         alert("Error updating Masjid details:");
@@ -124,6 +129,18 @@ function MasjidDetails() {
       reader.readAsDataURL(file);
     }
   };
+
+  //   const convertToBase64 = (file) => {
+  //   return new Promise((resolve, reject) => {
+  //     const reader = new FileReader();
+  //     reader.readAsDataURL(file);
+  //     reader.onerror = (error) => reject(error);
+  //     reader.onload = () => {
+  //       let base64String = reader.result.replace("data:", "").replace(/^.+,/, "");
+  //       resolve(base64String);
+  //     };
+  //   });
+  // };
 
   const [toastState, setToastState] = useState({
     open: false,
@@ -182,7 +199,7 @@ function MasjidDetails() {
           <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
             Salat Clock Theme
           </Typography>
-          
+
           {/* Background Image Upload - Full Width Row */}
           <Grid container sx={{ mb: 3 }}>
             <Grid item xs={12}>
@@ -206,10 +223,10 @@ function MasjidDetails() {
               </label>
               {masjidDetails.clock_background && (
                 <Box sx={{ mt: 1 }}>
-                  <img 
-                    src={masjidDetails.clock_background} 
-                    alt="Clock Background" 
-                    style={{ maxWidth: '200px' }} 
+                  <img
+                    src={masjidDetails.clock_background}
+                    alt="Clock Background"
+                    style={{ maxWidth: '200px' }}
                   />
                 </Box>
               )}
