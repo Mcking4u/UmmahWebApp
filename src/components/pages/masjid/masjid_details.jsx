@@ -6,6 +6,10 @@ import {
   Grid,
   Snackbar,
   Box,
+  InputLabel,
+  FormControl,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import NetworkHandler from "../../../network/network_handler";
 import withNavUpdate from "../../wrappers/with_nav_update";
@@ -269,6 +273,29 @@ function MasjidDetails() {
               </Grid>
             ))}
           </Grid>
+        </Grid>
+
+        <Grid item xs={3}>
+          <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
+            Turn off display
+          </Typography>
+          <FormControl fullWidth disabled={!masjidDetailsEditable}>
+            <InputLabel id="display-off-in-label">Display Off In - mins</InputLabel>
+            <Select
+              sx={{ mt: 1 }}
+              labelId="display-off-in-label"
+              name="display_off_in"
+              value={masjidDetails.display_off_in || 0}
+              onChange={handleInputChange}
+              label="Display Off In - (mins)"
+            >
+              {[0, 15, 30, 45, 60].map((value) => (
+                <MenuItem key={value} value={value}>
+                  {value}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Grid>
 
         {/* Clock Footer */}
