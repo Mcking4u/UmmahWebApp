@@ -248,6 +248,8 @@ function MasjidDetails() {
               { label: "Salah Card Active Text Color", name: "salah_card_active_text_color" },
               { label: "Time Remaining Card Color", name: "time_remaining_card_color" },
               { label: "Time Remaining Text Color", name: "time_remaining_text_color" },
+              { label: "Footer Background Color", name: "footer_background_color" },
+
             ].map((field) => (
               <Grid item xs={12} sm={6} key={field.name}>
                 <Typography variant="subtitle2">{field.label}</Typography>
