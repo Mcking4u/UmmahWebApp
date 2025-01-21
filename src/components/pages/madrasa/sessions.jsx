@@ -301,6 +301,8 @@ function Sessions() {
                                 >
                                     <MenuItem value="Boys">Boys</MenuItem>
                                     <MenuItem value="Girls">Girls</MenuItem>
+                                    <MenuItem value="Kids">Kids</MenuItem>
+                                    <MenuItem value="Mix Kids">Mix Kids</MenuItem>
                                     <MenuItem value="Adult Male">Adult Male</MenuItem>
                                     <MenuItem value="Adult Female">Adult Female</MenuItem>
                                 </Select>
