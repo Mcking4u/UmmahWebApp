@@ -338,7 +338,7 @@ const Students = () => {
 
   const rows = filteredEnrollments.map((enrollment) => ({
     id: enrollment.id,
-    name: enrollment.name,
+    name: enrollment.name + " - " + enrollment.program.name,
     parent_name: enrollment.parent_name,
     emergency_contact: enrollment.emergency_contact,
     sessions: enrollment.sessions,
@@ -347,7 +347,7 @@ const Students = () => {
 
   const allRows = allEnrollments.map((enrollment) => ({
     id: enrollment.id,
-    name: enrollment.name,
+    name: enrollment.name + " - " + enrollment.program.name,
     parent_name: enrollment.parent_name,
     emergency_contact: enrollment.emergency_contact,
     sessions: enrollment.sessions,
@@ -357,7 +357,7 @@ const Students = () => {
 
   const completedRows = filteredCompletedEnrollments.map((enrollment) => ({
     id: enrollment.id,
-    name: enrollment.name,
+    name: enrollment.name + " - " + enrollment.program.name,
     parent_name: enrollment.parent_name,
     emergency_contact: enrollment.emergency_contact,
     status: enrollment.status,
@@ -367,7 +367,7 @@ const Students = () => {
 
   const rejectedRows = filteredRejectedEnrollments.map((enrollment) => ({
     id: enrollment.id,
-    name: enrollment.name,
+    name: enrollment.name + " - " + enrollment.program.name,
     parent_name: enrollment.parent_name,
     emergency_contact: enrollment.emergency_contact,
     reason: enrollment.enrolled_comment,
