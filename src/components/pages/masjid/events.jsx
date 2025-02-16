@@ -136,13 +136,14 @@ const EventManager = () => {
     };
 
     const columns = [
-        { field: 'event_date', headerName: 'Event Date', width: 200 },
-        { field: 'end_date', headerName: 'End Date', width: 200 },
         { field: 'title', headerName: 'Title', width: 150 },
+        { field: 'event_date', headerName: 'Event Start Date', width: 200 },
+        { field: 'end_date', headerName: 'Event End Date', width: 200 },
         { field: 'yes_count', headerName: 'Attending', width: 100 },
         { field: 'no_count', headerName: 'Not Attending', width: 100 },
         { field: 'maybe_count', headerName: 'Maybe Attending', width: 150 },
-        { field: 'venue', headerName: 'Venue', width: 200 },
+        { field: 'venue', headerName: 'Venue', width: 100 },
+        { field: 'recurrence', headerName: 'Recurrence', width: 100 },
         {
             field: 'edit',
             headerName: 'Edit',
