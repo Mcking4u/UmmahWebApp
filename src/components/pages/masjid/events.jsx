@@ -99,13 +99,14 @@ const EventManager = () => {
 
         if (!currentEvent.event_date) {
             newErrors.event_date = 'Event date is required';
-        } else {
-            const selectedDate = new Date(currentEvent.event_date);
-            const now = new Date();
-            if (selectedDate < now) {
-                newErrors.event_date = 'Event date cannot be in the past';
-            }
         }
+        // else {
+        //     const selectedDate = new Date(currentEvent.event_date);
+        //     const now = new Date();
+        //     if (selectedDate < now) {
+        //         newErrors.event_date = 'Event date cannot be in the past';
+        //     }
+        // }
 
         if (!currentEvent.end_date) {
             newErrors.end_date = 'End date is required';
