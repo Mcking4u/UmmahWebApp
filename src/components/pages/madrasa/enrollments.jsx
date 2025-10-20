@@ -20,7 +20,13 @@ import {
 } from "@mui/material";
 import NetworkHandler from "../../../network/network_handler";
 import withNavUpdate from "../../wrappers/with_nav_update";
-import { Cancel, Check, RemoveRedEye, School } from "@mui/icons-material";
+import {
+  Cancel,
+  Check,
+  RemoveRedEye,
+  School,
+  PersonRemove,
+} from "@mui/icons-material";
 import ReplayIcon from "@mui/icons-material/Replay";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -47,21 +53,18 @@ const EnrollmentDataGrid = () => {
   const [approveLoading, setAppRoveLoading] = useState(false);
   const [programs, setPrograms] = useState([]);
   const [filteredPrograms, setFilteredPrograms] = useState([]);
-  const [info, setInfo] = useState(
-    {
-      id: "",
-      profile_picture: null,
-      name: "",
-      age: "",
-      gender: "",
-      proficiency: "",
-      parent_name: "",
-      emergency_contact: "",
-      enrolled_comment: "",
-    }
-  );
+  const [info, setInfo] = useState({
+    id: "",
+    profile_picture: null,
+    name: "",
+    age: "",
+    gender: "",
+    proficiency: "",
+    parent_name: "",
+    emergency_contact: "",
+    enrolled_comment: "",
+  });
   const [showInfo, setShowInfo] = useState(false);
-
 
   async function fetchData() {
     try {
@@ -81,12 +84,11 @@ const EnrollmentDataGrid = () => {
       setCompletedEnrollments(allCompletedEnrollments);
       setRejectedEnrollments(allRejectedEnrollments);
       const res = await new NetworkHandler().getPrograms();
-      setPrograms(res.programs)
+      setPrograms(res.programs);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   }
-
 
   useEffect(() => {
     fetchData();
@@ -170,7 +172,6 @@ const EnrollmentDataGrid = () => {
       student_id: selectedStudentId,
       sessions,
     };
-
 
     try {
       await new NetworkHandler().assignTeacher(assignmentData);
@@ -260,10 +261,10 @@ const EnrollmentDataGrid = () => {
   const showEntollment = (enrollment) => {
     setShowInfo(true);
     setInfo(enrollment);
-  }
+  };
   const handleInfoClose = () => {
     setShowInfo(false);
-  }
+  };
 
   const completedColumns = [
     {
@@ -323,8 +324,21 @@ const EnrollmentDataGrid = () => {
       width: 150,
       flex: 0.5,
     },
+    {
+      field: "de_enroll",
+      headerName: "DeEnroll",
+      renderCell: (params) => (
+        <IconButton
+          color="error"
+          onClick={() => handleOpenDeEnrollDialog(params.row.id)}
+        >
+          <PersonRemove />
+        </IconButton>
+      ),
+      width: 150,
+      flex: 0.5,
+    },
   ];
-
 
   const [showReassignProgram, setShowReassignProgram] = useState(false);
   const [reassignProgram, setReassignProgram] = useState({
@@ -336,15 +350,18 @@ const EnrollmentDataGrid = () => {
     setShowReassignProgram(true);
     const data = {
       student_id: enrollment.id,
-      program_id: enrollment.program.id
-    }
+      program_id: enrollment.program.id,
+    };
     setReassignProgram(data);
-  }
+  };
   const handleReassignProgramClose = () => {
     setShowReassignProgram(false);
     setReassignLoading(false);
-  }
+  };
   const [reassignLoading, setReassignLoading] = useState(false);
+  const [openDeEnrollDialog, setOpenDeEnrollDialog] = useState(false);
+  const [selectedDeEnrollStudentId, setSelectedDeEnrollStudentId] =
+    useState(null);
 
   const handleReassign = async () => {
     setReassignLoading(true);
@@ -352,10 +369,28 @@ const EnrollmentDataGrid = () => {
     await new NetworkHandler().changeProgram(reassignProgram);
     fetchData();
 
-    handleReassignProgramClose()
+    handleReassignProgramClose();
+  };
 
-  }
+  const handleOpenDeEnrollDialog = (studentId) => {
+    setSelectedDeEnrollStudentId(studentId);
+    setOpenDeEnrollDialog(true);
+  };
 
+  const handleCloseDeEnrollDialog = () => {
+    setOpenDeEnrollDialog(false);
+    setSelectedDeEnrollStudentId(null);
+  };
+
+  const handleDeEnroll = async () => {
+    try {
+      await new NetworkHandler().deEnrollStudent(selectedDeEnrollStudentId);
+      handleCloseDeEnrollDialog();
+      fetchData();
+    } catch (error) {
+      console.error("Error de-enrolling student:", error);
+    }
+  };
 
   const rejectedColumns = [
     {
@@ -414,7 +449,6 @@ const EnrollmentDataGrid = () => {
     program_sessions: enrollment.program_sessions,
     program: enrollment.program,
     enrollment: enrollment,
-
   }));
 
   const completedRows = filteredCompletedEnrollments.map((enrollment) => ({
@@ -426,7 +460,6 @@ const EnrollmentDataGrid = () => {
     enrollment: enrollment,
     program_sessions: enrollment.program_sessions,
     program: enrollment.program,
-
   }));
 
   const rejectedRows = filteredRejectedEnrollments.map((enrollment) => ({
@@ -495,20 +528,21 @@ const EnrollmentDataGrid = () => {
         keepMounted
         onClose={handleCloseApproveDialog}
       >
-        {allRows
-          .find((row) => row.id === selectedStudentId) && (
-            <DialogTitle>Assign Teachers for program - {allRows
-              .find((row) => row.id === selectedStudentId).program.name} </DialogTitle>
-          )}
+        {allRows.find((row) => row.id === selectedStudentId) && (
+          <DialogTitle>
+            Assign Teachers for program -{" "}
+            {allRows.find((row) => row.id === selectedStudentId).program.name}{" "}
+          </DialogTitle>
+        )}
 
-        <DialogContent
-          sx={{ minWidth: 400 }}
-        >
+        <DialogContent sx={{ minWidth: 400 }}>
           {allRows
             .find((row) => row.id === selectedStudentId)
             ?.program_sessions.map((session) => (
-              <Box key={session.id} >
-                <Typography component="div" variant="h6" >{session.name}</Typography>
+              <Box key={session.id}>
+                <Typography component="div" variant="h6">
+                  {session.name}
+                </Typography>
                 <FormControl fullWidth margin="normal" sx={{ mt: 1, pt: 0 }}>
                   <InputLabel>Select teacher for {session.name}</InputLabel>
                   <Select
@@ -527,21 +561,20 @@ const EnrollmentDataGrid = () => {
                 </FormControl>
               </Box>
             ))}
-
-
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseApproveDialog} color="secondary">
             Cancel
           </Button>
-          <Button onClick={handleApprove}
+          <Button
+            onClick={handleApprove}
             disabled={approveLoading}
-            color="primary">
+            color="primary"
+          >
             Approve
           </Button>
         </DialogActions>
       </Dialog>
-
 
       <Dialog
         open={showInfo}
@@ -555,58 +588,78 @@ const EnrollmentDataGrid = () => {
             <Grid item xs={12} align="start">
               <Avatar
                 alt={info.name}
-                src={info.profile_picture || '/placeholder.png'} // Provide a placeholder if no profile picture
+                src={info.profile_picture || "/placeholder.png"} // Provide a placeholder if no profile picture
                 sx={{ width: 100, height: 100 }}
               />
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="subtitle1"><strong>Name:</strong></Typography>
+              <Typography variant="subtitle1">
+                <strong>Name:</strong>
+              </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body1">{info.name}</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="subtitle1"><strong>DOB:</strong></Typography>
+              <Typography variant="subtitle1">
+                <strong>DOB:</strong>
+              </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body1">{info.dob}</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="subtitle1"><strong>Gender:</strong></Typography>
+              <Typography variant="subtitle1">
+                <strong>Gender:</strong>
+              </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body1">{info.gender}</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="subtitle1"><strong>Proficiency:</strong></Typography>
+              <Typography variant="subtitle1">
+                <strong>Proficiency:</strong>
+              </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body1">{info.proficiency}</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="subtitle1"><strong>Father Name:</strong></Typography>
+              <Typography variant="subtitle1">
+                <strong>Father Name:</strong>
+              </Typography>
             </Grid>
 
             <Grid item xs={6}>
               <Typography variant="body1">{info.parent_name}</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="subtitle1"><strong>Father Contact:</strong></Typography>
+              <Typography variant="subtitle1">
+                <strong>Father Contact:</strong>
+              </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="body1">{info.spouse_contact || 'N/A'}</Typography>
+              <Typography variant="body1">
+                {info.spouse_contact || "N/A"}
+              </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="subtitle1"><strong>Emergency Contact:</strong></Typography>
+              <Typography variant="subtitle1">
+                <strong>Emergency Contact:</strong>
+              </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body1">{info.emergency_contact}</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="subtitle1"><strong>Enrolled Comment:</strong></Typography>
+              <Typography variant="subtitle1">
+                <strong>Enrolled Comment:</strong>
+              </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="body1">{info.enrolled_comment || 'N/A'}</Typography>
+              <Typography variant="body1">
+                {info.enrolled_comment || "N/A"}
+              </Typography>
             </Grid>
           </Grid>
         </DialogContent>
@@ -626,26 +679,22 @@ const EnrollmentDataGrid = () => {
         <DialogTitle>Reassign Program</DialogTitle>
         <DialogContent>
           <FormControl fullWidth sx={{ mt: 1 }}>
-            <InputLabel >Select Program</InputLabel>
+            <InputLabel>Select Program</InputLabel>
             <Select
-
               value={reassignProgram.program_id}
-              label='Select Program'
+              label="Select Program"
               onChange={(e) => {
-                const reassignProgram_ = { ...reassignProgram }
+                const reassignProgram_ = { ...reassignProgram };
                 reassignProgram_.program_id = e.target.value;
                 setReassignProgram(reassignProgram_);
-              }
-              }
+              }}
             >
-
-              {filteredPrograms.length > 0 && (
+              {filteredPrograms.length > 0 &&
                 filteredPrograms.map((program) => (
                   <MenuItem key={program.id} value={program.id}>
                     {program.name}
                   </MenuItem>
-                ))
-              )}
+                ))}
             </Select>
           </FormControl>
         </DialogContent>
@@ -653,9 +702,11 @@ const EnrollmentDataGrid = () => {
           <Button onClick={handleReassignProgramClose} color="secondary">
             Cancel
           </Button>
-          <Button onClick={handleReassign}
+          <Button
+            onClick={handleReassign}
             disabled={reassignLoading}
-            color="primary">
+            color="primary"
+          >
             Reassign
           </Button>
         </DialogActions>
@@ -685,6 +736,29 @@ const EnrollmentDataGrid = () => {
           </Button>
           <Button onClick={handleReject} color="primary">
             Reject
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openDeEnrollDialog}
+        TransitionComponent={Transition}
+        keepMounted
+        onClose={handleCloseDeEnrollDialog}
+      >
+        <DialogTitle>Confirm De-Enrollment</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to de-enroll this student? This action cannot
+            be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeEnrollDialog} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleDeEnroll} color="error">
+            De-Enroll
           </Button>
         </DialogActions>
       </Dialog>

@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// export const host = "http://127.0.0.1:8000"; 
-export const host = "https://objects.ummah-app.com";
+export const host = "http://127.0.0.1:8000"; 
+// export const host = "https://objects.ummah-app.com";
 
 const baseUrls = {
   landing: `${host}/landing/api`,
@@ -470,6 +470,28 @@ class NetworkHandler {
 
     try {
       const response = await this.axiosInstance.post(url, rejectionData, { headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+  
+  async deEnrollStudent(studentId) {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/ummah/de-enroll-student";
+
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      "Content-Type": "application/json",
+    };
+
+    const data = { student_id: studentId };
+
+    try {
+      const response = await this.axiosInstance.post(url, data, {
+        baseURL: baseUrls.landing,
+        headers,
+      });
       return response.data;
     } catch (error) {
       throw error;
