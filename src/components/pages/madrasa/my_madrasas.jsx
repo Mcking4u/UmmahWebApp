@@ -21,8 +21,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import withNavUpdate from "../../wrappers/with_nav_update";
 import NetworkHandler from "../../../network/network_handler";
 import { Money, Map, Title } from "@mui/icons-material";
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="left" ref={ref} {...props} />;
@@ -34,6 +34,7 @@ function MyMadrasas() {
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [dataLoading, setDataLoading] = useState(true);
   const [formData, setFormData] = useState({
     madrasa_name: "",
     description: "",
@@ -44,10 +45,13 @@ function MyMadrasas() {
 
   async function fetchData() {
     try {
+      setDataLoading(true);
       const response = await new NetworkHandler().getMadrasas();
       setMadrasasData(response.madrasas);
     } catch (error) {
       console.error("Error fetching madrasas:", error);
+    } finally {
+      setDataLoading(false);
     }
   }
 
@@ -129,7 +133,13 @@ function MyMadrasas() {
   };
 
   const columns = [
-    { field: "name", headerName: "Madrasa Name", width: 200, flex: 1, minWidth: 150 },
+    {
+      field: "name",
+      headerName: "Madrasa Name",
+      width: 200,
+      flex: 1,
+      minWidth: 150,
+    },
     { field: "describtion", headerName: "Description", width: 300, flex: 2 },
     { field: "address", headerName: "Address", width: 150, flex: 1 },
     {
@@ -150,8 +160,15 @@ function MyMadrasas() {
   ];
 
   return (
-    <div>
-      <Box sx={{ width: "100%", textAlign: "right" }}>
+    <Box
+      sx={{
+        height: "90vh",
+        display: "flex",
+        flexDirection: "column",
+        minHeight: 0,
+      }}
+    >
+      <Box sx={{ width: "100%", textAlign: "right", mb: 2, flexShrink: 0 }}>
         <Button
           size="small"
           variant="contained"
@@ -168,26 +185,56 @@ function MyMadrasas() {
             setFormErrors({});
             setOpenDialog(true);
           }}
-          sx={{ marginBottom: 2 }}
         >
           Add Madrasa
         </Button>
       </Box>
 
-      <div style={{ height: 400, width: "100%" }}>
-        <DataGrid
-          rows={madrasasData}
-          columns={columns}
-          pageSize={5}
-          rowsPerPageOptions={[5, 10, 20]}
-        />
-      </div>
+      <Box
+        sx={{
+          flex: 1,
+          width: "100%",
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        {dataLoading ? (
+          <Box
+            sx={{
+              height: "100%",
+              width: "100%",
+              flex: 1,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        ) : (
+          <DataGrid
+            rows={madrasasData}
+            columns={columns}
+            pageSize={10}
+            rowsPerPageOptions={[5, 10, 20, 50]}
+            autoHeight={false}
+            sx={{
+              height: "100%",
+              width: "100%",
+              flex: 1,
+              minHeight: 0,
+            }}
+            loading={dataLoading}
+          />
+        )}
+      </Box>
 
       <Dialog
         open={openDialog}
         TransitionComponent={Transition}
         onClose={() => setOpenDialog(false)}
-        maxWidth="md"
+        maxWidth="sm"
         fullWidth
       >
         <DialogTitle sx={{ textAlign: "center" }}>
@@ -201,16 +248,11 @@ function MyMadrasas() {
           </IconButton>
         </DialogTitle>
 
-        <DialogContent
-          sx={{ minHeight: '400px' }}
-        >
-          <Stack spacing={2}
-            sx={{ mt: 1 }}
-          >
+        <DialogContent sx={{ minHeight: "400px" }}>
+          <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
               label="Madrasa Name"
               fullWidth
-
               size="small"
               InputProps={{
                 startAdornment: (
@@ -249,9 +291,10 @@ function MyMadrasas() {
 
             <ReactQuill
               theme="snow"
-
               value={formData.description}
-              onChange={(value) => setFormData({ ...formData, description: value })}
+              onChange={(value) =>
+                setFormData({ ...formData, description: value })
+              }
               placeholder="Enter description..."
               style={{ marginTop: 16, height: "200px" }}
             />
@@ -272,7 +315,7 @@ function MyMadrasas() {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </Box>
   );
 }
 

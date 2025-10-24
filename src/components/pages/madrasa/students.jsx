@@ -17,14 +17,22 @@ import {
   Avatar,
   IconButton,
   Box,
+  CircularProgress,
+  Stack,
 } from "@mui/material";
 import NetworkHandler from "../../../network/network_handler";
 import withNavUpdate from "../../wrappers/with_nav_update";
-import { ArrowDownward, Cancel, Check, RemoveRedEye } from "@mui/icons-material";
-import ExcelJS from 'exceljs';
+import {
+  ArrowDownward,
+  Cancel,
+  Check,
+  RemoveRedEye,
+  Close,
+} from "@mui/icons-material";
+import ExcelJS from "exceljs";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
+  return <Slide direction="left" ref={ref} {...props} />;
 });
 
 const Students = () => {
@@ -45,23 +53,23 @@ const Students = () => {
   const [selectedSessions, setSelectedSessions] = useState({});
   const [rejectReason, setRejectReason] = useState("");
   const [approveLoading, setAppRoveLoading] = useState(false);
-  const [info, setInfo] = useState(
-    {
-      id: "",
-      profile_picture: null,
-      name: "",
-      age: "",
-      gender: "",
-      proficiency: "",
-      parent_name: "",
-      emergency_contact: "",
-      enrolled_comment: "",
-    }
-  );
+  const [info, setInfo] = useState({
+    id: "",
+    profile_picture: null,
+    name: "",
+    age: "",
+    gender: "",
+    proficiency: "",
+    parent_name: "",
+    emergency_contact: "",
+    enrolled_comment: "",
+  });
   const [showInfo, setShowInfo] = useState(false);
+  const [dataLoading, setDataLoading] = useState(true);
 
   async function fetchData() {
     try {
+      setDataLoading(true);
       const response = await new NetworkHandler().getMadrasaEnrollments();
       setMadrasas(response.madrasas);
       setSelectedMadrasa(response.madrasas[0].name);
@@ -79,9 +87,10 @@ const Students = () => {
       setRejectedEnrollments(allRejectedEnrollments);
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      setDataLoading(false);
     }
   }
-
 
   useEffect(() => {
     fetchData();
@@ -147,9 +156,10 @@ const Students = () => {
       teacher_id: selectedSessions[sessionId],
     }));
 
-    if (sessions.length != allRows
-      .find((row) => row.id === selectedStudentId)
-      ?.sessions.length) {
+    if (
+      sessions.length !=
+      allRows.find((row) => row.id === selectedStudentId)?.sessions.length
+    ) {
       alert("Please select teachers");
       return;
     }
@@ -159,7 +169,6 @@ const Students = () => {
       student_id: selectedStudentId,
       sessions,
     };
-
 
     try {
       await new NetworkHandler().assignTeacher(assignmentData);
@@ -249,10 +258,10 @@ const Students = () => {
   const showEntollment = (enrollment) => {
     setShowInfo(true);
     setInfo(enrollment);
-  }
+  };
   const handleInfoClose = () => {
     setShowInfo(false);
-  }
+  };
 
   const completedColumns = [
     {
@@ -352,7 +361,6 @@ const Students = () => {
     emergency_contact: enrollment.emergency_contact,
     sessions: enrollment.sessions,
     enrollment: enrollment,
-
   }));
 
   const completedRows = filteredCompletedEnrollments.map((enrollment) => ({
@@ -362,7 +370,6 @@ const Students = () => {
     emergency_contact: enrollment.emergency_contact,
     status: enrollment.status,
     enrollment: enrollment,
-
   }));
 
   const rejectedRows = filteredRejectedEnrollments.map((enrollment) => ({
@@ -375,11 +382,15 @@ const Students = () => {
   }));
 
   const onExport = async () => {
-    if (completedEnrollments === null || completedEnrollments === undefined || completedEnrollments.length <= 0) {
+    if (
+      completedEnrollments === null ||
+      completedEnrollments === undefined ||
+      completedEnrollments.length <= 0
+    ) {
       return;
     }
     const exportList = [...completedEnrollments];
-    const filteredExportList = exportList.map(item => ({
+    const filteredExportList = exportList.map((item) => ({
       name: item.name || "N/A",
       profile_picture: item.profile_picture || "N/A",
       dob: item.dob || "N/A",
@@ -388,23 +399,23 @@ const Students = () => {
       parent_name: item.parent_name || "N/A",
       spouse_contact: item.spouse_contact || "N/A",
       emergency_contact: item.emergency_contact || "N/A",
-      enrolled_comment: item.enrolled_comment || "N/A"
+      enrolled_comment: item.enrolled_comment || "N/A",
     }));
 
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Sheet1');
+    const worksheet = workbook.addWorksheet("Sheet1");
 
     // Set column headers
     worksheet.columns = [
-      { header: 'Name', key: 'name', width: 30 },
-      { header: 'Profile Picture', key: 'profile_picture', width: 20 },
-      { header: 'DOB', key: 'dob', width: 15 },
-      { header: 'Gender', key: 'gender', width: 10 },
-      { header: 'Proficiency', key: 'proficiency', width: 20 },
-      { header: 'Parent Name', key: 'parent_name', width: 25 },
-      { header: 'Spouse Contact', key: 'spouse_contact', width: 20 },
-      { header: 'Emergency Contact', key: 'emergency_contact', width: 20 },
-      { header: 'Enrolled Comment', key: 'enrolled_comment', width: 30 },
+      { header: "Name", key: "name", width: 30 },
+      { header: "Profile Picture", key: "profile_picture", width: 20 },
+      { header: "DOB", key: "dob", width: 15 },
+      { header: "Gender", key: "gender", width: 10 },
+      { header: "Proficiency", key: "proficiency", width: 20 },
+      { header: "Parent Name", key: "parent_name", width: 25 },
+      { header: "Spouse Contact", key: "spouse_contact", width: 20 },
+      { header: "Emergency Contact", key: "emergency_contact", width: 20 },
+      { header: "Enrolled Comment", key: "enrolled_comment", width: 30 },
     ];
 
     // Add data rows
@@ -412,192 +423,272 @@ const Students = () => {
 
     // Save the workbook to a file and trigger download
     const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    const link = document.createElement('a');
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = 'student_data.xlsx';
+    link.download = "student_data.xlsx";
     link.click();
-  }
+  };
 
   return (
-    <div>
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
-        <FormControl
-          variant="outlined"
-          style={{ marginBottom: "20px", minWidth: 200 }}
-        >
-          <InputLabel id="madrasa-select-label">Filter by Madrasa</InputLabel>
-          <Select
-            labelId="madrasa-select-label"
-            id="madrasa-select"
-            value={selectedMadrasa}
-            onChange={handleMadrasaChange}
-            label="Filter by Madrasa"
+    <Box
+      sx={{
+        height: "90vh",
+        display: "flex",
+        flexDirection: "column",
+        minHeight: 0,
+      }}
+    >
+      {!dataLoading && (
+        <Box sx={{ width: "100%", flexShrink: 0, mb: 2 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+            }}
           >
-            {madrasas.map((madrasa) => (
-              <MenuItem key={madrasa.name} value={madrasa.name}>
-                {madrasa.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+            <FormControl variant="outlined" sx={{ minWidth: 200 }}>
+              <InputLabel id="madrasa-select-label">
+                Filter by Madrasa
+              </InputLabel>
+              <Select
+                labelId="madrasa-select-label"
+                id="madrasa-select"
+                value={selectedMadrasa}
+                onChange={handleMadrasaChange}
+                label="Filter by Madrasa"
+                size="small"
+              >
+                {madrasas.map((madrasa) => (
+                  <MenuItem key={madrasa.name} value={madrasa.name}>
+                    {madrasa.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
-        <Box>
-          <Button
-            variant="contained" color="primary"
-            onClick={onExport}
-            endIcon={<ArrowDownward />}
-          >
-            Export
-          </Button>
+            <Box>
+              <Button
+                variant="contained"
+                color="primary"
+                size="small"
+                onClick={onExport}
+                endIcon={<ArrowDownward />}
+              >
+                Export
+              </Button>
+            </Box>
+          </Box>
         </Box>
+      )}
 
+      <Box
+        sx={{
+          flex: 1,
+          width: "100%",
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        {dataLoading ? (
+          <Box
+            sx={{
+              height: "100%",
+              width: "100%",
+              flex: 1,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        ) : (
+          <DataGrid
+            rows={completedRows}
+            columns={completedColumns}
+            pageSize={10}
+            rowsPerPageOptions={[5, 10, 20, 50]}
+            autoHeight={false}
+            sx={{
+              height: "100%",
+              width: "100%",
+              flex: 1,
+              minHeight: 0,
+            }}
+            loading={dataLoading}
+            disableSelectionOnClick
+          />
+        )}
       </Box>
-      {/* <div style={{ height: 400, width: "100%", marginBottom: "20px" }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          pageSize={5}
-          disableSelectionOnClick
-        />
-      </div> */}
-
-      <div style={{ height: 700, width: "100%", marginBottom: "20px" }}>
-        <DataGrid
-          rows={completedRows}
-          columns={completedColumns}
-          pageSize={5}
-          disableSelectionOnClick
-        />
-      </div>
-
-      {/* <div style={{ height: 400, width: "100%", marginBottom: "20px" }}>
-        <DataGrid
-          rows={rejectedRows}
-          columns={rejectedColumns}
-          pageSize={5}
-          disableSelectionOnClick
-        />
-      </div> */}
 
       <Dialog
         open={openApproveDialog}
         TransitionComponent={Transition}
         keepMounted
         onClose={handleCloseApproveDialog}
+        maxWidth="sm"
+        fullWidth
       >
-        <DialogTitle>Assign Teachers</DialogTitle>
-        <DialogContent
-          sx={{ minWidth: 400 }}
-        >
-          {allRows
-            .find((row) => row.id === selectedStudentId)
-            ?.sessions.map((session) => (
-              <Box key={session.id} >
-                <Typography component="div" variant="h6" >{session.name}</Typography>
-                <FormControl fullWidth margin="normal" sx={{ mt: 1, pt: 0 }}>
-                  <InputLabel>Select teacher for {session.name}</InputLabel>
-                  <Select
-                    value={selectedSessions[session.id] || ""}
-                    label={`Select teacher for ${session.name}`}
-                    onChange={(e) =>
-                      handleSessionTeacherChange(session.id, e.target.value)
-                    }
-                  >
-                    {session.teachers.map((teacher) => (
-                      <MenuItem key={teacher.id} value={teacher.id}>
-                        {teacher.profile.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Box>
-            ))}
-
-
+        <DialogTitle>
+          Assign Teachers
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseApproveDialog}
+            sx={{ position: "absolute", right: 8, top: 8 }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ minHeight: "400px" }}>
+          <Stack spacing={2} sx={{ mt: 1 }}>
+            {allRows
+              .find((row) => row.id === selectedStudentId)
+              ?.sessions.map((session) => (
+                <Box key={session.id}>
+                  <Typography component="div" variant="h6" sx={{ mb: 1 }}>
+                    {session.name}
+                  </Typography>
+                  <FormControl fullWidth>
+                    <InputLabel>Select teacher for {session.name}</InputLabel>
+                    <Select
+                      value={selectedSessions[session.id] || ""}
+                      label={`Select teacher for ${session.name}`}
+                      onChange={(e) =>
+                        handleSessionTeacherChange(session.id, e.target.value)
+                      }
+                    >
+                      {session.teachers.map((teacher) => (
+                        <MenuItem key={teacher.id} value={teacher.id}>
+                          {teacher.profile.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Box>
+              ))}
+          </Stack>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseApproveDialog} color="secondary">
             Cancel
           </Button>
-          <Button onClick={handleApprove}
+          <Button
+            onClick={handleApprove}
             disabled={approveLoading}
-            color="primary">
+            color="primary"
+            startIcon={approveLoading ? <CircularProgress size={20} /> : null}
+          >
             Approve
           </Button>
         </DialogActions>
       </Dialog>
-
 
       <Dialog
         open={showInfo}
         TransitionComponent={Transition}
         keepMounted
         onClose={handleInfoClose}
+        maxWidth="sm"
+        fullWidth
       >
-        <DialogTitle>More Info</DialogTitle>
-        <DialogContent sx={{ minWidth: 400 }}>
+        <DialogTitle>
+          More Info
+          <IconButton
+            aria-label="close"
+            onClick={handleInfoClose}
+            sx={{ position: "absolute", right: 8, top: 8 }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ minHeight: "400px" }}>
           <Grid container spacing={2}>
             <Grid item xs={12} align="start">
               <Avatar
                 alt={info.name}
-                src={info.profile_picture || '/placeholder.png'} // Provide a placeholder if no profile picture
+                src={info.profile_picture || "/placeholder.png"} // Provide a placeholder if no profile picture
                 sx={{ width: 100, height: 100 }}
               />
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="subtitle1"><strong>Name:</strong></Typography>
+              <Typography variant="subtitle1">
+                <strong>Name:</strong>
+              </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body1">{info.name}</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="subtitle1"><strong>DOB:</strong></Typography>
+              <Typography variant="subtitle1">
+                <strong>DOB:</strong>
+              </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body1">{info.dob}</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="subtitle1"><strong>Gender:</strong></Typography>
+              <Typography variant="subtitle1">
+                <strong>Gender:</strong>
+              </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body1">{info.gender}</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="subtitle1"><strong>Proficiency:</strong></Typography>
+              <Typography variant="subtitle1">
+                <strong>Proficiency:</strong>
+              </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body1">{info.proficiency}</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="subtitle1"><strong>Father Name:</strong></Typography>
+              <Typography variant="subtitle1">
+                <strong>Father Name:</strong>
+              </Typography>
             </Grid>
 
             <Grid item xs={6}>
               <Typography variant="body1">{info.parent_name}</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="subtitle1"><strong>Father Contact:</strong></Typography>
+              <Typography variant="subtitle1">
+                <strong>Father Contact:</strong>
+              </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="body1">{info.spouse_contact || 'N/A'}</Typography>
+              <Typography variant="body1">
+                {info.spouse_contact || "N/A"}
+              </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="subtitle1"><strong>Emergency Contact:</strong></Typography>
+              <Typography variant="subtitle1">
+                <strong>Emergency Contact:</strong>
+              </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body1">{info.emergency_contact}</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="subtitle1"><strong>Enrolled Comment:</strong></Typography>
+              <Typography variant="subtitle1">
+                <strong>Enrolled Comment:</strong>
+              </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="body1">{info.enrolled_comment || 'N/A'}</Typography>
+              <Typography variant="body1">
+                {info.enrolled_comment || "N/A"}
+              </Typography>
             </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleInfoClose} color="primary">
+          <Button onClick={handleInfoClose} color="secondary">
             Close
           </Button>
         </DialogActions>
@@ -608,18 +699,31 @@ const Students = () => {
         TransitionComponent={Transition}
         keepMounted
         onClose={handleCloseRejectDialog}
+        maxWidth="sm"
+        fullWidth
       >
-        <DialogTitle>Reject Enrollment</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Reason for Rejection"
-            multiline
-            rows={4}
-            variant="outlined"
-            fullWidth
-            value={rejectReason}
-            onChange={(e) => setRejectReason(e.target.value)}
-          />
+        <DialogTitle>
+          Reject Enrollment
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseRejectDialog}
+            sx={{ position: "absolute", right: 8, top: 8 }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ minHeight: "400px" }}>
+          <Stack spacing={2} sx={{ mt: 1 }}>
+            <TextField
+              label="Reason for Rejection"
+              multiline
+              rows={4}
+              variant="outlined"
+              fullWidth
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+            />
+          </Stack>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseRejectDialog} color="secondary">
@@ -630,7 +734,7 @@ const Students = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </Box>
   );
 };
 

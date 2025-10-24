@@ -17,6 +17,7 @@ import {
   Grid,
   IconButton,
   InputAdornment,
+  Stack,
 } from "@mui/material";
 import { InputBase } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
@@ -37,6 +38,7 @@ const Teachers = () => {
   const [madrasas, setMadrasas] = useState([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [dataLoading, setDataLoading] = useState(true);
   const [isEditMode, setIsEditMode] = useState(false);
   const [form, setForm] = useState({
     phoneNumber: "",
@@ -54,10 +56,17 @@ const Teachers = () => {
   const [selectedTeacherId, setSelectedTeacherId] = useState(null);
 
   const fetchData = async () => {
-    const networkHandler = new NetworkHandler();
-    const data = await networkHandler.getTeachers();
-    setMadrasas(data.madrasas);
-    setTeachersData(data.madrasas[selectedMadrasa]?.teachers || []);
+    try {
+      setDataLoading(true);
+      const networkHandler = new NetworkHandler();
+      const data = await networkHandler.getTeachers();
+      setMadrasas(data.madrasas);
+      setTeachersData(data.madrasas[selectedMadrasa]?.teachers || []);
+    } catch (error) {
+      console.error("Error fetching teachers:", error);
+    } finally {
+      setDataLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -70,7 +79,13 @@ const Teachers = () => {
   };
 
   const columns = [
-    { field: "username", headerName: "Username", width: 150, flex: 1, minWidth: 150 },
+    {
+      field: "username",
+      headerName: "Username",
+      width: 150,
+      flex: 1,
+      minWidth: 150,
+    },
     {
       field: "name",
       headerName: "Name",
@@ -218,54 +233,104 @@ const Teachers = () => {
   };
 
   return (
-    <Box sx={{ height: 400, width: "100%" }}>
-      <Grid container sx={{ marginBottom: 2, width: "100%" }} spacing={2} alignItems="center">
-        <Grid item>
-          <FormControl fullWidth variant="outlined">
-            <InputLabel>Select Madrasa</InputLabel>
-            <Select
-              value={selectedMadrasa}
-              onChange={handleMadrasaChange}
-              label="Select Madrasa"
-              sx={{ minWidth: 150 }}
-            >
-              {madrasas.map((madrasa, index) => (
-                <MenuItem key={index} value={index}>
-                  {madrasa.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item flexGrow={1}>
-          <Box sx={{ with: "100%", textAlign: "right" }}>
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              startIcon={<Add />}
-              onClick={handleOpenDialog}
-            >
-              Add Teacher
-            </Button>
+    <Box
+      sx={{
+        height: "90vh",
+        display: "flex",
+        flexDirection: "column",
+        minHeight: 0,
+      }}
+    >
+      {!dataLoading && (
+        <Box sx={{ width: "100%", flexShrink: 0 }}>
+          <Grid
+            container
+            sx={{ marginBottom: 2, width: "100%" }}
+            alignItems="center"
+          >
+            <Grid item>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel>Select Madrasa</InputLabel>
+                <Select
+                  value={selectedMadrasa}
+                  onChange={handleMadrasaChange}
+                  label="Select Madrasa"
+                  size="small"
+                  sx={{ minWidth: 150 }}
+                >
+                  {madrasas.map((madrasa, index) => (
+                    <MenuItem key={index} value={index}>
+                      {madrasa.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item flexGrow={1}>
+              <Box sx={{ width: "100%", textAlign: "right" }}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="small"
+                  startIcon={<Add />}
+                  onClick={handleOpenDialog}
+                >
+                  Add Teacher
+                </Button>
+              </Box>
+            </Grid>
+          </Grid>
+        </Box>
+      )}
+      <Box
+        sx={{
+          flex: 1,
+          width: "100%",
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        {dataLoading ? (
+          <Box
+            sx={{
+              height: "100%",
+              width: "100%",
+              flex: 1,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <CircularProgress />
           </Box>
-        </Grid>
-      </Grid>
-
-      <DataGrid
-        rows={teachersData}
-        columns={columns}
-        getRowId={(row) => row.id}
-        pageSize={5}
-        rowsPerPageOptions={[5]}
-      />
+        ) : (
+          <DataGrid
+            rows={teachersData}
+            columns={columns}
+            getRowId={(row) => row.id}
+            pageSize={10}
+            rowsPerPageOptions={[5, 10, 20, 50]}
+            autoHeight={false}
+            sx={{
+              height: "100%",
+              width: "100%",
+              flex: 1,
+              minHeight: 0,
+            }}
+            loading={dataLoading}
+          />
+        )}
+      </Box>
       <Dialog
         open={open}
         onClose={handleCloseDialog}
         TransitionComponent={Transition}
+        maxWidth="sm"
+        fullWidth
         keepMounted
       >
-        <DialogTitle sx={{ textAlign: "center" }}>
+        <DialogTitle>
           {isEditMode ? "Edit Teacher" : "Add Teacher"}
           <IconButton
             aria-label="close"
@@ -275,122 +340,122 @@ const Teachers = () => {
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent sx={{ maxWidth: 300 }}>
-          <Grid sx={{ mt: 1 }} container spacing={2} alignItems="center">
-            <Grid item xs={12} sm={12}>
-              <TextField
-                label="Phone Number"
-                name="phoneNumber"
-                size="small"
-                placeholder="442446786"
-                value={form.phoneNumber}
-                onChange={handleFormChange}
-                error={!!formErrors.phoneNumber}
-                helperText={formErrors.phoneNumber}
-                fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <FormControl variant="standard" size="small" sx={{ marginRight: 1 }}>
-                        <Select
-                          value={form.countryCode}
-                          onChange={handleCountryCodeChange}
-                          input={<InputBase />}
-                          sx={{
-                            minWidth: 70,
-                            "& .MuiSelect-select": {
-                              paddingLeft: 0,
-                            },
-                            "& .MuiSelect-icon": {
-                              display: 'none', // Hide the dropdown icon if needed
-                            },
-                            "& .MuiOutlinedInput-notchedOutline": {
-                              border: 'none', // Remove the border
-                            },
-                          }}
-                        >
-                          {countryCodes.map((code) => (
-                            <MenuItem key={code} value={code}>
-                              {code}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
+        <DialogContent sx={{ minHeight: "400px" }}>
+          <Stack spacing={2} sx={{ mt: 1 }}>
+            <TextField
+              label="Phone Number"
+              name="phoneNumber"
+              placeholder="442446786"
+              value={form.phoneNumber}
+              onChange={handleFormChange}
+              error={!!formErrors.phoneNumber}
+              helperText={formErrors.phoneNumber}
+              fullWidth
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <FormControl
+                      variant="standard"
+                      size="small"
+                      sx={{ marginRight: 1 }}
+                    >
+                      <Select
+                        value={form.countryCode}
+                        onChange={handleCountryCodeChange}
+                        input={<InputBase />}
+                        sx={{
+                          minWidth: 70,
+                          "& .MuiSelect-select": {
+                            paddingLeft: 0,
+                          },
+                          "& .MuiSelect-icon": {
+                            display: "none", // Hide the dropdown icon if needed
+                          },
+                          "& .MuiOutlinedInput-notchedOutline": {
+                            border: "none", // Remove the border
+                          },
+                        }}
+                      >
+                        {countryCodes.map((code) => (
+                          <MenuItem key={code} value={code}>
+                            {code}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </InputAdornment>
+                ),
+              }}
+            />
 
-            <Grid item xs={12} sm={12}>
-              <TextField
-                label="Name"
-                name="name"
-                size="small"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Person />
-                    </InputAdornment>
-                  ),
-                }}
-                value={form.name}
-                onChange={handleFormChange}
-                error={!!formErrors.name}
-                helperText={formErrors.name}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12} sm={12}>
-              <TextField
-                label="Email"
-                name="email"
-                size="small"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Email />
-                    </InputAdornment>
-                  ),
-                }}
-                value={form.email}
-                onChange={handleFormChange}
-                error={!!formErrors.email}
-                helperText={formErrors.email}
-                fullWidth
-              />
-            </Grid>
+            <TextField
+              label="Name"
+              name="name"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Person />
+                  </InputAdornment>
+                ),
+              }}
+              value={form.name}
+              onChange={handleFormChange}
+              error={!!formErrors.name}
+              helperText={formErrors.name}
+              fullWidth
+            />
+
+            <TextField
+              label="Email"
+              name="email"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Email />
+                  </InputAdornment>
+                ),
+              }}
+              value={form.email}
+              onChange={handleFormChange}
+              error={!!formErrors.email}
+              helperText={formErrors.email}
+              fullWidth
+            />
+
             {!isEditMode && (
-              <Grid item xs={12} sm={12}>
-                <FormControl fullWidth variant="outlined" size="small">
-                  <InputLabel>Madrasa</InputLabel>
-                  <Select
-                    label="Madrasa"
-                    name="madrasa"
-                    value={form.madrasa}
-                    onChange={handleFormChange}
-                    error={!!formErrors.madrasa}
-                  >
-                    {madrasas.map((madrasa) => (
-                      <MenuItem key={madrasa.id} value={madrasa.id}>
-                        {madrasa.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  {formErrors.madrasa && (
-                    <p style={{ color: "red" }}>{formErrors.madrasa}</p>
-                  )}
-                </FormControl>
-              </Grid>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel>Madrasa</InputLabel>
+                <Select
+                  label="Madrasa"
+                  name="madrasa"
+                  value={form.madrasa}
+                  onChange={handleFormChange}
+                  error={!!formErrors.madrasa}
+                >
+                  {madrasas.map((madrasa) => (
+                    <MenuItem key={madrasa.id} value={madrasa.id}>
+                      {madrasa.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {formErrors.madrasa && (
+                  <p style={{ color: "red" }}>{formErrors.madrasa}</p>
+                )}
+              </FormControl>
             )}
-          </Grid>
+          </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} color="primary" variant="outlined">
+          <Button onClick={handleCloseDialog} color="secondary">
             Cancel
           </Button>
-          <Button onClick={handleSubmit} color="primary" variant="contained">
-            {loading ? <CircularProgress size={24} /> : "Save"}
+          <Button
+            onClick={handleSubmit}
+            disabled={loading}
+            startIcon={loading ? <CircularProgress size={20} /> : null}
+            color="primary"
+          >
+            {isEditMode ? "Save Teacher" : "Add Teacher"}
           </Button>
         </DialogActions>
       </Dialog>

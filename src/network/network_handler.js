@@ -1,10 +1,11 @@
 import axios from "axios";
 
-// export const host = "http://127.0.0.1:8000"; 
-export const host = "https://objects.ummah-app.com";
+export const host = "http://127.0.0.1:8000"; 
+// export const host = "https://objects.ummah-app.com";
 
 const baseUrls = {
   landing: `${host}/landing/api`,
+  landingv2: `${host}/landing/api/v2`,
   masjid: `${host}/masjid/api`,
   madrasa: `${host}/madrasa/api`,
   faq: `${host}/faq/api`,
@@ -266,7 +267,7 @@ class NetworkHandler {
     };
 
     try {
-      const response = await this.axiosInstance.get(url, { headers });
+      const response = await this.axiosInstance.get(url, {baseURL: baseUrls.landingv2, headers });
       return response.data;
     } catch (error) {
       throw error;

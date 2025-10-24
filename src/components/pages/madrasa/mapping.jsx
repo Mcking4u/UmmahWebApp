@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   DataGrid,
   GridToolbarContainer,
   GridToolbarFilterButton,
-} from '@mui/x-data-grid';
+} from "@mui/x-data-grid";
 import {
   Container,
   MenuItem,
@@ -24,22 +24,37 @@ import {
   TableRow,
   Paper,
   Typography,
-} from '@mui/material';
-import NetworkHandler from '../../../network/network_handler';
-import { ViewArray } from '@mui/icons-material';
-import withNavUpdate from '../../wrappers/with_nav_update';
+  CircularProgress,
+  Slide,
+  IconButton,
+} from "@mui/material";
+import NetworkHandler from "../../../network/network_handler";
+import { ViewArray, Close } from "@mui/icons-material";
+import withNavUpdate from "../../wrappers/with_nav_update";
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="left" ref={ref} {...props} />;
+});
 
 const TeachersMapping = () => {
   const [data, setData] = useState([]);
   const [madrasas, setMadrasas] = useState([]);
-  const [selectedMadrasa, setSelectedMadrasa] = useState('');
+  const [selectedMadrasa, setSelectedMadrasa] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedStudents, setSelectedStudents] = useState([]);
+  const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await new NetworkHandler().getAssignedStudents();
-      setMadrasas(response.madrasas);
+      try {
+        setDataLoading(true);
+        const response = await new NetworkHandler().getAssignedStudents();
+        setMadrasas(response.madrasas);
+      } catch (error) {
+        console.error("Error fetching assigned students:", error);
+      } finally {
+        setDataLoading(false);
+      }
     };
     fetchData();
   }, []);
@@ -81,14 +96,20 @@ const TeachersMapping = () => {
   };
 
   const columns = [
-    { field: 'username', headerName: 'Username', width: 150, flex: 1, minWidth: 150 },
-    { field: 'name', headerName: 'Name', width: 150, flex: 1 },
-    { field: 'email', headerName: 'Email', width: 200, flex: 1 },
     {
-      field: 'actions',
-      headerName: 'Actions',
+      field: "username",
+      headerName: "Username",
       width: 150,
-      flex: .8,
+      flex: 1,
+      minWidth: 150,
+    },
+    { field: "name", headerName: "Name", width: 150, flex: 1 },
+    { field: "email", headerName: "Email", width: 200, flex: 1 },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 150,
+      flex: 0.8,
       renderCell: (params) => (
         <Button
           variant="contained"
@@ -105,39 +126,88 @@ const TeachersMapping = () => {
   ];
 
   return (
-    <div>
-      <FormControl sx={{ minWidth: 200, marginRight: 2 }}>
-        <InputLabel id="madrasa-select-label">Filter by Madrasa</InputLabel>
-        <Select
-          labelId="madrasa-select-label"
-          id="madrasa-select"
-          value={selectedMadrasa}
-          label="Filter by Madrasa"
-          onChange={(e) => setSelectedMadrasa(e.target.value)}
-        >
-          <MenuItem value="">
-            <em>None</em>
-          </MenuItem>
-          {madrasas.map((madrasa, index) => (
-            <MenuItem key={index} value={madrasa.name}>
-              {madrasa.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <Box sx={{ height: 400, width: '100%', mt: 2 }}>
-        <DataGrid
-          rows={data}
-          columns={columns}
-          pageSize={5}
-          rowsPerPageOptions={[5]}
-          getRowId={(row) => row.id}
-        />
+    <Box
+      sx={{
+        height: "90vh",
+        display: "flex",
+        flexDirection: "column",
+        minHeight: 0,
+      }}
+    >
+      {!dataLoading && (
+        <Box sx={{ width: "100%", flexShrink: 0, mb: 2 }}>
+          <FormControl sx={{ minWidth: 200 }}>
+            <InputLabel id="madrasa-select-label">Filter by Madrasa</InputLabel>
+            <Select
+              labelId="madrasa-select-label"
+              id="madrasa-select"
+              value={selectedMadrasa}
+              label="Filter by Madrasa"
+              size="small"
+              onChange={(e) => setSelectedMadrasa(e.target.value)}
+            >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              {madrasas.map((madrasa, index) => (
+                <MenuItem key={index} value={madrasa.name}>
+                  {madrasa.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+      )}
+
+      <Box
+        sx={{
+          flex: 1,
+          width: "100%",
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        {dataLoading ? (
+          <Box
+            sx={{
+              height: "100%",
+              width: "100%",
+              flex: 1,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        ) : (
+          <DataGrid
+            rows={data}
+            columns={columns}
+            pageSize={10}
+            rowsPerPageOptions={[5, 10, 20, 50]}
+            autoHeight={false}
+            sx={{
+              height: "100%",
+              width: "100%",
+              flex: 1,
+              minHeight: 0,
+            }}
+            loading={dataLoading}
+            getRowId={(row) => row.id}
+          />
+        )}
       </Box>
-      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
-        <DialogTitle>Students</DialogTitle>
-        <DialogContent>
-          <TableContainer component={Paper}>
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        TransitionComponent={Transition}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogContent sx={{ minHeight: "400px" }}>
+          <TableContainer>
             <Table>
               <TableHead>
                 <TableRow>
@@ -159,12 +229,12 @@ const TeachersMapping = () => {
           </TableContainer>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} color="primary">
+          <Button onClick={handleCloseDialog} color="secondary">
             Close
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </Box>
   );
 };
 
