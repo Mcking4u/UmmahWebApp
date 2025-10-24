@@ -434,7 +434,7 @@ class NetworkHandler {
     };
 
     try {
-      const response = await this.axiosInstance.get(url, { headers });
+      const response = await this.axiosInstance.get(url, {baseURL: baseUrls.landingv2, headers });
       return response.data;
     } catch (error) {
       throw error;
