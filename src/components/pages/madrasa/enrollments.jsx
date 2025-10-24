@@ -17,6 +17,10 @@ import {
   Avatar,
   IconButton,
   Box,
+  CircularProgress,
+  Stack,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import NetworkHandler from "../../../network/network_handler";
 import withNavUpdate from "../../wrappers/with_nav_update";
@@ -26,11 +30,12 @@ import {
   RemoveRedEye,
   School,
   PersonRemove,
+  Close,
 } from "@mui/icons-material";
 import ReplayIcon from "@mui/icons-material/Replay";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
+  return <Slide direction="left" ref={ref} {...props} />;
 });
 
 const EnrollmentDataGrid = () => {
@@ -65,9 +70,12 @@ const EnrollmentDataGrid = () => {
     enrolled_comment: "",
   });
   const [showInfo, setShowInfo] = useState(false);
+  const [dataLoading, setDataLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState(0);
 
   async function fetchData() {
     try {
+      setDataLoading(true);
       const response = await new NetworkHandler().getMadrasaEnrollments();
       setMadrasas(response.madrasas);
       setSelectedMadrasa(response.madrasas[0].name);
@@ -87,6 +95,8 @@ const EnrollmentDataGrid = () => {
       setPrograms(res.programs);
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      setDataLoading(false);
     }
   }
 
@@ -124,6 +134,10 @@ const EnrollmentDataGrid = () => {
 
   const handleMadrasaChange = (event) => {
     setSelectedMadrasa(event.target.value);
+  };
+
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
   };
 
   const handleOpenApproveDialog = (studentId) => {
@@ -474,93 +488,189 @@ const EnrollmentDataGrid = () => {
   }));
 
   return (
-    <div>
-      <FormControl
-        variant="outlined"
-        style={{ marginBottom: "20px", minWidth: 200 }}
+    <Box
+      sx={{
+        height: "90vh",
+        display: "flex",
+        flexDirection: "column",
+        minHeight: 0,
+      }}
+    >
+      {!dataLoading && (
+        <Box sx={{ width: "100%", flexShrink: 0, mb: 2 }}>
+          <FormControl variant="outlined" sx={{ minWidth: 200 }}>
+            <InputLabel id="madrasa-select-label">Filter by Madrasa</InputLabel>
+            <Select
+              labelId="madrasa-select-label"
+              id="madrasa-select"
+              value={selectedMadrasa}
+              onChange={handleMadrasaChange}
+              label="Filter by Madrasa"
+              size="small"
+            >
+              {madrasas.map((madrasa) => (
+                <MenuItem key={madrasa.name} value={madrasa.name}>
+                  {madrasa.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+      )}
+
+      <Box
+        sx={{
+          flex: 1,
+          width: "100%",
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
+        }}
       >
-        <InputLabel id="madrasa-select-label">Filter by Madrasa</InputLabel>
-        <Select
-          labelId="madrasa-select-label"
-          id="madrasa-select"
-          value={selectedMadrasa}
-          onChange={handleMadrasaChange}
-          label="Filter by Madrasa"
-        >
-          {madrasas.map((madrasa) => (
-            <MenuItem key={madrasa.name} value={madrasa.name}>
-              {madrasa.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+        {dataLoading ? (
+          <Box
+            sx={{
+              height: "100%",
+              width: "100%",
+              flex: 1,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        ) : (
+          <Box
+            sx={{ height: "100%", display: "flex", flexDirection: "column" }}
+          >
+            <Tabs
+              value={activeTab}
+              onChange={handleTabChange}
+              sx={{ borderBottom: 1, borderColor: "divider", flexShrink: 0 }}
+            >
+              <Tab
+                label={`Pending Enrollments (${rows.length})`}
+                sx={{ textTransform: "none" }}
+              />
+              <Tab
+                label={`Completed Enrollments (${completedRows.length})`}
+                sx={{ textTransform: "none" }}
+              />
+              <Tab
+                label={`Rejected Enrollments (${rejectedRows.length})`}
+                sx={{ textTransform: "none" }}
+              />
+            </Tabs>
 
-      <div style={{ height: 400, width: "100%", marginBottom: "20px" }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          pageSize={5}
-          disableSelectionOnClick
-        />
-      </div>
+            <Box sx={{ flex: 1, minHeight: 0, mt: 2 }}>
+              {activeTab === 0 && (
+                <DataGrid
+                  rows={rows}
+                  columns={columns}
+                  pageSize={10}
+                  rowsPerPageOptions={[5, 10, 20, 50]}
+                  autoHeight={false}
+                  sx={{
+                    height: "100%",
+                    width: "100%",
+                    minHeight: 0,
+                  }}
+                  loading={dataLoading}
+                  disableSelectionOnClick
+                />
+              )}
 
-      <div style={{ height: 400, width: "100%", marginBottom: "20px" }}>
-        <DataGrid
-          rows={completedRows}
-          columns={completedColumns}
-          pageSize={5}
-          disableSelectionOnClick
-        />
-      </div>
+              {activeTab === 1 && (
+                <DataGrid
+                  rows={completedRows}
+                  columns={completedColumns}
+                  pageSize={10}
+                  rowsPerPageOptions={[5, 10, 20, 50]}
+                  autoHeight={false}
+                  sx={{
+                    height: "100%",
+                    width: "100%",
+                    minHeight: 0,
+                  }}
+                  loading={dataLoading}
+                  disableSelectionOnClick
+                />
+              )}
 
-      <div style={{ height: 400, width: "100%", marginBottom: "20px" }}>
-        <DataGrid
-          rows={rejectedRows}
-          columns={rejectedColumns}
-          pageSize={5}
-          disableSelectionOnClick
-        />
-      </div>
+              {activeTab === 2 && (
+                <DataGrid
+                  rows={rejectedRows}
+                  columns={rejectedColumns}
+                  pageSize={10}
+                  rowsPerPageOptions={[5, 10, 20, 50]}
+                  autoHeight={false}
+                  sx={{
+                    height: "100%",
+                    width: "100%",
+                    minHeight: 0,
+                  }}
+                  loading={dataLoading}
+                  disableSelectionOnClick
+                />
+              )}
+            </Box>
+          </Box>
+        )}
+      </Box>
 
       <Dialog
         open={openApproveDialog}
         TransitionComponent={Transition}
         keepMounted
         onClose={handleCloseApproveDialog}
+        maxWidth="sm"
+        fullWidth
       >
-        {allRows.find((row) => row.id === selectedStudentId) && (
-          <DialogTitle>
-            Assign Teachers for program -{" "}
-            {allRows.find((row) => row.id === selectedStudentId).program.name}{" "}
-          </DialogTitle>
-        )}
+        <DialogTitle>
+          {allRows.find((row) => row.id === selectedStudentId) && (
+            <>
+              Assign Teachers for program -{" "}
+              {allRows.find((row) => row.id === selectedStudentId).program.name}
+            </>
+          )}
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseApproveDialog}
+            sx={{ position: "absolute", right: 8, top: 8 }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
 
-        <DialogContent sx={{ minWidth: 400 }}>
-          {allRows
-            .find((row) => row.id === selectedStudentId)
-            ?.program_sessions.map((session) => (
-              <Box key={session.id}>
-                <Typography component="div" variant="h6">
-                  {session.name}
-                </Typography>
-                <FormControl fullWidth margin="normal" sx={{ mt: 1, pt: 0 }}>
-                  <InputLabel>Select teacher for {session.name}</InputLabel>
-                  <Select
-                    value={selectedSessions[session.id] || ""}
-                    label={`Select teacher for ${session.name}`}
-                    onChange={(e) =>
-                      handleSessionTeacherChange(session.id, e.target.value)
-                    }
-                  >
-                    {session.teachers.map((teacher) => (
-                      <MenuItem key={teacher.id} value={teacher.id}>
-                        {teacher.profile.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Box>
-            ))}
+        <DialogContent sx={{ minHeight: "400px" }}>
+          <Stack spacing={2} sx={{ mt: 1 }}>
+            {allRows
+              .find((row) => row.id === selectedStudentId)
+              ?.program_sessions.map((session) => (
+                <Box key={session.id}>
+                  <Typography component="div" variant="h6" sx={{ mb: 1 }}>
+                    {session.name}
+                  </Typography>
+                  <FormControl fullWidth>
+                    <InputLabel>Select teacher for {session.name}</InputLabel>
+                    <Select
+                      value={selectedSessions[session.id] || ""}
+                      label={`Select teacher for ${session.name}`}
+                      onChange={(e) =>
+                        handleSessionTeacherChange(session.id, e.target.value)
+                      }
+                    >
+                      {session.teachers.map((teacher) => (
+                        <MenuItem key={teacher.id} value={teacher.id}>
+                          {teacher.profile.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Box>
+              ))}
+          </Stack>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseApproveDialog} color="secondary">
@@ -570,6 +680,7 @@ const EnrollmentDataGrid = () => {
             onClick={handleApprove}
             disabled={approveLoading}
             color="primary"
+            startIcon={approveLoading ? <CircularProgress size={20} /> : null}
           >
             Approve
           </Button>
@@ -581,9 +692,20 @@ const EnrollmentDataGrid = () => {
         TransitionComponent={Transition}
         keepMounted
         onClose={handleInfoClose}
+        maxWidth="sm"
+        fullWidth
       >
-        <DialogTitle>More Info</DialogTitle>
-        <DialogContent sx={{ minWidth: 400 }}>
+        <DialogTitle>
+          More Info
+          <IconButton
+            aria-label="close"
+            onClick={handleInfoClose}
+            sx={{ position: "absolute", right: 8, top: 8 }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ minHeight: "400px" }}>
           <Grid container spacing={2}>
             <Grid item xs={12} align="start">
               <Avatar
@@ -664,7 +786,7 @@ const EnrollmentDataGrid = () => {
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleInfoClose} color="primary">
+          <Button onClick={handleInfoClose} color="secondary">
             Close
           </Button>
         </DialogActions>
@@ -675,28 +797,41 @@ const EnrollmentDataGrid = () => {
         TransitionComponent={Transition}
         keepMounted
         onClose={handleReassignProgramClose}
+        maxWidth="sm"
+        fullWidth
       >
-        <DialogTitle>Reassign Program</DialogTitle>
-        <DialogContent>
-          <FormControl fullWidth sx={{ mt: 1 }}>
-            <InputLabel>Select Program</InputLabel>
-            <Select
-              value={reassignProgram.program_id}
-              label="Select Program"
-              onChange={(e) => {
-                const reassignProgram_ = { ...reassignProgram };
-                reassignProgram_.program_id = e.target.value;
-                setReassignProgram(reassignProgram_);
-              }}
-            >
-              {filteredPrograms.length > 0 &&
-                filteredPrograms.map((program) => (
-                  <MenuItem key={program.id} value={program.id}>
-                    {program.name}
-                  </MenuItem>
-                ))}
-            </Select>
-          </FormControl>
+        <DialogTitle>
+          Reassign Program
+          <IconButton
+            aria-label="close"
+            onClick={handleReassignProgramClose}
+            sx={{ position: "absolute", right: 8, top: 8 }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ minHeight: "400px" }}>
+          <Stack spacing={2} sx={{ mt: 1 }}>
+            <FormControl fullWidth>
+              <InputLabel>Select Program</InputLabel>
+              <Select
+                value={reassignProgram.program_id}
+                label="Select Program"
+                onChange={(e) => {
+                  const reassignProgram_ = { ...reassignProgram };
+                  reassignProgram_.program_id = e.target.value;
+                  setReassignProgram(reassignProgram_);
+                }}
+              >
+                {filteredPrograms.length > 0 &&
+                  filteredPrograms.map((program) => (
+                    <MenuItem key={program.id} value={program.id}>
+                      {program.name}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+          </Stack>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleReassignProgramClose} color="secondary">
@@ -706,6 +841,7 @@ const EnrollmentDataGrid = () => {
             onClick={handleReassign}
             disabled={reassignLoading}
             color="primary"
+            startIcon={reassignLoading ? <CircularProgress size={20} /> : null}
           >
             Reassign
           </Button>
@@ -717,18 +853,31 @@ const EnrollmentDataGrid = () => {
         TransitionComponent={Transition}
         keepMounted
         onClose={handleCloseRejectDialog}
+        maxWidth="sm"
+        fullWidth
       >
-        <DialogTitle>Reject Enrollment</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Reason for Rejection"
-            multiline
-            rows={4}
-            variant="outlined"
-            fullWidth
-            value={rejectReason}
-            onChange={(e) => setRejectReason(e.target.value)}
-          />
+        <DialogTitle>
+          Reject Enrollment
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseRejectDialog}
+            sx={{ position: "absolute", right: 8, top: 8 }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ minHeight: "400px" }}>
+          <Stack spacing={2} sx={{ mt: 1 }}>
+            <TextField
+              label="Reason for Rejection"
+              multiline
+              rows={4}
+              variant="outlined"
+              fullWidth
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+            />
+          </Stack>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseRejectDialog} color="secondary">
@@ -745,9 +894,20 @@ const EnrollmentDataGrid = () => {
         TransitionComponent={Transition}
         keepMounted
         onClose={handleCloseDeEnrollDialog}
+        maxWidth="sm"
+        fullWidth
       >
-        <DialogTitle>Confirm De-Enrollment</DialogTitle>
-        <DialogContent>
+        <DialogTitle>
+          Confirm De-Enrollment
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseDeEnrollDialog}
+            sx={{ position: "absolute", right: 8, top: 8 }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ minHeight: "400px" }}>
           <Typography>
             Are you sure you want to de-enroll this student? This action cannot
             be undone.
@@ -762,7 +922,7 @@ const EnrollmentDataGrid = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </Box>
   );
 };
 
