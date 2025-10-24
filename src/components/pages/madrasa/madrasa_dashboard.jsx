@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Card, Typography, Grid, Box, Skeleton, alpha } from "@mui/material";
 import PeopleIcon from "@mui/icons-material/People";
-import { Mosque, SchoolSharp } from "@mui/icons-material";
+import {
+  Mosque,
+  SchoolSharp,
+  MenuBook,
+  Schedule,
+  PendingActions,
+} from "@mui/icons-material";
 // --- Restored original imports ---
 import NetworkHandler from "../../../network/network_handler";
 import withNavUpdate from "../../wrappers/with_nav_update";
@@ -74,6 +80,9 @@ const Dashboard = () => {
     total_teachers: 0,
     total_madrasas: 0,
     total_students: 0,
+    total_programs: 0,
+    total_sessions: 0,
+    pending_enrolls: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -117,6 +126,27 @@ const Dashboard = () => {
       color: "warning.main",
       bgColor: (theme) => alpha(theme.palette.warning.main, 0.1),
     },
+    {
+      icon: <MenuBook />,
+      number: data.total_programs,
+      text: "Total Programs",
+      color: "info.main",
+      bgColor: (theme) => alpha(theme.palette.info.main, 0.1),
+    },
+    {
+      icon: <Schedule />,
+      number: data.total_sessions,
+      text: "Total Sessions",
+      color: "secondary.main",
+      bgColor: (theme) => alpha(theme.palette.secondary.main, 0.1),
+    },
+    {
+      icon: <PendingActions />,
+      number: data.pending_enrolls,
+      text: "Pending Enrollments",
+      color: "error.main",
+      bgColor: (theme) => alpha(theme.palette.error.main, 0.1),
+    },
   ];
 
   return (
@@ -135,7 +165,7 @@ const Dashboard = () => {
       <Grid container spacing={3}>
         {isLoading
           ? // --- SKELETON STATE ---
-            [1, 2, 3].map((n) => (
+            [1, 2, 3, 4, 5, 6].map((n) => (
               <Grid item xs={12} sm={6} md={4} key={n}>
                 <StatCardSkeleton />
               </Grid>

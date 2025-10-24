@@ -404,6 +404,26 @@ class NetworkHandler {
       throw error;
     }
   }
+
+  async getMadrasaStudents() {
+    const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
+    const url = "/ummah/list-students";
+
+    const headers = {
+      Authorization: `Token ${authToken}`,
+      Accept: "application/json, text/plain, */*",
+    };
+
+    try {
+      const response = await this.axiosInstance.get(url, {baseURL: baseUrls.landingv2, headers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
+
   async getMadrasaEnrollments() {
     const authToken = localStorage.getItem(NetworkHandler.loginTokenKey);
     const url = "/ummah/get-enrollments";

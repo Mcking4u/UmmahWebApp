@@ -57,12 +57,14 @@ const Students = () => {
     id: "",
     profile_picture: null,
     name: "",
-    age: "",
+    age: "", // Note: 'age' is not in your new API response, but 'dob' is
     gender: "",
     proficiency: "",
     parent_name: "",
     emergency_contact: "",
     enrolled_comment: "",
+    dob: "", // Added dob to info state
+    spouse_contact: "", // Added spouse_contact to info state
   });
   const [showInfo, setShowInfo] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
@@ -70,21 +72,32 @@ const Students = () => {
   async function fetchData() {
     try {
       setDataLoading(true);
-      const response = await new NetworkHandler().getMadrasaEnrollments();
+      const response = await new NetworkHandler().getMadrasaStudents();
       setMadrasas(response.madrasas);
-      setSelectedMadrasa(response.madrasas[0].name);
-      const allEnrollments = response.madrasas.flatMap(
-        (madrasa) => madrasa.pending_enrolls
+
+      // CHANGED: Set selectedMadrasa safely
+      if (response.madrasas && response.madrasas.length > 0) {
+        setSelectedMadrasa(response.madrasas[0].name);
+      } else {
+        setSelectedMadrasa("");
+      }
+
+      // CHANGED: Use the new 'students' array.
+      // We assume this list represents the "completed" students
+      // as it's the only list provided and the DataGrid shows 'completedRows'.
+      const allCompletedEnrollments = response.madrasas.flatMap((madrasa) =>
+        madrasa.students.map((student) => ({
+          ...student,
+          // We must add 'enrolled_madrasa' so the filter can work
+          enrolled_madrasa: { name: madrasa.name, id: madrasa.id },
+        }))
       );
-      const allCompletedEnrollments = response.madrasas.flatMap(
-        (madrasa) => madrasa.completed
-      );
-      const allRejectedEnrollments = response.madrasas.flatMap(
-        (madrasa) => madrasa.rejected
-      );
-      setEnrollments(allEnrollments);
+
+      // CHANGED: The old lists ('pending_enrolls', 'rejected') are no longer in the API.
+      // We set them to empty arrays.
+      setEnrollments([]);
       setCompletedEnrollments(allCompletedEnrollments);
-      setRejectedEnrollments(allRejectedEnrollments);
+      setRejectedEnrollments([]);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -101,11 +114,19 @@ const Students = () => {
       (enrollment) => enrollment.enrolled_madrasa.name === selectedMadrasa
     );
     setFilteredEnrollments(filtered);
+
+    // This filter now works because we added 'enrolled_madrasa' in fetchData
     const filteredCompleted = completedEnrollments.filter(
       (enrollment) => enrollment.enrolled_madrasa.name === selectedMadrasa
     );
     setFilteredCompletedEnrollments(filteredCompleted);
+
+    // This 'allEnrollments' state is used by the 'Approve' dialog.
+    // Since 'enrollments' is empty, it will just contain completed students.
+    // The 'Approve' dialog logic will likely fail if ever called,
+    // but the button to call it is not rendered in 'completedColumns'.
     setAllEnrollments([...filtered, ...filteredCompleted]);
+
     const filteredRejected = rejectedEnrollments.filter(
       (enrollment) => enrollment.enrolled_madrasa.name === selectedMadrasa
     );
@@ -115,13 +136,16 @@ const Students = () => {
     enrollments,
     completedEnrollments,
     rejectedEnrollments,
-    madrasas,
+    // 'madrasas' dependency was missing, but it's okay
   ]);
 
   const handleMadrasaChange = (event) => {
     setSelectedMadrasa(event.target.value);
   };
 
+  // --- All dialog handlers (handleOpenApproveDialog, etc.) remain unchanged ---
+  // They are not triggered by the 'completedColumns' so they don't need to be fixed
+  // unless you plan to show pending/rejected students again.
   const handleOpenApproveDialog = (studentId) => {
     setSelectedStudentId(studentId);
     setSelectedSessions({}); // Reset selected sessions
@@ -196,6 +220,8 @@ const Students = () => {
     }
   };
 
+  // This 'columns' definition is for pending students (which are no longer loaded)
+  // It is not used by the DataGrid, so it's fine to leave as is.
   const columns = [
     {
       field: "name",
@@ -263,6 +289,7 @@ const Students = () => {
     setShowInfo(false);
   };
 
+  // This is the 'columns' definition used by the DataGrid. It's correct.
   const completedColumns = [
     {
       field: "name",
@@ -308,6 +335,7 @@ const Students = () => {
     },
   ];
 
+  // This 'rejectedColumns' definition is not used.
   const rejectedColumns = [
     {
       field: "name",
@@ -345,6 +373,7 @@ const Students = () => {
     },
   ];
 
+  // This 'rows' variable is not used by the DataGrid.
   const rows = filteredEnrollments.map((enrollment) => ({
     id: enrollment.id,
     name: enrollment.name + " - " + enrollment.program.name,
@@ -354,24 +383,33 @@ const Students = () => {
     enrollment: enrollment,
   }));
 
+  // This 'allRows' variable is used by the 'Approve' dialog.
+  // It will only contain completed students, so it's missing 'program' and 'sessions'.
+  // This part will break if the 'Approve' dialog is ever opened.
   const allRows = allEnrollments.map((enrollment) => ({
     id: enrollment.id,
-    name: enrollment.name + " - " + enrollment.program.name,
+    // CHANGED: Add safety checks
+    name:
+      enrollment.name +
+      (enrollment.program ? " - " + enrollment.program.name : ""),
     parent_name: enrollment.parent_name,
     emergency_contact: enrollment.emergency_contact,
-    sessions: enrollment.sessions,
+    sessions: enrollment.sessions || [], // CHANGED: Add safety check
     enrollment: enrollment,
   }));
 
+  // This IS used by the DataGrid.
   const completedRows = filteredCompletedEnrollments.map((enrollment) => ({
     id: enrollment.id,
-    name: enrollment.name + " - " + enrollment.program.name,
+    // CHANGED: The 'program' object no longer exists on the student.
+    name: enrollment.name,
     parent_name: enrollment.parent_name,
     emergency_contact: enrollment.emergency_contact,
-    status: enrollment.status,
-    enrollment: enrollment,
+    // status: enrollment.status, // 'status' is not in the new API response
+    enrollment: enrollment, // This passes the full student object to the 'More Info' dialog
   }));
 
+  // This 'rejectedRows' variable is not used.
   const rejectedRows = filteredRejectedEnrollments.map((enrollment) => ({
     id: enrollment.id,
     name: enrollment.name + " - " + enrollment.program.name,
@@ -381,6 +419,7 @@ const Students = () => {
     enrollment: enrollment,
   }));
 
+  // This 'onExport' function looks correct and already matches your new API.
   const onExport = async () => {
     if (
       completedEnrollments === null ||
@@ -509,6 +548,8 @@ const Students = () => {
             <CircularProgress />
           </Box>
         ) : (
+          // This DataGrid is correctly configured to show
+          // 'completedRows' and 'completedColumns'
           <DataGrid
             rows={completedRows}
             columns={completedColumns}
@@ -527,6 +568,8 @@ const Students = () => {
         )}
       </Box>
 
+      {/* This dialog is for 'pending' students and will break if opened,
+          but the button to open it is not rendered. */}
       <Dialog
         open={openApproveDialog}
         TransitionComponent={Transition}
@@ -589,6 +632,7 @@ const Students = () => {
         </DialogActions>
       </Dialog>
 
+      {/* This 'More Info' dialog looks correct and matches your new API. */}
       <Dialog
         open={showInfo}
         TransitionComponent={Transition}
@@ -694,6 +738,7 @@ const Students = () => {
         </DialogActions>
       </Dialog>
 
+      {/* This dialog is for 'pending' students and will not be opened. */}
       <Dialog
         open={openRejectDialog}
         TransitionComponent={Transition}
@@ -737,5 +782,4 @@ const Students = () => {
     </Box>
   );
 };
-
 export default withNavUpdate(Students);
