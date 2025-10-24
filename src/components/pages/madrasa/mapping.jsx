@@ -50,6 +50,10 @@ const TeachersMapping = () => {
         setDataLoading(true);
         const response = await new NetworkHandler().getAssignedStudents();
         setMadrasas(response.madrasas);
+        // Auto-select the first madrasa if available
+        if (response.madrasas && response.madrasas.length > 0) {
+          setSelectedMadrasa(response.madrasas[0].name);
+        }
       } catch (error) {
         console.error("Error fetching assigned students:", error);
       } finally {

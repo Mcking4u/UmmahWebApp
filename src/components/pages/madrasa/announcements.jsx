@@ -196,8 +196,17 @@ const Announcements = () => {
 
       setAnnouncements(allAnnouncements);
       setMadrasaNames(names);
-      setSelectedMadrasa("");
-      setFilteredAnnouncements(allAnnouncements);
+      // Auto-select the first madrasa if available
+      if (names.length > 0) {
+        setSelectedMadrasa(names[0]);
+        const filtered = allAnnouncements.filter(
+          (announcement) => announcement.madrasaName === names[0]
+        );
+        setFilteredAnnouncements(filtered);
+      } else {
+        setSelectedMadrasa("");
+        setFilteredAnnouncements(allAnnouncements);
+      }
       setMadrasas(data.madrasas);
     } catch (error) {
       console.error("Error fetching announcements:", error);
@@ -214,14 +223,10 @@ const Announcements = () => {
     const selected = event.target.value;
     setSelectedMadrasa(selected);
 
-    if (selected === "") {
-      setFilteredAnnouncements(announcements);
-    } else {
-      const filtered = announcements.filter(
-        (announcement) => announcement.madrasaName === selected
-      );
-      setFilteredAnnouncements(filtered);
-    }
+    const filtered = announcements.filter(
+      (announcement) => announcement.madrasaName === selected
+    );
+    setFilteredAnnouncements(filtered);
   };
 
   const handleDialogOpen = () => {
@@ -271,7 +276,6 @@ const Announcements = () => {
                   label="Select Madrasa"
                   size="small"
                 >
-                  <MenuItem value="">All</MenuItem>
                   {madrasaNames.map((name) => (
                     <MenuItem key={name} value={name}>
                       {name}
